@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate:local": "wrangler d1 execute ai-chronicle-db --local --file=./migrations/001_initial.sql",
-    "db:migrate:remote": "wrangler d1 execute ai-chronicle-db --remote --file=./migrations/001_initial.sql"
+    "db:migrate:remote": "wrangler d1 execute ai-chronicle-db --remote --file=./migrations/001_initial.sql",
+    "collect": "tsx scripts/collect-new-tools.ts",
+    "update-prices": "tsx scripts/update-prices.ts",
+    "debug-ph": "tsx scripts/debug-ph.ts"
   },
   "dependencies": {
     "next": "^15.5.15",
@@ -26,6 +29,8 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.15",
-    "wrangler": "^4.84.1"
+    "wrangler": "^4.84.1",
+    "tsx": "^4.19.2",
+    "dotenv": "^16.4.7"
   }
 }
