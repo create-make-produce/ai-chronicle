@@ -12,6 +12,9 @@ on:
     - cron: '0 3 * * 1'   # 毎週月曜UTC 03:00
   workflow_dispatch:       # 手動実行も可能
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   update:
     runs-on: ubuntu-latest
