@@ -1,0 +1,31 @@
+{
+  "name": "ai-chronicle",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:migrate:local": "wrangler d1 execute ai-chronicle-db --local --file=./migrations/001_initial.sql",
+    "db:migrate:remote": "wrangler d1 execute ai-chronicle-db --remote --file=./migrations/001_initial.sql"
+  },
+  "dependencies": {
+    "next": "^15.5.15",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "framer-motion": "^12.38.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "tailwindcss": "^3.4.19",
+    "postcss": "^8.5.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^15.5.15",
+    "wrangler": "^4.84.1"
+  }
+}

@@ -1,0 +1,31 @@
+# =============================================
+# AI Chronicle - Cloudflare Wrangler 設定
+# =============================================
+# データベース作成後に database_id を更新すること
+# 作成コマンド: wrangler d1 create ai-chronicle-db
+# =============================================
+
+name = "ai-chronicle"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages用設定
+pages_build_output_dir = ".vercel/output/static"
+
+# D1データベースバインディング
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-chronicle-db"
+database_id = "REPLACE_WITH_ACTUAL_DATABASE_ID"
+# ↑ wrangler d1 create ai-chronicle-db を実行して取得したIDに置き換える
+# ローカル開発用ID（migrationを実行すると自動生成される）
+
+# R2バケット（Phase 2以降に有効化）
+# [[r2_buckets]]
+# binding = "ASSETS"
+# bucket_name = "ai-chronicle-assets"
+
+# 環境変数（公開しても問題ないもののみ）
+[vars]
+# 本番環境のサイトURL
+NEXT_PUBLIC_SITE_URL = "https://ai-chronicle.com"
