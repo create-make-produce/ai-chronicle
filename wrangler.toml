@@ -16,7 +16,7 @@ pages_build_output_dir = ".vercel/output/static"
 [[d1_databases]]
 binding = "DB"
 database_name = "ai-chronicle-db"
-database_id = "REPLACE_WITH_ACTUAL_DATABASE_ID"
+database_id = "f6fecbd5-d72c-4b80-b4ae-42746a527583"
 # ↑ wrangler d1 create ai-chronicle-db を実行して取得したIDに置き換える
 # ローカル開発用ID（migrationを実行すると自動生成される）
 
