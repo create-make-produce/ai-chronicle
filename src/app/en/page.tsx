@@ -1,82 +1,56 @@
-import Link from "next/link";
-import type { Metadata } from "next";
+// src/app/en/page.tsx
+// Home page (English)
 
-export const metadata: Metadata = {
-  title: "AI Chronicle - AI Tools Database & Price Comparison",
+import HomeContent from '@/components/HomeContent';
+import {
+  getToolCount,
+  getLatestNews,
+  getRecentlyUpdatedTools,
+  getCategoriesWithCount,
+  getRecentPriceChanges,
+} from '@/lib/db';
+import { CONFIG } from '@/config';
+
+export const revalidate = 1800;
+
+export const metadata = {
+  title: 'AI Chronicle - AI Tools Pricing Database',
   description:
-    "Cross-compare AI tools, pricing, free plans, and latest news. Updated automatically.",
+    'Bilingual (JP/EN) AI tools pricing database. Accurate USD and Japan official prices, updated daily.',
 };
 
-/**
- * AI Chronicle - Top Page (English)
- *
- * Phase 1: Minimal page for setup verification.
- */
-export default function HomePageEn() {
+export default async function HomePageEn() {
+  const [toolCount, latestNews, newTools, categories, priceChangesRaw] = await Promise.all([
+    getToolCount(),
+    getLatestNews(CONFIG.NEWS_TOP_DISPLAY_COUNT),
+    getRecentlyUpdatedTools(9),
+    getCategoriesWithCount(),
+    getRecentPriceChanges(CONFIG.PRICE_CHANGE_ALERT_DAYS, 5),
+  ]);
+
+  const priceChanges = priceChangesRaw.map((p) => ({
+    tool_slug: p.tool_slug,
+    tool_name_ja: p.tool_name_ja,
+    tool_name_en: p.tool_name_en,
+    plan_name: p.plan_name,
+    price_usd: p.price_usd,
+    previous_price_usd: p.previous_price_usd,
+    price_trend: p.price_trend,
+    price_changed_at: p.price_changed_at,
+  }));
+
   return (
-    <main className="min-h-screen bg-bg">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/en" className="font-display text-2xl font-black tracking-tight">
-            AI CHRONICLE
-          </Link>
-          <nav className="flex items-center gap-6 text-sm">
-            <Link href="/en/tools" className="hover:text-accent transition-colors">
-              Tools
-            </Link>
-            <Link href="/en/news" className="hover:text-accent transition-colors">
-              News
-            </Link>
-            <Link href="/en/free" className="hover:text-accent transition-colors">
-              Free Tools
-            </Link>
-            <Link
-              href="/"
-              className="text-xs font-bold tracking-widest border border-border px-3 py-1 rounded hover:bg-text hover:text-bg transition-colors"
-            >
-              JP
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <p className="section-label mb-4">★ AI TOOLS DATABASE ★</p>
-        <h1 className="hero-heading text-5xl md:text-7xl mb-6">
-          Compare every<br />
-          AI tool. Instantly.
-        </h1>
-        <p className="text-text-sub text-lg max-w-2xl">
-          Pricing, features, free plans, and the latest news — bilingual,
-          automatically updated.
-        </p>
-
-        <div className="mt-10 inline-flex items-center gap-3 text-sm text-text-muted">
-          <span>🚧</span>
-          <span>Phase 1 in progress: foundation setup complete</span>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <p className="text-xs text-text-muted leading-relaxed">
-            Information about AI tools on this site including pricing, features,
-            and specifications is collected automatically and provided for
-            reference only. We do not guarantee the accuracy or completeness of
-            this information. Please verify current information on each tool's
-            official website.
-          </p>
-          <div className="mt-6 flex gap-6 text-xs text-text-sub">
-            <Link href="/about" className="hover:text-accent">About</Link>
-            <Link href="/privacy" className="hover:text-accent">Privacy</Link>
-            <Link href="/contact" className="hover:text-accent">Contact</Link>
-          </div>
-          <p className="mt-6 text-xs text-text-muted">© 2026 AI Chronicle</p>
-        </div>
-      </footer>
-    </main>
+    <HomeContent
+      locale="en"
+      stats={{
+        toolCount,
+        newToday: newTools.length,
+        recentlyUpdated: priceChanges.length,
+      }}
+      latestNews={latestNews}
+      newTools={newTools}
+      categories={categories}
+      priceChanges={priceChanges}
+    />
   );
 }

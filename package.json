@@ -1,36 +1,36 @@
 {
   "name": "ai-chronicle",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:migrate:local": "wrangler d1 execute ai-chronicle-db --local --file=./migrations/001_initial.sql",
-    "db:migrate:remote": "wrangler d1 execute ai-chronicle-db --remote --file=./migrations/001_initial.sql",
     "collect": "tsx scripts/collect-new-tools.ts",
-    "update-prices": "tsx scripts/update-prices.ts",
-    "debug-ph": "tsx scripts/debug-ph.ts"
+    "update-prices": "tsx scripts/update-prices.ts"
   },
   "dependencies": {
-    "next": "^15.5.15",
+    "@google/generative-ai": "^0.24.0",
+    "framer-motion": "^11.15.0",
+    "next": "^15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "framer-motion": "^12.38.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "@types/node": "^25.6.0",
-    "@types/react": "^19.0.7",
-    "@types/react-dom": "^19.0.3",
-    "tailwindcss": "^3.4.19",
-    "postcss": "^8.5.1",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.39.4",
-    "eslint-config-next": "^15.5.15",
-    "wrangler": "^4.84.1",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.1.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "postcss": "^8.4.49",
     "tsx": "^4.19.2",
-    "dotenv": "^16.4.7"
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
