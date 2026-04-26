@@ -53,10 +53,20 @@ export const CONFIG = {
   GEMINI_MAX_RETRIES: 3,
 
   // =============================================
+  // スクレイピング設定
+  // =============================================
+  SCRAPER_USER_AGENT: 'AI-Chronicle-Bot/1.0 (+https://ai-chronicle.com/about)',
+  SCRAPER_REQUEST_DELAY_MS: 3000,
+  SCRAPER_TIMEOUT_MS: 10000,
+  SCRAPER_MAX_RETRIES: 2,
+
+  // =============================================
   // ニュース設定
   // =============================================
   NEWS_GENERATE_ON_PRICE_CHANGE: true,
   NEWS_GENERATE_ON_NEW_TOOL: true,
+  NEWS_MIN_BODY_LENGTH: 200,
+
 } as const;
 
 export type Config = typeof CONFIG;
