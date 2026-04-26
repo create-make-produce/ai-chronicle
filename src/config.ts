@@ -25,12 +25,16 @@ export const CONFIG = {
   // =============================================
   // データ収集スクリプト用
   // =============================================
-  /** 1回の実行で新規登録する最大ツール数 */
   MAX_NEW_TOOLS_PER_RUN: 50,
-  /** 1回の実行で価格チェックする最大ツール数 */
   MAX_PRICE_CHECKS_PER_RUN: 50,
-  /** 自動公開する最低AIconfidenceスコア */
   MIN_AI_CONFIDENCE_TO_PUBLISH: 0.6,
+
+  // =============================================
+  // Product Hunt API
+  // =============================================
+  PRODUCT_HUNT_POSTS_PER_REQUEST: 50,
+  PRODUCT_HUNT_MIN_VOTES: 0,
+  PRODUCT_HUNT_DAILY_REQUEST_LIMIT: 80,
 
   // =============================================
   // AI プロバイダー設定
@@ -43,7 +47,7 @@ export const CONFIG = {
   AI_MAX_OUTPUT_TOKENS: 1024,
 
   // =============================================
-  // Gemini（後方互換用・AI_MODELと同じ値）
+  // Gemini（後方互換用）
   // =============================================
   GEMINI_MODEL: 'gemini-3.1-flash-lite-preview',
   GEMINI_MAX_RETRIES: 3,
