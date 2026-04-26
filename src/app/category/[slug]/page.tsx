@@ -13,20 +13,10 @@ import {
   getAllCategories,
 } from '@/lib/db';
 
-export const revalidate = 3600;
-
 interface Params {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  try {
-    const cats = await getAllCategories();
-    return cats.map((c) => ({ slug: c.slug }));
-  } catch {
-    return [];
-  }
-}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;

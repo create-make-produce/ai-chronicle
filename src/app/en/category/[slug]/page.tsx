@@ -13,8 +13,6 @@ import {
 } from '@/lib/db';
 import { CONFIG } from '@/config';
 
-export const revalidate = 1800;
-
 export const metadata = {
   title: 'AI Chronicle - AI Tools Pricing Database',
   description:

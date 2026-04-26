@@ -7,20 +7,10 @@ import type { Metadata } from 'next';
 import NewsDetailContent from '@/components/NewsDetailContent';
 import { getNewsBySlug, getAllNewsSlugs, getRelatedNews, getToolById } from '@/lib/db';
 
-export const revalidate = 86400;
-
 interface Params {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  try {
-    const slugs = await getAllNewsSlugs();
-    return slugs.map((slug) => ({ slug }));
-  } catch {
-    return [];
-  }
-}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;

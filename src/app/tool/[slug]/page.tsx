@@ -9,20 +9,11 @@ import ToolDetailContent from '@/components/ToolDetailContent';
 import { getToolDetailBySlug, getRelatedTools, getAllToolSlugs } from '@/lib/db';
 import { CONFIG } from '@/config';
 
-export const revalidate = 86400; // 24時間
 
 interface Params {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  try {
-    const slugs = await getAllToolSlugs();
-    return slugs.map((slug) => ({ slug }));
-  } catch {
-    return [];
-  }
-}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
