@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 // src/app/en/news/[slug]/page.tsx
 
 import { notFound } from 'next/navigation';

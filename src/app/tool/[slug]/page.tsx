@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 // src/app/tool/[slug]/page.tsx
 // ツール詳細（日本語）
 

@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 // src/app/category/[slug]/page.tsx
 // カテゴリページ（日本語）
 
