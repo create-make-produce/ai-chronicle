@@ -39,7 +39,7 @@ export default function ToolsListContent({ tools, locale, title, description }: 
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <AdSlot slot="header" className="mb-8" />
-        <ToolsFilter tools={tools} locale={locale} showCompare={false} />
+        <ToolsFilter tools={tools} locale={locale} />
       </div>
     </main>
   );
