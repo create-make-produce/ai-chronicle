@@ -164,7 +164,7 @@ function SectionHeadWithTime({ label, isoTime, locale }: { label: string; isoTim
   );
 }
 
-function newsLabel(type: string, tt: typeof t['ja']): string {
+function newsLabel(type: string, tt: typeof t[keyof typeof t]): string {
   switch(type) {
     case 'price_change': return tt.newsTypePriceChange;
     case 'new_tool':     return tt.newsTypeNewTool;
