@@ -4,9 +4,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const NAV_ITEMS = [
-  { href: '/news',    hrefEn: '/en/news',    labelJa: 'ニュース',          labelEn: 'News' },
+  { href: '/',        hrefEn: '/en',        labelJa: 'TOP',           labelEn: 'TOP' },
+  { href: '/news',    hrefEn: '/en/news',    labelJa: 'ニュース',      labelEn: 'News' },
   { href: '/monthly', hrefEn: '/en/monthly', labelJa: '月刊AIアップデート', labelEn: 'AI Update Monthly' },
-  { href: '/tools',   hrefEn: '/en/tools',   labelJa: 'すべてのAI',        labelEn: 'All AI' },
+  { href: '/tools',   hrefEn: '/en/tools',   labelJa: 'すべてのAI',    labelEn: 'All AI' },
 ];
 
 export default function Header() {
@@ -26,7 +27,8 @@ export default function Header() {
 
   const isActive = (href: string, hrefEn: string) => {
     const target = isEn ? hrefEn : href;
-    if (target === '/' || target === '/en') return pathname === target;
+    // TOP は完全一致のみ
+    if (href === '/') return pathname === target;
     return pathname.startsWith(target);
   };
 
@@ -97,7 +99,6 @@ export default function Header() {
 
         {/* 言語切替 + モバイルメニュー */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          {/* JP/EN ボタン */}
           <div style={{ display: 'flex', border: '1px solid rgba(0,140,237,0.4)', borderRadius: '4px', overflow: 'hidden' }}>
             <button
               onClick={() => isEn && toggleLang()}
@@ -134,7 +135,6 @@ export default function Header() {
             </button>
           </div>
 
-          {/* モバイルハンバーガー */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden"
@@ -159,13 +159,7 @@ export default function Header() {
 
       {/* モバイルメニュー */}
       {mobileOpen && (
-        <div
-          style={{
-            background: '#0A0D12',
-            borderTop: '1px solid rgba(0,140,237,0.12)',
-            padding: '0.75rem 1.5rem 1rem',
-          }}
-        >
+        <div style={{ background: '#0A0D12', borderTop: '1px solid rgba(0,140,237,0.12)', padding: '0.75rem 1.5rem 1rem' }}>
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href, item.hrefEn);
             const href = isEn ? item.hrefEn : item.href;
