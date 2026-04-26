@@ -84,7 +84,7 @@ function groupByMonth(items: News[]): Array<{ month: string; items: News[] }> {
     .map(([month, items]) => ({ month, items }));
 }
 
-function newsTypeLabel(type: string, tt: typeof t['ja']): string {
+function newsTypeLabel(type: string, tt: typeof t[keyof typeof t]): string {
   switch (type) {
     case 'price_change': return tt.newsTypePriceChange;
     case 'new_tool':     return tt.newsTypeNewTool;
