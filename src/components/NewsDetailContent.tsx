@@ -1,7 +1,7 @@
 // src/components/NewsDetailContent.tsx
 import Link from 'next/link';
 import type { Locale, News, Tool } from '@/types';
-import { t, localizedPath, formatDate } from '@/lib/i18n';
+import { t, type TDict, localizedPath, formatDate } from '@/lib/i18n';
 import AdSlot from './AdSlot';
 
 interface NewsDetailContentProps {
@@ -119,7 +119,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
   );
 }
 
-function newsTypeLabel(type: string, tt: typeof t[keyof typeof t]): string {
+function newsTypeLabel(type: string, tt: TDict): string {
   switch (type) {
     case 'price_change': return tt.newsTypePriceChange;
     case 'new_tool':     return tt.newsTypeNewTool;

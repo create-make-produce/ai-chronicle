@@ -1,6 +1,6 @@
 // src/components/SpecTable.tsx
 import type { Locale, Tool } from '@/types';
-import { t } from '@/lib/i18n';
+import { t, type TDict } from '@/lib/i18n';
 
 interface SpecTableProps {
   tool: Tool;
@@ -82,7 +82,7 @@ function formatArray(json: string | null): string | null {
   }
 }
 
-function boolLabel(v: number | null, tt: typeof t['ja']): string {
+function boolLabel(v: number | null, tt: TDict): string {
   if (v == null) return tt.specUnknown;
   return v === 1 ? tt.specYes : tt.specNo;
 }

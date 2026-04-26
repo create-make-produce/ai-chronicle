@@ -1,7 +1,7 @@
 // src/components/NewsListContent.tsx
 import Link from 'next/link';
 import type { Locale, News } from '@/types';
-import { t, localizedPath, formatDateShort } from '@/lib/i18n';
+import { t, type TDict, localizedPath, formatDateShort } from '@/lib/i18n';
 import AdSlot from './AdSlot';
 
 interface NewsListContentProps {
@@ -84,7 +84,7 @@ function groupByMonth(items: News[]): Array<{ month: string; items: News[] }> {
     .map(([month, items]) => ({ month, items }));
 }
 
-function newsTypeLabel(type: string, tt: typeof t[keyof typeof t]): string {
+function newsTypeLabel(type: string, tt: TDict): string {
   switch (type) {
     case 'price_change': return tt.newsTypePriceChange;
     case 'new_tool':     return tt.newsTypeNewTool;

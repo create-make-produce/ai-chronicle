@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import type { Locale, Tool, News } from '@/types';
 import type { CategoryWithCount } from '@/lib/db';
-import { t, localizedPath, formatDateShort } from '@/lib/i18n';
+import { t, type TDict, localizedPath, formatDateShort } from '@/lib/i18n';
 import HeroSection from './HeroSection';
 import CategoryGrid from './CategoryGrid';
 import ToolCard from './ToolCard';
@@ -164,7 +164,7 @@ function SectionHeadWithTime({ label, isoTime, locale }: { label: string; isoTim
   );
 }
 
-function newsLabel(type: string, tt: typeof t[keyof typeof t]): string {
+function newsLabel(type: string, tt: TDict): string {
   switch(type) {
     case 'price_change': return tt.newsTypePriceChange;
     case 'new_tool':     return tt.newsTypeNewTool;
