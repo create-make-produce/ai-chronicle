@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import type { Locale } from '@/types';
 import type { CategoryWithCount } from '@/lib/db';
-import { localizedPath } from '@/lib/i18n';
 
 const ICON_FILE: Record<string, string> = {
   'text-generation':  'cat-text.png',
@@ -43,16 +42,12 @@ function HudCorners({ left = '#008CED', right = '#001433' }: { left?: string; ri
   const L = { position: 'absolute' as const, background: left };
   const R = { position: 'absolute' as const, background: right };
   return <>
-    {/* 左上（青） */}
     <div style={{ ...L, top:0, left:0, width:12, height:2 }} />
     <div style={{ ...L, top:0, left:0, width:2, height:12 }} />
-    {/* 右上（黒） */}
     <div style={{ ...R, top:0, right:0, width:12, height:2 }} />
     <div style={{ ...R, top:0, right:0, width:2, height:12 }} />
-    {/* 左下（青） */}
     <div style={{ ...L, bottom:0, left:0, width:12, height:2 }} />
     <div style={{ ...L, bottom:0, left:0, width:2, height:12 }} />
-    {/* 右下（黒） */}
     <div style={{ ...R, bottom:0, right:0, width:12, height:2 }} />
     <div style={{ ...R, bottom:0, right:0, width:2, height:12 }} />
   </>;
@@ -75,6 +70,8 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
         const name_en  = cat.name_en;
         const dispName = locale === 'ja' ? name_ja : name_en;
         const iconFile = ICON_FILE[cat.slug];
+        // カテゴリグリッドから /tools?cat=slug に遷移（カテゴリページ不要）
+        const href = locale === 'ja' ? `/tools?cat=${cat.slug}` : `/en/tools?cat=${cat.slug}`;
 
         return (
           <motion.div key={cat.id}
@@ -84,103 +81,36 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
             transition={{ duration: 0.2, delay: i * 0.02 }}
           >
             <Link
-              href={localizedPath(locale, `/category/${cat.slug}`)}
+              href={href}
               className="group relative block overflow-hidden transition-transform duration-150 hover:-translate-y-0.5"
-              style={{
-                background:   DARK,
-                border:       '1px solid #1A3860',
-                borderRadius: '3px',
-                height:       '72px',       // ← 半分サイズ
-              }}
+              style={{ background: DARK, border: '1px solid #1A3860', borderRadius: '3px', height: '72px' }}
             >
-              {/* 青グラデーション三角（右側） */}
               <div style={{
-                position:   'absolute',
-                inset:      0,
+                position: 'absolute', inset: 0,
                 background: `linear-gradient(135deg, ${BLUE1}, ${BLUE2})`,
-                clipPath:   'polygon(55% 0%, 100% 0%, 100% 100%, 42% 100%)',
+                clipPath: 'polygon(55% 0%, 100% 0%, 100% 100%, 42% 100%)',
               }} />
-
-              {/* 右下の //// 装飾（黒） */}
-              <div style={{
-                position:      'absolute',
-                bottom:        6,
-                right:         10,
-                fontSize:      '0.55rem',
-                fontWeight:    700,
-                color:         'rgba(0,0,0,0.35)',
-                letterSpacing: '0.08em',
-              }}>
+              <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: '0.55rem', fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '0.08em' }}>
                 ////
               </div>
-
-              {/* アイコン（右側中央） */}
-              <div style={{
-                position:       'absolute',
-                right:          '6%',
-                top:            '50%',
-                transform:      'translateY(-50%)',
-                width:          44,
-                height:         44,
-                display:        'flex',
-                alignItems:     'center',
-                justifyContent: 'center',
-                filter:         'drop-shadow(0 0 8px rgba(255,255,255,0.25))',
-              }}>
+              <div style={{ position: 'absolute', right: '6%', top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }}>
                 {iconFile ? (
-                  <img
-                    src={`/icons/${iconFile}`}
-                    alt={name_en}
-                    width={38}
-                    height={38}
-                    style={{ objectFit: 'contain' }}
-                  />
+                  <img src={`/icons/${iconFile}`} alt={name_en} width={38} height={38} style={{ objectFit: 'contain' }} />
                 ) : (
                   <FallbackIcon slug={cat.slug} />
                 )}
               </div>
-
-              {/* カテゴリ名（全幅にかかる・左寄せ） */}
-              <div style={{
-                position:       'absolute',
-                top:            0,
-                left:           0,
-                bottom:         0,
-                width:          '72%',      // 青エリアにはみ出す
-                padding:        '0 16px',
-                display:        'flex',
-                flexDirection:  'column',
-                justifyContent: 'center',
-                gap:            2,
-              }}>
-                <p style={{
-                  fontFamily:    'var(--font-noto), sans-serif',
-                  fontSize:      dispName.length > 7 ? '1rem' : '1.15rem',
-                  fontWeight:    700,
-                  color:         '#FFFFFF',
-                  lineHeight:    1,
-                  textShadow:    '1px 1px 4px rgba(0,0,0,0.6)',  // 青エリア上でも読める
-                }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '72%', padding: '0 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2 }}>
+                <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: dispName.length > 7 ? '1rem' : '1.15rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.6)' }}>
                   {dispName}
                 </p>
                 {locale === 'ja' && (
-                  <p style={{
-                    fontFamily:    'var(--font-fira), system-ui',
-                    fontSize:      '0.58rem',
-                    letterSpacing: '0.2em',
-                    color:         'rgba(255,255,255,0.6)',
-                    textTransform: 'uppercase',
-                    textShadow:    '1px 1px 3px rgba(0,0,0,0.5)',
-                  }}>
+                  <p style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: '0.58rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>
                     {name_en}
                   </p>
                 )}
               </div>
-
-              {/* コーナーブラケット（最前面） */}
               <HudCorners left={BLUE2} right="#FFFFFF" />
-
-              {/* ホバー時インナーボーダー */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none"
                 style={{ boxShadow: `inset 0 0 0 1px ${BLUE2}`, borderRadius: '3px' }} />
             </Link>
