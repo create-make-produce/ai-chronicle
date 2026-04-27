@@ -35,21 +35,26 @@ function FoldedCorner({ size = 22 }: { size?: number }) {
   );
 }
 
-// 「。」で分割して各文を別行で表示するコンポーネント
-function JaText({ text, style, lineStyle }: {
+// 「。」で分割して各文を別行で表示するコンポーネント（行数制限付き）
+function JaText({ text, style, lineStyle, maxLines }: {
   text: string;
   style?: React.CSSProperties;
   lineStyle?: React.CSSProperties;
+  maxLines?: number;
 }) {
-  // 「。」で分割し、空文字を除去
   const lines = text.split('。').map(s => s.trim()).filter(Boolean);
-  if (lines.length <= 1) {
+  const displayLines = maxLines ? lines.slice(0, maxLines) : lines;
+  const truncated = maxLines && lines.length > maxLines;
+
+  if (displayLines.length <= 1 && !truncated) {
     return <span style={style}>{text}</span>;
   }
   return (
     <span style={style}>
-      {lines.map((line, i) => (
-        <span key={i} style={{ display: 'block', ...lineStyle }}>{line}</span>
+      {displayLines.map((line, i) => (
+        <span key={i} style={{ display: 'block', ...lineStyle }}>
+          {line}{i === displayLines.length - 1 && truncated ? '…' : ''}
+        </span>
       ))}
     </span>
   );
@@ -101,13 +106,15 @@ export default function ToolCard({ tool, locale, index = 0, categoryName }: Tool
             overflow: 'hidden',
             clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%)',
             height: '220px',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <FoldedCorner />
 
-          <div className="p-4 pt-5 flex flex-col h-full">
+          <div style={{ padding: '1rem', paddingTop: '1.25rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             {/* バッジ行 */}
-            <div className="flex flex-wrap items-center gap-1.5 mb-3">
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', marginBottom: '10px', flexShrink: 0 }}>
               {tool.has_free_plan === 1 && (
                 <span style={{
                   background: '#1A56DB', color: '#FFFFFF',
@@ -138,45 +145,51 @@ export default function ToolCard({ tool, locale, index = 0, categoryName }: Tool
                 letterSpacing: locale === 'ja' ? '0.05em' : '0.03em',
                 textTransform: locale === 'ja' ? 'none' as const : 'uppercase' as const,
                 lineHeight: 1.15,
+                flexShrink: 0,
               }}
             >
               {name}
             </h3>
 
-            {/* タグライン・説明文（。で改行） */}
-            {tagline && (
-              locale === 'ja' ? (
-                <JaText
-                  text={tagline}
-                  style={{ fontSize: '0.75rem', fontWeight: 500, lineHeight: 1.5, color: '#1A2E4A', display: 'block', marginBottom: '0.25rem' }}
-                  lineStyle={{ marginBottom: '0.1rem' }}
-                />
-              ) : (
-                <p className="text-xs font-medium leading-relaxed line-clamp-2 mb-1" style={{ color: '#1A2E4A' }}>
-                  {tagline}
-                </p>
-              )
-            )}
-            {desc && (
-              locale === 'ja' ? (
-                <JaText
-                  text={desc}
-                  style={{ fontSize: '0.72rem', lineHeight: 1.5, color: '#4A6B8A', display: 'block' }}
-                  lineStyle={{ marginBottom: '0.1rem' }}
-                />
-              ) : (
-                <p className="text-xs leading-relaxed line-clamp-2" style={{ color: '#4A6B8A', minHeight: tagline ? '0' : '2.8rem' }}>
-                  {desc}
-                </p>
-              )
-            )}
-            {!tagline && !desc && <div style={{ minHeight: '2.8rem' }} />}
+            {/* テキストエリア：flex-shrink可能・overflow hidden で詳しく見るを常に表示 */}
+            <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+              {tagline && (
+                locale === 'ja' ? (
+                  <JaText
+                    text={tagline}
+                    maxLines={2}
+                    style={{ fontSize: '0.75rem', fontWeight: 500, lineHeight: 1.5, color: '#1A2E4A', display: 'block', marginBottom: '0.25rem' }}
+                    lineStyle={{ marginBottom: '0.1rem' }}
+                  />
+                ) : (
+                  <p style={{ fontSize: '0.75rem', fontWeight: 500, lineHeight: 1.5, color: '#1A2E4A', marginBottom: '4px',
+                    overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>
+                    {tagline}
+                  </p>
+                )
+              )}
+              {desc && (
+                locale === 'ja' ? (
+                  <JaText
+                    text={desc}
+                    maxLines={2}
+                    style={{ fontSize: '0.72rem', lineHeight: 1.5, color: '#4A6B8A', display: 'block' }}
+                    lineStyle={{ marginBottom: '0.1rem' }}
+                  />
+                ) : (
+                  <p style={{ fontSize: '0.72rem', lineHeight: 1.5, color: '#4A6B8A',
+                    overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>
+                    {desc}
+                  </p>
+                )
+              )}
+            </div>
 
-            <div className="flex-1" />
-
-            {/* 詳しく見る */}
-            <div className="flex items-center gap-2 pt-3 text-xs font-bold tracking-widest uppercase"
-              style={{ borderTop: '1px solid #C0D4E8', color: '#6B8FAF' }}>
+            {/* 詳しく見る - 常にカード下部に表示 */}
+            <div
+              className="flex items-center gap-2 pt-3 text-xs font-bold tracking-widest uppercase"
+              style={{ borderTop: '1px solid #C0D4E8', color: '#6B8FAF', flexShrink: 0, marginTop: '8px' }}
+            >
               <span className="group-hover:text-[var(--color-accent)] transition-colors">
                 {locale === 'ja' ? '詳しく見る' : 'Learn more'}
               </span>

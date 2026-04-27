@@ -24,31 +24,24 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
   return data.result?.[0]?.results ?? [];
 }
 
-async function getThisMonthNews() {
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+async function getLatestNews() {
   return queryD1(
     `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en, t.slug as tool_slug
      FROM news n LEFT JOIN tools t ON n.tool_id = t.id
-     WHERE n.is_published = 1 AND strftime('%Y-%m', n.published_at) = ?
-     ORDER BY n.published_at DESC`,
-    [ym]
+     WHERE n.is_published = 1
+     ORDER BY n.published_at DESC
+     LIMIT 50`,
+    []
   );
 }
 
-function formatMonthJa() {
-  const now = new Date();
-  return `${now.getFullYear()}年${now.getMonth() + 1}月`;
-}
-
 export default async function NewsPage() {
-  const newsItems = await getThisMonthNews();
+  const newsItems = await getLatestNews();
 
   return (
     <main style={{ minHeight: '100vh', background: '#111318' }}>
       <section style={{ background: 'linear-gradient(135deg, #0A0D12 0%, #111827 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2.5rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          {/* パンくず */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
             <Link href="/" style={{ color: '#4A5568', textDecoration: 'none' }}>ホーム</Link>
             <span>/</span>
@@ -67,14 +60,9 @@ export default async function NewsPage() {
       </section>
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-        {/* 月ラベル */}
-        <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.85rem', fontWeight: 700, color: '#4A5568', marginBottom: '1rem' }}>
-          {formatMonthJa()}
-        </p>
-
         {newsItems.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#4A5568', fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.9rem' }}>
-            今月のニュースはまだありません。
+            ニュースはまだありません。
           </div>
         ) : (
           <div style={{ background: '#1A1D24', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', overflow: 'hidden' }}>

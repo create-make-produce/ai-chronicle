@@ -24,32 +24,24 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
   return data.result?.[0]?.results ?? [];
 }
 
-async function getThisMonthNews() {
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+async function getLatestNews() {
   return queryD1(
     `SELECT n.*, t.name_en as tool_name_en, t.name_ja as tool_name_ja, t.slug as tool_slug
      FROM news n LEFT JOIN tools t ON n.tool_id = t.id
-     WHERE n.is_published = 1 AND strftime('%Y-%m', n.published_at) = ?
-     ORDER BY n.published_at DESC`,
-    [ym]
+     WHERE n.is_published = 1
+     ORDER BY n.published_at DESC
+     LIMIT 50`,
+    []
   );
 }
 
-function formatMonthEn() {
-  const now = new Date();
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${months[now.getMonth()]} ${now.getFullYear()}`;
-}
-
 export default async function NewsPageEn() {
-  const newsItems = await getThisMonthNews();
+  const newsItems = await getLatestNews();
 
   return (
     <main style={{ minHeight: '100vh', background: '#111318' }}>
       <section style={{ background: 'linear-gradient(135deg, #0A0D12 0%, #111827 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2.5rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          {/* Breadcrumb */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
             <Link href="/en" style={{ color: '#4A5568', textDecoration: 'none' }}>Home</Link>
             <span>/</span>
@@ -68,14 +60,9 @@ export default async function NewsPageEn() {
       </section>
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-        {/* 月ラベル */}
-        <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.85rem', fontWeight: 700, color: '#4A5568', marginBottom: '1rem' }}>
-          {formatMonthEn()}
-        </p>
-
         {newsItems.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#4A5568', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem' }}>
-            No news this month yet.
+            No news yet.
           </div>
         ) : (
           <div style={{ background: '#1A1D24', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', overflow: 'hidden' }}>

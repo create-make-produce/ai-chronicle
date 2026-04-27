@@ -77,7 +77,7 @@ export default function HomeContent(p: HomeContentProps) {
       {/* 最新アップデート */}
       {newTools.length > 0 && (
         <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)">
-          <SectionHead label={locale==='ja'?'最新アップデート':'LATEST UPDATES'} />
+          <SectionHead label={locale==='ja'?'月刊AIアップデート':'Monthly AI Updates'} />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {newTools.slice(0,6).map((tool,i) => (
               <ToolCard key={tool.id} tool={tool} locale={locale} index={i}

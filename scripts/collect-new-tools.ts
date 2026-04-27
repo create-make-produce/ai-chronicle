@@ -19,7 +19,7 @@ if (existsSync(envLocalPath)) {
 import { CONFIG } from '../src/config';
 import { D1Client } from '../src/lib/d1-rest';
 import { callAI, parseJsonResponse } from '../src/lib/ai';
-import { fetchLatestAIPosts, type ProductHuntPost } from '../src/lib/product-hunt';
+import { fetchLatestAIPosts, fetchLatestPosts, isAITool, type ProductHuntPost } from '../src/lib/product-hunt';
 import {
   fetchHtml,
   htmlToText,
@@ -68,6 +68,74 @@ const CATEGORY_MAP: Record<string, string> = {
   workflow: 'productivity',
   automation: 'productivity',
 };
+
+// =============================================
+// 失敗IDの管理（scrape_logsを利用）
+// =============================================
+
+const FAILED_IDS_JOB = 'collect_failed_ids';
+
+/**
+ * 前回以前に失敗したProduct Hunt IDを取得
+ */
+async function loadFailedProductHuntIds(db: D1Client): Promise<string[]> {
+  const row = await db.first<{ errors: string | null }>(
+    `SELECT errors FROM scrape_logs WHERE job_name = ? ORDER BY started_at DESC LIMIT 1`,
+    [FAILED_IDS_JOB]
+  );
+  if (!row || !row.errors) return [];
+  try {
+    const parsed = JSON.parse(row.errors) as string[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * 失敗IDリストを保存（上書き）
+ */
+async function saveFailedProductHuntIds(db: D1Client, ids: string[]): Promise<void> {
+  if (ids.length === 0) {
+    // 失敗IDがゼロになったらレコードを削除してクリーン
+    await db.execute(`DELETE FROM scrape_logs WHERE job_name = ?`, [FAILED_IDS_JOB]);
+    console.log('  ✅ 失敗IDログをクリア（全件成功）');
+    return;
+  }
+  // 既存レコードがあれば更新、なければ挿入
+  const existing = await db.first<{ id: string }>(
+    `SELECT id FROM scrape_logs WHERE job_name = ? LIMIT 1`,
+    [FAILED_IDS_JOB]
+  );
+  if (existing) {
+    await db.execute(
+      `UPDATE scrape_logs SET errors = ?, started_at = datetime('now'), finished_at = datetime('now') WHERE id = ?`,
+      [JSON.stringify(ids), existing.id]
+    );
+  } else {
+    await db.execute(
+      `INSERT INTO scrape_logs (id, job_name, status, errors, started_at, finished_at) VALUES (?, ?, 'error', ?, datetime('now'), datetime('now'))`,
+      [generateId('log'), FAILED_IDS_JOB, JSON.stringify(ids)]
+    );
+  }
+  console.log(`  📝 失敗IDログ更新: ${ids.length}件 → 次回優先処理`);
+}
+
+/**
+ * 失敗したIDのPostをProduct Hunt APIから取得
+ */
+async function fetchPostsByIds(ids: string[]): Promise<ProductHuntPost[]> {
+  if (ids.length === 0) return [];
+  // 全件取得してIDでフィルタ（GraphQLのIDフィルタが使えない場合の代替）
+  const all = await fetchLatestPosts();
+  const found = all.filter(p => ids.includes(p.id));
+  console.log(`  → 失敗ID ${ids.length}件中 ${found.length}件を再取得`);
+  return found;
+}
+
+// =============================================
+// ツールデータ処理
+// =============================================
 
 async function discoverNewTools(db: D1Client): Promise<ProductHuntPost[]> {
   console.log('🔍 Product Huntから新着AIツールを取得中...');
@@ -233,7 +301,6 @@ async function processSingleTool(
 
     const extracted = await extractToolData(post, pageText);
 
-    // AIツール判定フィルター
     if (!extracted.is_ai_tool) {
       console.log(`  ⏭️ スキップ: AIツールではないと判定（${post.name}）`);
       return { success: true, skipped: true };
@@ -333,6 +400,10 @@ async function processSingleTool(
   }
 }
 
+// =============================================
+// メイン処理
+// =============================================
+
 async function main() {
   console.log('🚀 AI Chronicle - 新着ツール収集ジョブ開始');
   console.log(`   設定: MAX_NEW_TOOLS_PER_RUN = ${CONFIG.MAX_NEW_TOOLS_PER_RUN}`);
@@ -351,19 +422,134 @@ async function main() {
   let skipped = 0;
   const errors: string[] = [];
 
+  // Geminiダウン検知カウンター
+  let consecutiveGeminiFailures = 0;
+  const GEMINI_DOWN_THRESHOLD = 2; // 連続2件失敗でダウン判定
+
+  // 失敗IDを次回に持ち越すリスト
+  let failedIds = await loadFailedProductHuntIds(db);
+  if (failedIds.length > 0) {
+    console.log(`\n⚠️ 前回失敗分: ${failedIds.length}件を優先処理します`);
+  }
+
   try {
+    // =============================================
+    // STEP 1: 前回失敗分を優先処理
+    // =============================================
+    if (failedIds.length > 0) {
+      console.log('\n--- 前回失敗分の再処理 ---');
+      const retryPosts = await fetchPostsByIds(failedIds);
+
+      for (const post of retryPosts) {
+        // 既にDBに登録済みなら（別ルートで登録された等）スキップ
+        const existing = await db.first<{ count: number }>(
+          'SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?',
+          [post.id]
+        );
+        if (existing && existing.count > 0) {
+          console.log(`  ⏭️ 既に登録済みのためスキップ: ${post.name}`);
+          failedIds = failedIds.filter(id => id !== post.id);
+          continue;
+        }
+
+        const result = await processSingleTool(db, post);
+
+        if (result.skipped) {
+          // AIツールではないと判定 → 失敗リストから除去
+          failedIds = failedIds.filter(id => id !== post.id);
+          skipped++;
+        } else if (result.success) {
+          // 成功 → 失敗リストから除去
+          failedIds = failedIds.filter(id => id !== post.id);
+          added++;
+          consecutiveGeminiFailures = 0;
+        } else {
+          // また失敗 → リストに残す（次回へ持ち越し）
+          consecutiveGeminiFailures++;
+          errors.push(`${post.name}: ${result.error ?? 'unknown'}`);
+
+          if (consecutiveGeminiFailures >= GEMINI_DOWN_THRESHOLD) {
+            console.log(`\n🛑 Gemini連続${GEMINI_DOWN_THRESHOLD}件失敗 → サーバーダウンと判断し今回の処理を終了`);
+            console.log('   次回スケジュール実行時に自動リトライされます');
+            await saveFailedProductHuntIds(db, failedIds);
+            const status = added > 0 ? 'partial' : 'error';
+            await db.execute(
+              `UPDATE scrape_logs SET status = ?, tools_added = ?, errors = ?, finished_at = datetime('now') WHERE id = ?`,
+              [status, added, JSON.stringify(errors), logId]
+            );
+            console.log(`\n========== 結果 ==========`);
+            console.log(`  ✅ 新規登録: ${added}件`);
+            console.log(`  ⏭️ スキップ（非AIツール）: ${skipped}件`);
+            console.log(`  ❌ エラー: ${errors.length}件`);
+            console.log(`  🏁 ステータス: ${status}（Geminiダウンのため早期終了）`);
+            return;
+          }
+        }
+      }
+
+      // 再処理後の失敗IDリストを保存
+      await saveFailedProductHuntIds(db, failedIds);
+    }
+
+    // =============================================
+    // STEP 2: 通常の新着取得
+    // =============================================
+    console.log('\n--- 新着ツールの取得 ---');
     const newPosts = await discoverNewTools(db);
-    if (newPosts.length === 0) console.log('\n✨ 新規ツールはありませんでした');
+    if (newPosts.length === 0) {
+      console.log('\n✨ 新規ツールはありませんでした');
+    }
 
     for (const post of newPosts) {
       const result = await processSingleTool(db, post);
-      if (result.skipped) { skipped++; }
-      else if (result.success) { added++; }
-      else { errors.push(`${post.name}: ${result.error ?? 'unknown'}`); }
+
+      if (result.skipped) {
+        skipped++;
+      } else if (result.success) {
+        added++;
+        consecutiveGeminiFailures = 0;
+      } else {
+        consecutiveGeminiFailures++;
+        errors.push(`${post.name}: ${result.error ?? 'unknown'}`);
+
+        // 失敗IDを記録（次回優先処理）
+        if (!failedIds.includes(post.id)) {
+          failedIds.push(post.id);
+        }
+
+        if (consecutiveGeminiFailures >= GEMINI_DOWN_THRESHOLD) {
+          console.log(`\n🛑 Gemini連続${GEMINI_DOWN_THRESHOLD}件失敗 → サーバーダウンと判断し今回の処理を終了`);
+          console.log('   次回スケジュール実行時に自動リトライされます');
+
+          // 未処理のツールも失敗IDに追加（取りこぼし防止）
+          const currentIndex = newPosts.indexOf(post);
+          for (const remainingPost of newPosts.slice(currentIndex + 1)) {
+            if (!failedIds.includes(remainingPost.id)) {
+              failedIds.push(remainingPost.id);
+            }
+          }
+          console.log(`  📝 未処理 ${newPosts.slice(currentIndex + 1).length}件も次回優先リストに追加`);
+
+          await saveFailedProductHuntIds(db, failedIds);
+          const status = added > 0 ? 'partial' : 'error';
+          await db.execute(
+            `UPDATE scrape_logs SET status = ?, tools_added = ?, errors = ?, finished_at = datetime('now') WHERE id = ?`,
+            [status, added, JSON.stringify(errors), logId]
+          );
+          console.log(`\n========== 結果 ==========`);
+          console.log(`  ✅ 新規登録: ${added}件`);
+          console.log(`  ⏭️ スキップ（非AIツール）: ${skipped}件`);
+          console.log(`  ❌ エラー: ${errors.length}件`);
+          console.log(`  🏁 ステータス: ${status}（Geminiダウンのため早期終了）`);
+          return;
+        }
+      }
     }
 
-    const status = errors.length === 0 ? 'success' : added > 0 ? 'partial' : 'error';
+    // 最後に失敗IDリストを保存（全成功なら空になってクリア）
+    await saveFailedProductHuntIds(db, failedIds);
 
+    const status = errors.length === 0 ? 'success' : added > 0 ? 'partial' : 'error';
     await db.execute(
       `UPDATE scrape_logs SET status = ?, tools_added = ?, errors = ?, finished_at = datetime('now') WHERE id = ?`,
       [status, added, errors.length > 0 ? JSON.stringify(errors) : null, logId]
@@ -374,9 +560,12 @@ async function main() {
     console.log(`  ⏭️ スキップ（非AIツール）: ${skipped}件`);
     console.log(`  ❌ エラー: ${errors.length}件`);
     console.log(`  🏁 ステータス: ${status}`);
+
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error('🔥 致命的エラー:', msg);
+    // 致命的エラー時も失敗IDは保存しておく
+    await saveFailedProductHuntIds(db, failedIds);
     await db.execute(
       `UPDATE scrape_logs SET status = 'error', errors = ?, finished_at = datetime('now') WHERE id = ?`,
       [JSON.stringify([msg]), logId]
