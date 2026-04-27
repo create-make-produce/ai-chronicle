@@ -78,6 +78,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={href}
+                className={active ? '' : 'link-underline'}
                 style={{
                   fontFamily: 'Fira Sans, sans-serif',
                   fontSize: '0.85rem',

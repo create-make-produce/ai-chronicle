@@ -84,10 +84,20 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
               {/* タイトル・バッジ */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', marginBottom: '0.5rem' }}>
-                  <span className="badge badge-outline">{statusLabel()}</span>
-                  {tool.has_free_plan === 1 && <span className="badge badge-free">{tt.badgeFreePlan}</span>}
+                  {tool.status !== 'active' && (
+                    <span style={{ background: '#374151', color: '#9CA3AF', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', padding: '2px 8px', borderRadius: '2px' }}>
+                      {statusLabel()}
+                    </span>
+                  )}
+                  {tool.has_free_plan === 1 && (
+                    <span style={{ background: '#1A56DB', color: '#FFFFFF', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', padding: '2px 8px', borderRadius: '2px' }}>
+                      {locale === 'ja' ? '無料プラン' : 'FREE'}
+                    </span>
+                  )}
                   {tool.category && (
-                    <Link href={localizedPath(locale, `/category/${tool.category.slug}`)} className="badge badge-outline link-underline">
+                    <Link href={localizedPath(locale, `/tools?cat=${tool.category.slug}`)}
+                      className="link-underline"
+                      style={{ background: '#0F3D8C', color: '#FFFFFF', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', padding: '2px 8px', borderRadius: '2px', border: '1px solid #1A56DB', textDecoration: 'none' }}>
                       {locale === 'ja' ? tool.category.name_ja : tool.category.name_en}
                     </Link>
                   )}
@@ -102,79 +112,89 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                 )}
               </div>
 
-              {/* CTA（右） */}
-              {ctaUrlClean && (
-                <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                  <a href={ctaUrlClean} target="_blank" rel="noopener noreferrer nofollow" className="btn-primary">
-                    {tt.ctaVisitSite} →
-                  </a>
-                  {tool.has_affiliate === 1 && (
-                    <span style={{ fontSize: '0.65rem', color: '#4A5568' }}>{tt.ctaAffiliateNote}</span>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </section>
 
         {/* 本文 */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-10" style={{ paddingTop: '2.5rem' }}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-4" style={{ paddingTop: '2rem' }}>
 
-          {/* 概要 */}
-          {description && (
-            <section>
-              <h2 className="section-label mb-3">{locale === 'ja' ? '概要' : 'Overview'}</h2>
-              <div className="prose prose-sm max-w-none text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">
-                {description}
-              </div>
-            </section>
-          )}
+          {/* 概要 + リンク + ニュース（統合パネル） */}
+          {(description || officialUrl || tool.twitter_handle || tool.github_url || tool.product_hunt_url || toolNews.length > 0) && (
+            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+              {/* 概要 */}
+              {description && (
+                <div className="mb-5">
+                  <h2 className="font-display text-2xl tracking-tight mb-4">{locale === 'ja' ? '概要' : 'Overview'}</h2>
+                  <div className="prose prose-sm max-w-none text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">
+                    {description}
+                  </div>
+                </div>
+              )}
 
-          {/* このツールのニュース */}
-          {toolNews.length > 0 && (
-            <section>
-              <h2 className="section-label mb-3">{locale === 'ja' ? 'このツールのニュース' : 'News'}</h2>
-              <div style={{ background: 'var(--color-bg-sub)', border: '1px solid var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                {toolNews.map((item, i) => {
-                  const typeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
-                  const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
-                  const badgeLabel = locale === 'ja' ? badge.ja : badge.en;
-                  const title = locale === 'ja' ? item.title_ja : (item.title_en || item.title_ja);
-                  return (
-                    <Link
-                      key={item.id}
-                      href={localizedPath(locale, `/news/${item.slug}`)}
-                      className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-bg)]"
-                      style={{ borderBottom: i < toolNews.length - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none' }}
-                    >
-                      <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', whiteSpace: 'nowrap' }}>
-                        {item.published_at?.substring(0, 10)}
-                      </time>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.border}` }}>
-                        {badgeLabel}
-                      </span>
-                      <span className="flex-1 text-sm truncate group-hover:text-[var(--color-accent)]" style={{ color: 'var(--color-text)' }}>
-                        {title}
-                      </span>
-                      <span style={{ color: 'var(--color-accent)', fontSize: '0.85rem' }}>→</span>
-                    </Link>
-                  );
-                })}
-              </div>
+              {/* リンク */}
+              {(officialUrl || tool.twitter_handle || tool.github_url || tool.product_hunt_url) && (
+                <div className="mb-5">
+                  <h2 className="section-label mb-3">{locale === 'ja' ? 'リンク' : 'Links'}</h2>
+                  <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', listStyle: 'none', margin: 0, padding: 0, fontSize: '0.88rem' }}>
+                    {officialUrl && (
+                      <li><a href={officialUrl} target="_blank" rel="noopener noreferrer nofollow" className="link-underline">{locale === 'ja' ? '公式サイト' : 'Website'}</a></li>
+                    )}
+                    {tool.twitter_handle && (
+                      <li><a href={`https://x.com/${tool.twitter_handle}`} target="_blank" rel="noopener noreferrer" className="link-underline">X @{tool.twitter_handle}</a></li>
+                    )}
+                    {tool.github_url && (
+                      <li><a href={tool.github_url} target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a></li>
+                    )}
+                    {tool.product_hunt_url && (
+                      <li><a href={tool.product_hunt_url} target="_blank" rel="noopener noreferrer" className="link-underline">Product Hunt</a></li>
+                    )}
+                  </ul>
+                </div>
+              )}
+
+              {/* このツールのニュース（最新3件） */}
+              {toolNews.length > 0 && (
+                <div>
+                  <h2 className="section-label mb-3">{locale === 'ja' ? 'このツールのニュース' : 'News'}</h2>
+                  <div style={{ overflow: 'hidden', borderRadius: '4px', border: '1px solid rgba(0,140,237,0.08)' }}>
+                    {toolNews.slice(0, 3).map((item, i) => {
+                      const typeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
+                      const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
+                      const badgeLabel = locale === 'ja' ? badge.ja : badge.en;
+                      const title = locale === 'ja' ? item.title_ja : (item.title_en || item.title_ja);
+                      return (
+                        <Link
+                          key={item.id}
+                          href={localizedPath(locale, `/news/${item.slug}`)}
+                          className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-bg)]"
+                          style={{ borderBottom: i < Math.min(toolNews.length, 3) - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none' }}
+                        >
+                          <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', whiteSpace: 'nowrap' }}>
+                            {item.published_at?.substring(0, 10)}
+                          </time>
+                          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.border}` }}>
+                            {badgeLabel}
+                          </span>
+                          <span className="flex-1 text-sm truncate group-hover:text-[var(--color-accent)]" style={{ color: 'var(--color-text)' }}>
+                            {title}
+                          </span>
+                          <span style={{ color: 'var(--color-accent)', fontSize: '0.85rem' }}>→</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
           {/* 料金プラン */}
-          <section>
+          <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
             <div className="flex items-baseline justify-between mb-4">
               <h2 className="font-display text-2xl tracking-tight">
                 {locale === 'ja' ? '料金プラン' : 'Pricing'}
               </h2>
-              {tool.last_price_checked_at && (
-                <span className="text-xs text-[var(--color-text-muted)]">
-                  {tt.priceLastChecked}: {formatDate(tool.last_price_checked_at, locale)}
-                </span>
-              )}
             </div>
             <PriceTable plans={tool.plans} locale={locale} lastCheckedAt={tool.last_price_checked_at} />
           </section>
@@ -182,7 +202,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
           <AdSlot slot="in-content" />
 
           {/* スペック */}
-          <section>
+          <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
             <h2 className="font-display text-2xl tracking-tight mb-4">
               {locale === 'ja' ? 'スペック' : 'Specifications'}
             </h2>
@@ -191,7 +211,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
 
           {/* メディア */}
           {(tool.demo_url || tool.video_url) && (
-            <section>
+            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
               <h2 className="font-display text-2xl tracking-tight mb-4">
                 {locale === 'ja' ? 'メディア' : 'Media'}
               </h2>
@@ -210,33 +230,10 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             </section>
           )}
 
-          {/* リンク */}
-          {(officialUrl || tool.twitter_handle || tool.github_url || tool.product_hunt_url) && (
-            <section>
-              <h2 className="font-display text-2xl tracking-tight mb-4">
-                {locale === 'ja' ? 'リンク' : 'Links'}
-              </h2>
-              <div className="border border-[var(--color-border)] rounded-sm p-4">
-                <ul className="flex flex-wrap gap-4 text-sm">
-                  {officialUrl && (
-                    <li><a href={officialUrl} target="_blank" rel="noopener noreferrer nofollow" className="link-underline">{locale === 'ja' ? '公式サイト' : 'Website'} ↗</a></li>
-                  )}
-                  {tool.twitter_handle && (
-                    <li><a href={`https://x.com/${tool.twitter_handle}`} target="_blank" rel="noopener noreferrer" className="link-underline">X @{tool.twitter_handle}</a></li>
-                  )}
-                  {tool.github_url && (
-                    <li><a href={tool.github_url} target="_blank" rel="noopener noreferrer" className="link-underline">GitHub ↗</a></li>
-                  )}
-                  {tool.product_hunt_url && (
-                    <li><a href={tool.product_hunt_url} target="_blank" rel="noopener noreferrer" className="link-underline">Product Hunt ↗</a></li>
-                  )}
-                </ul>
-              </div>
-            </section>
-          )}
+
 
           {tool.user_count_label && (
-            <section>
+            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
               <h2 className="section-label mb-2">{locale === 'ja' ? 'ユーザー数' : 'Users'}</h2>
               <p className="font-display text-xl">{tool.user_count_label}</p>
             </section>

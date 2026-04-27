@@ -18,7 +18,6 @@ export default function SpecTable({ tool, locale }: SpecTableProps) {
     { label: tt.specLanguages, value: formatArray(tool.language_support) },
     { label: tt.specHasApi, value: boolLabel(tool.has_api, tt) },
     { label: tt.specHasMobileApp, value: boolLabel(tool.has_mobile_app, tt) },
-    { label: tt.specHasChromeExt, value: boolLabel(tool.has_chrome_ext, tt) },
     { label: tt.specLoginMethods, value: formatArray(tool.login_methods) },
     { label: tt.specDataRegion, value: tool.data_storage_region },
     { label: tt.specGdpr, value: tool.gdpr_compliant == null ? null : boolLabel(tool.gdpr_compliant, tt) },

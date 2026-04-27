@@ -42,7 +42,7 @@ export default function PriceTable({ plans, locale, lastCheckedAt }: PriceTableP
                 <tr key={plan.id} className={plan.price_trend === 'up' ? 'price-up' : ''}>
                   <td className="font-bold">{name}</td>
                   <td>
-                    <span className={plan.is_free === 1 ? 'badge badge-free' : ''}>
+                    <span>
                       {formatUsd(plan.price_usd, locale, plan.is_free === 1)}
                     </span>
                     {plan.price_trend === 'up' && plan.previous_price_usd != null && (
@@ -77,16 +77,7 @@ export default function PriceTable({ plans, locale, lastCheckedAt }: PriceTableP
         </table>
       </div>
 
-      {/* 免責事項 */}
-      <div className="text-xs text-[var(--color-text-muted)] leading-relaxed">
-        <span className="badge badge-warn mr-2">!</span>
-        {tt.priceDisclaimer}
-        {lastCheckedAt && (
-          <span className="ml-1">
-            {tt.priceLastChecked}: {formatDate(lastCheckedAt, locale)}
-          </span>
-        )}
-      </div>
+
     </div>
   );
 }

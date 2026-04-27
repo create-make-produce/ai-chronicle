@@ -1,5 +1,6 @@
 // src/components/ToolsListContent.tsx
 import Link from 'next/link';
+import { Suspense } from 'react';
 import type { Locale, Tool } from '@/types';
 import { t, localizedPath } from '@/lib/i18n';
 import ToolsFilter from './ToolsFilter';
@@ -26,7 +27,6 @@ export default function ToolsListContent({ tools, locale, title, description, ca
 
   return (
     <main className="flex-1">
-      {/* ヘッダーセクション */}
       <section style={{ background: 'linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
@@ -50,7 +50,9 @@ export default function ToolsListContent({ tools, locale, title, description, ca
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
         <AdSlot slot="header" className="mb-8" />
-        <ToolsFilter tools={tools} locale={locale} categories={categories} />
+        <Suspense fallback={<div style={{ color: 'var(--color-text-muted)', padding: '2rem' }}>読み込み中...</div>}>
+          <ToolsFilter tools={tools} locale={locale} categories={categories} />
+        </Suspense>
       </div>
     </main>
   );
