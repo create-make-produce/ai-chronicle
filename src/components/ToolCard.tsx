@@ -119,9 +119,9 @@ export default function ToolCard({ tool, locale, index = 0, categoryName }: Tool
                 <span style={{
                   background: '#1A56DB', color: '#FFFFFF',
                   fontSize: '0.6875rem', fontWeight: 700,
-                  letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+                  letterSpacing: '0.06em', textTransform: 'none' as const,
                   padding: '2px 8px', borderRadius: '2px',
-                }}>FREE</span>
+                }}>{locale === 'ja' ? '無料プラン' : 'FREE'}</span>
               )}
               {categoryName && (
                 <span style={{

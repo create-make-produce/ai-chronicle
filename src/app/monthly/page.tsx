@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: '最新アップデートされたAIツールをまとめてチェック。',
 };
 
-const PER_PAGE = 30;
+const PER_PAGE = 12;
 
 async function queryD1(sql: string, params: (string | number | null)[] = []) {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -31,35 +31,44 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
 
 async function getAllTools() {
   return queryD1(
-    `SELECT t.*,
-            c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug
+    `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug
      FROM tools t LEFT JOIN categories c ON t.category_id = c.id
-     WHERE t.is_published = 1
-     ORDER BY t.updated_at DESC`,
-    []
+     WHERE t.is_published = 1 ORDER BY t.updated_at DESC`
   );
+}
+
+async function getThisMonthCount() {
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const rows = await queryD1(
+    `SELECT COUNT(*) as count FROM tools WHERE is_published = 1 AND strftime('%Y-%m', updated_at) = ?`,
+    [ym]
+  );
+  return (rows[0]?.count as number) ?? 0;
 }
 
 export default async function MonthlyPage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const sp = await searchParams;
-  const allTools = await getAllTools();
+  const [allTools, thisMonthCount] = await Promise.all([getAllTools(), getThisMonthCount()]);
   const totalPages = Math.max(1, Math.ceil(allTools.length / PER_PAGE));
   const currentPage = Math.min(Math.max(1, parseInt(sp.p ?? '1', 10)), totalPages);
   const tools = allTools.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+
+  const now = new Date();
+  const monthLabel = `${now.getFullYear()}年${now.getMonth() + 1}月`;
 
   return (
     <main style={{ minHeight: '100vh', background: '#111318' }}>
       <section style={{ background: 'linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          {/* パンくず */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
             <Link href="/" style={{ color: '#4A5568', textDecoration: 'none' }}>ホーム</Link>
             <span>/</span>
             <span style={{ color: '#F0EBE1' }}>月刊AIアップデート</span>
           </nav>
 
-          {/* タイトル行＋ページネーション右側 */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' }}>
+          {/* タイトル + 右側ラベル */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
               <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#008CED', marginBottom: '0.5rem' }}>
                 Monthly Update
@@ -72,14 +81,15 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
               </p>
             </div>
 
-            {/* ページネーション（右側） */}
-            <div style={{ flexShrink: 0, paddingBottom: '0.25rem' }}>
-              <PageSelect
-                currentPage={currentPage}
-                totalPages={totalPages}
-                basePath="/monthly"
-                lang="ja"
-              />
+            {/* 右側：月・件数 */}
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', color: '#4A5568', marginBottom: '4px' }}>
+                {monthLabel}
+              </p>
+              <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '1.6rem', fontWeight: 800, color: '#008CED', lineHeight: 1, marginBottom: '2px' }}>
+                {thisMonthCount}
+                <span style={{ fontSize: '0.85rem', fontWeight: 400, color: '#7A8A99', marginLeft: '4px' }}>件更新</span>
+              </p>
             </div>
           </div>
         </div>
@@ -92,27 +102,15 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
           </div>
         ) : (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem 1.25rem', paddingTop: '0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem 1.25rem' }}>
               {tools.map((tool: Record<string, unknown>, i: number) => (
-                <ToolCard
-                  key={tool.id as string}
-                  tool={tool as any}
-                  locale="ja"
-                  index={i}
-                  categoryName={tool.category_name_ja as string | undefined}
-                />
+                <ToolCard key={tool.id as string} tool={tool as any} locale="ja" index={i}
+                  categoryName={tool.category_name_ja as string | undefined} />
               ))}
             </div>
-
-            {/* 下部ページネーション */}
             {totalPages > 1 && (
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2.5rem' }}>
-                <PageSelect
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  basePath="/monthly"
-                  lang="ja"
-                />
+                <PageSelect currentPage={currentPage} totalPages={totalPages} basePath="/monthly" lang="ja" />
               </div>
             )}
           </>

@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   description: 'Monthly roundup of updated AI tools.',
 };
 
-const PER_PAGE = 30;
+const PER_PAGE = 12;
+const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 async function queryD1(sql: string, params: (string | number | null)[] = []) {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -31,21 +32,31 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
 
 async function getAllTools() {
   return queryD1(
-    `SELECT t.*,
-            c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug
+    `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug
      FROM tools t LEFT JOIN categories c ON t.category_id = c.id
-     WHERE t.is_published = 1
-     ORDER BY t.updated_at DESC`,
-    []
+     WHERE t.is_published = 1 ORDER BY t.updated_at DESC`
   );
+}
+
+async function getThisMonthCount() {
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const rows = await queryD1(
+    `SELECT COUNT(*) as count FROM tools WHERE is_published = 1 AND strftime('%Y-%m', updated_at) = ?`,
+    [ym]
+  );
+  return (rows[0]?.count as number) ?? 0;
 }
 
 export default async function MonthlyPageEn({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const sp = await searchParams;
-  const allTools = await getAllTools();
+  const [allTools, thisMonthCount] = await Promise.all([getAllTools(), getThisMonthCount()]);
   const totalPages = Math.max(1, Math.ceil(allTools.length / PER_PAGE));
   const currentPage = Math.min(Math.max(1, parseInt(sp.p ?? '1', 10)), totalPages);
   const tools = allTools.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+
+  const now = new Date();
+  const monthLabel = `${MONTHS_EN[now.getMonth()]} ${now.getFullYear()}`;
 
   return (
     <main style={{ minHeight: '100vh', background: '#111318' }}>
@@ -57,7 +68,7 @@ export default async function MonthlyPageEn({ searchParams }: { searchParams: Pr
             <span style={{ color: '#F0EBE1' }}>AI Update Monthly</span>
           </nav>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
               <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#008CED', marginBottom: '0.5rem' }}>
                 Monthly Update
@@ -70,13 +81,14 @@ export default async function MonthlyPageEn({ searchParams }: { searchParams: Pr
               </p>
             </div>
 
-            <div style={{ flexShrink: 0, paddingBottom: '0.25rem' }}>
-              <PageSelect
-                currentPage={currentPage}
-                totalPages={totalPages}
-                basePath="/en/monthly"
-                lang="en"
-              />
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', color: '#4A5568', marginBottom: '4px' }}>
+                {monthLabel}
+              </p>
+              <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '1.6rem', fontWeight: 800, color: '#008CED', lineHeight: 1, marginBottom: '2px' }}>
+                {thisMonthCount}
+                <span style={{ fontSize: '0.85rem', fontWeight: 400, color: '#7A8A99', marginLeft: '4px' }}>updated</span>
+              </p>
             </div>
           </div>
         </div>
@@ -89,26 +101,15 @@ export default async function MonthlyPageEn({ searchParams }: { searchParams: Pr
           </div>
         ) : (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem 1.25rem', paddingTop: '0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem 1.25rem' }}>
               {tools.map((tool: Record<string, unknown>, i: number) => (
-                <ToolCard
-                  key={tool.id as string}
-                  tool={tool as any}
-                  locale="en"
-                  index={i}
-                  categoryName={tool.category_name_en as string | undefined}
-                />
+                <ToolCard key={tool.id as string} tool={tool as any} locale="en" index={i}
+                  categoryName={tool.category_name_en as string | undefined} />
               ))}
             </div>
-
             {totalPages > 1 && (
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2.5rem' }}>
-                <PageSelect
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  basePath="/en/monthly"
-                  lang="en"
-                />
+                <PageSelect currentPage={currentPage} totalPages={totalPages} basePath="/en/monthly" lang="en" />
               </div>
             )}
           </>
