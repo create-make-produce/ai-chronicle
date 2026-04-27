@@ -1,0 +1,565 @@
+'use client';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+
+interface Tool {
+  id: string; slug: string; name_ja: string; name_en: string;
+  tagline_ja: string; tagline_en: string; description_ja: string; description_en: string;
+  official_url: string; logo_url: string; company_name: string;
+  status: string; is_published: number; has_free_plan: number; has_api: number;
+  manually_verified: number; category_id: string; category_name_ja: string;
+  data_source: string; created_at: string; updated_at: string;
+}
+
+interface Plan {
+  id: string; tool_id: string; plan_name: string; plan_name_ja: string;
+  is_free: number; price_usd: number | null; price_jpy_official: number | null;
+  has_japan_pricing: number; billing_cycle: string;
+  price_usd_annual: number | null; price_jpy_annual: number | null;
+  manually_verified: number;
+}
+
+interface Contact {
+  id: string; category: string; subject: string; email: string;
+  checked: number; checked_at: string | null; created_at: string;
+}
+
+interface ContactDetail extends Contact {
+  body: string;
+}
+
+const INPUT = (extra?: React.CSSProperties): React.CSSProperties => ({
+  width: '100%', padding: '7px 10px', background: '#111318',
+  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '2px',
+  color: '#F0EBE1', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box', ...extra
+});
+
+const BTN = (bg = '#008CED', color = '#000'): React.CSSProperties => ({
+  padding: '6px 14px', background: bg, border: `1px solid ${bg}`, borderRadius: '2px',
+  color, fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer',
+  letterSpacing: '0.05em', textTransform: 'uppercase' as const,
+});
+
+const LABEL: React.CSSProperties = {
+  display: 'block', fontSize: '0.65rem', fontWeight: 700, color: '#4A5568',
+  marginBottom: '4px', letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+};
+
+const PANEL = (accent = '#008CED'): React.CSSProperties => ({
+  background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)',
+  borderLeft: `3px solid ${accent}`, borderRadius: '4px', padding: '1.25rem', marginBottom: '1rem',
+});
+
+export default function AdminDashboard() {
+  const router = useRouter();
+
+  // メインタブ
+  const [mainTab, setMainTab] = useState<'tools' | 'contacts'>('tools');
+
+  // ツール関連
+  const [tools,     setTools]     = useState<Tool[]>([]);
+  const [search,    setSearch]    = useState('');
+  const [loading,   setLoading]   = useState(true);
+  const [editTool,  setEditTool]  = useState<Tool | null>(null);
+  const [plans,     setPlans]     = useState<Plan[]>([]);
+  const [editTab,   setEditTab]   = useState<'tools' | 'pricing'>('tools');
+  const [csvText,   setCsvText]   = useState('');
+
+  // お問い合わせ関連
+  const [contacts,       setContacts]       = useState<Contact[]>([]);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null);
+
+  // 共通
+  const [saving, setSaving] = useState(false);
+  const [msg,    setMsg]    = useState('');
+
+  const showMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000); };
+
+  // ツール取得
+  const fetchTools = useCallback(async (q = '') => {
+    setLoading(true);
+    const res = await fetch(`/api/admin/tools?q=${encodeURIComponent(q)}`);
+    if (res.status === 401) { router.push('/admin'); return; }
+    const data = await res.json();
+    setTools(data.tools ?? []);
+    setLoading(false);
+  }, [router]);
+
+  // お問い合わせ取得
+  const fetchContacts = useCallback(async () => {
+    setContactLoading(true);
+    const res = await fetch('/api/admin/contacts');
+    if (res.status === 401) { router.push('/admin'); return; }
+    const data = await res.json();
+    setContacts(data.contacts ?? []);
+    setContactLoading(false);
+  }, [router]);
+
+  useEffect(() => { fetchTools(); }, [fetchTools]);
+  useEffect(() => { if (mainTab === 'contacts') fetchContacts(); }, [mainTab, fetchContacts]);
+
+  const openContact = async (contact: Contact) => {
+    const res = await fetch('/api/admin/contacts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: contact.id }),
+    });
+    const data = await res.json();
+    setSelectedContact(data.contact);
+  };
+
+  const toggleCheck = async (id: string, checked: boolean) => {
+    await fetch('/api/admin/contacts', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, checked }),
+    });
+    fetchContacts();
+    if (selectedContact?.id === id) {
+      setSelectedContact(prev => prev ? { ...prev, checked: checked ? 1 : 0 } : null);
+    }
+    showMsg(checked ? '✅ チェック済みにしました（7日後に自動削除）' : '✅ チェックを解除しました');
+  };
+
+  const deleteContact = async (id: string) => {
+    if (!confirm('このお問い合わせを削除しますか？')) return;
+    await fetch(`/api/admin/contacts?id=${id}`, { method: 'DELETE' });
+    setSelectedContact(null);
+    fetchContacts();
+    showMsg('✅ 削除しました');
+  };
+
+  // ツール編集
+  const openEdit = async (tool: Tool) => {
+    setEditTool({ ...tool });
+    const res = await fetch(`/api/admin/pricing?tool_id=${tool.id}`);
+    const data = await res.json();
+    setPlans(data.plans ?? []);
+    setEditTab('tools');
+  };
+
+  const saveTool = async () => {
+    if (!editTool) return;
+    setSaving(true);
+    const res = await fetch('/api/admin/tools', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editTool),
+    });
+    const data = await res.json();
+    setSaving(false);
+    if (data.ok) { showMsg('✅ 保存しました'); fetchTools(search); }
+    else showMsg('❌ 保存失敗: ' + data.error);
+  };
+
+  const savePlan = async (plan: Plan) => {
+    const res = await fetch('/api/admin/pricing', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(plan),
+    });
+    const data = await res.json();
+    if (data.ok) showMsg('✅ 料金プランを保存しました');
+    else showMsg('❌ 保存失敗');
+  };
+
+  const addPlan = async () => {
+    if (!editTool) return;
+    await fetch('/api/admin/pricing', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool_id: editTool.id }),
+    });
+    const res = await fetch(`/api/admin/pricing?tool_id=${editTool.id}`);
+    const data = await res.json();
+    setPlans(data.plans ?? []);
+  };
+
+  const deletePlan = async (id: string) => {
+    if (!confirm('このプランを削除しますか？')) return;
+    await fetch(`/api/admin/pricing?id=${id}`, { method: 'DELETE' });
+    setPlans(plans.filter(p => p.id !== id));
+  };
+
+  const exportCSV = async () => {
+    const res = await fetch('/api/admin/csv');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ai-chronicle-tools-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importCSV = async () => {
+    if (!csvText.trim()) { showMsg('❌ CSVデータを貼り付けてください'); return; }
+    const lines = csvText.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const dataLines = lines.length > 2 ? lines.slice(2) : lines.slice(1);
+    const rows = dataLines.map(line => {
+      const vals = parseCSVLine(line);
+      const obj: Record<string, string> = {};
+      headers.forEach((h, i) => { obj[h] = (vals[i] ?? '').trim(); });
+      return obj;
+    }).filter(r => r['id'] && r['id'] !== 'id');
+    setSaving(true);
+    const res = await fetch('/api/admin/csv', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows }),
+    });
+    const data = await res.json();
+    setSaving(false);
+    showMsg(`✅ ${data.updated}件更新${data.errors?.length ? `（エラー${data.errors.length}件）` : ''}`);
+    setCsvText('');
+    fetchTools(search);
+  };
+
+  const logout = async () => {
+    await fetch('/api/admin/auth', { method: 'DELETE' });
+    router.push('/admin');
+  };
+
+  const uncheckedCount = contacts.filter(c => !c.checked).length;
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#0A0D12', color: '#F0EBE1', fontFamily: 'Fira Sans, sans-serif' }}>
+      {/* ヘッダー */}
+      <header style={{ background: '#1A1D24', borderBottom: '1px solid rgba(0,140,237,0.2)', padding: '0 1.5rem', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.95rem', fontWeight: 900, letterSpacing: '0.06em' }}>
+          AI<span style={{ color: '#008CED' }}>/</span>CHRONICLE <span style={{ color: '#4A5568', fontSize: '0.7rem', fontFamily: 'Fira Sans, sans-serif' }}>Admin</span>
+        </span>
+        <button onClick={logout} style={BTN('#374151', '#9CA3AF')}>ログアウト</button>
+      </header>
+
+      {/* メインタブ */}
+      <div style={{ background: '#111318', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 1.5rem' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '4px' }}>
+          {[
+            { key: 'tools',    label: 'ツール一覧' },
+            { key: 'contacts', label: `お問い合わせ${uncheckedCount > 0 ? ` (${uncheckedCount})` : ''}` },
+          ].map(({ key, label }) => (
+            <button key={key} onClick={() => setMainTab(key as any)}
+              style={{ padding: '12px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${mainTab === key ? '#008CED' : 'transparent'}`, color: mainTab === key ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1.5rem' }}>
+        {msg && (
+          <div style={{ padding: '10px 16px', background: msg.startsWith('✅') ? 'rgba(52,211,153,0.1)' : 'rgba(249,115,22,0.1)', border: `1px solid ${msg.startsWith('✅') ? '#34D399' : '#F97316'}`, borderRadius: '4px', marginBottom: '1rem', fontSize: '0.85rem', color: msg.startsWith('✅') ? '#34D399' : '#F97316' }}>
+            {msg}
+          </div>
+        )}
+
+        {/* ===== ツール一覧タブ ===== */}
+        {mainTab === 'tools' && (
+          <>
+            <div style={PANEL()}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                <h2 style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7A8A99', margin: 0 }}>
+                  ツール一覧 <span style={{ color: '#008CED' }}>{tools.length}件</span>
+                </h2>
+                <input type="text" placeholder="名前・スラッグで検索..."
+                  value={search} onChange={e => setSearch(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && fetchTools(search)}
+                  style={{ ...INPUT(), maxWidth: '300px', flex: 1 }} />
+                <button onClick={() => fetchTools(search)} style={BTN()}>検索</button>
+                <button onClick={exportCSV} style={{ ...BTN('#10B981', '#000'), marginLeft: 'auto' }}>CSV出力</button>
+              </div>
+
+              {loading ? <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>読み込み中...</p> : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        {['公開', 'ツール内容固定', 'ツール名(JA)', 'カテゴリ', '公式URL', '更新日', '操作'].map(h => (
+                          <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tools.map(tool => (
+                        <tr key={tool.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,140,237,0.04)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                          <td style={{ padding: '8px 10px' }}>
+                            <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: tool.is_published ? 'rgba(52,211,153,0.15)' : 'rgba(156,163,175,0.1)', color: tool.is_published ? '#34D399' : '#6B7280' }}>
+                              {tool.is_published ? '公開' : '非公開'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 10px' }}>
+                            {tool.manually_verified ? <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA' }}>固定中</span> : ''}
+                          </td>
+                          <td style={{ padding: '8px 10px', maxWidth: '200px' }}>
+                            <div style={{ fontWeight: 600, color: '#F0EBE1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tool.name_ja}</div>
+                            <div style={{ color: '#4A5568', fontSize: '0.7rem' }}>{tool.slug}</div>
+                          </td>
+                          <td style={{ padding: '8px 10px', color: '#7A8A99', whiteSpace: 'nowrap' }}>{tool.category_name_ja ?? '—'}</td>
+                          <td style={{ padding: '8px 10px', maxWidth: '180px' }}>
+                            {tool.official_url ? <a href={tool.official_url} target="_blank" rel="noreferrer" style={{ color: '#008CED', fontSize: '0.7rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{tool.official_url.replace('https://', '')}</a> : <span style={{ color: '#374151' }}>—</span>}
+                          </td>
+                          <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{tool.updated_at?.slice(0, 10)}</td>
+                          <td style={{ padding: '8px 10px' }}>
+                            <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* CSV一括インポート */}
+            <div style={PANEL('#F97316')}>
+              <h2 style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7A8A99', marginBottom: '0.5rem' }}>
+                CSV一括インポート
+              </h2>
+              <p style={{ fontSize: '0.75rem', color: '#4A5568', marginBottom: '0.75rem' }}>
+                出力したCSVを編集して貼り付け → id列をキーに差分上書き。1行目・2行目は自動スキップ。
+              </p>
+              <textarea value={csvText} onChange={e => setCsvText(e.target.value)}
+                placeholder="CSVデータをここに貼り付け..." rows={6}
+                style={{ ...INPUT(), resize: 'vertical', fontFamily: 'monospace', fontSize: '0.75rem' }} />
+              <div style={{ marginTop: '0.75rem' }}>
+                <button onClick={importCSV} disabled={saving} style={BTN(saving ? '#374151' : '#F97316', '#000')}>
+                  {saving ? 'インポート中...' : 'インポート実行'}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ===== お問い合わせタブ ===== */}
+        {mainTab === 'contacts' && (
+          <div style={PANEL('#60A5FA')}>
+            <h2 style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7A8A99', marginBottom: '1rem' }}>
+              お問い合わせ一覧 <span style={{ color: '#60A5FA' }}>{contacts.length}件</span>
+              {uncheckedCount > 0 && <span style={{ marginLeft: '8px', padding: '2px 8px', background: 'rgba(249,115,22,0.2)', color: '#F97316', borderRadius: '2px', fontSize: '0.7rem' }}>未確認 {uncheckedCount}件</span>}
+            </h2>
+
+            {contactLoading ? <p style={{ color: '#4A5568' }}>読み込み中...</p> : (
+              <div style={{ display: 'grid', gridTemplateColumns: selectedContact ? '1fr 1fr' : '1fr', gap: '1rem' }}>
+                {/* 一覧 */}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        {['確認', 'カテゴリ', '件名', '連絡先', '受信日時', ''].map(h => (
+                          <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contacts.length === 0 ? (
+                        <tr><td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#4A5568' }}>お問い合わせはありません</td></tr>
+                      ) : contacts.map(c => (
+                        <tr key={c.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: selectedContact?.id === c.id ? 'rgba(96,165,250,0.08)' : 'transparent', opacity: c.checked ? 0.5 : 1 }}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,140,237,0.04)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = selectedContact?.id === c.id ? 'rgba(96,165,250,0.08)' : 'transparent')}>
+                          <td style={{ padding: '8px 10px' }}>
+                            <input type="checkbox" checked={!!c.checked}
+                              onChange={e => toggleCheck(c.id, e.target.checked)}
+                              style={{ accentColor: '#008CED', width: '15px', height: '15px', cursor: 'pointer' }} />
+                          </td>
+                          <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                            <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA' }}>{c.category}</span>
+                          </td>
+                          <td style={{ padding: '8px 10px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#F0EBE1' }}>{c.subject}</td>
+                          <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.72rem' }}>{c.email || '—'}</td>
+                          <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
+                            {c.created_at?.replace('T', ' ').slice(0, 16)}
+                          </td>
+                          <td style={{ padding: '8px 10px' }}>
+                            <button onClick={() => openContact(c)} style={BTN('#1A56DB', '#fff')}>詳細</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* 詳細パネル */}
+                {selectedContact && (
+                  <div style={{ background: '#111318', border: '1px solid rgba(96,165,250,0.2)', borderRadius: '4px', padding: '1.5rem', position: 'sticky', top: '1rem', alignSelf: 'start' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+                      <span style={{ padding: '3px 10px', borderRadius: '2px', fontSize: '0.7rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA' }}>{selectedContact.category}</span>
+                      <button onClick={() => setSelectedContact(null)} style={{ background: 'transparent', border: 'none', color: '#4A5568', cursor: 'pointer', fontSize: '1.1rem' }}>✕</button>
+                    </div>
+
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#F0EBE1', marginBottom: '1rem', lineHeight: 1.4 }}>{selectedContact.subject}</h3>
+
+                    <div style={{ display: 'grid', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '0.78rem' }}>
+                      <div style={{ display: 'flex', gap: '1rem' }}>
+                        <span style={{ color: '#4A5568', minWidth: '60px' }}>受信日時</span>
+                        <span style={{ color: '#9CA3AF' }}>{selectedContact.created_at?.replace('T', ' ').slice(0, 16)}</span>
+                      </div>
+                      {selectedContact.email && (
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                          <span style={{ color: '#4A5568', minWidth: '60px' }}>連絡先</span>
+                          <a href={`mailto:${selectedContact.email}`} style={{ color: '#008CED' }}>{selectedContact.email}</a>
+                        </div>
+                      )}
+                      {selectedContact.checked_at && (
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                          <span style={{ color: '#4A5568', minWidth: '60px' }}>確認日時</span>
+                          <span style={{ color: '#34D399', fontSize: '0.72rem' }}>{selectedContact.checked_at?.slice(0, 16)} ✓（7日後に自動削除）</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ background: '#1A1D24', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px', padding: '1rem', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#D1D5DB', lineHeight: 1.8, whiteSpace: 'pre-wrap', maxHeight: '300px', overflowY: 'auto' }}>
+                      {selectedContact.body}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button onClick={() => toggleCheck(selectedContact.id, !selectedContact.checked)}
+                        style={BTN(selectedContact.checked ? '#374151' : '#008CED', selectedContact.checked ? '#9CA3AF' : '#000')}>
+                        {selectedContact.checked ? 'チェック解除' : '確認済みにする'}
+                      </button>
+                      <button onClick={() => deleteContact(selectedContact.id)} style={BTN('#DC2626', '#fff')}>削除</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ツール編集モーダル */}
+      {editTool && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 100, overflowY: 'auto', padding: '2rem' }}
+          onClick={e => e.target === e.currentTarget && setEditTool(null)}>
+          <div style={{ maxWidth: '900px', margin: '0 auto', background: '#1A1D24', border: '1px solid rgba(0,140,237,0.2)', borderTop: '3px solid #008CED', borderRadius: '4px', padding: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#F0EBE1', margin: 0 }}>{editTool.name_ja}</h2>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={saveTool} disabled={saving} style={BTN()}>{saving ? '保存中...' : '保存'}</button>
+                <button onClick={() => setEditTool(null)} style={BTN('#374151', '#9CA3AF')}>閉じる</button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              {(['tools', 'pricing'] as const).map(t => (
+                <button key={t} onClick={() => setEditTab(t)}
+                  style={{ padding: '8px 16px', background: 'transparent', border: 'none', borderBottom: `2px solid ${editTab === t ? '#008CED' : 'transparent'}`, color: editTab === t ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  {t === 'tools' ? 'ツール情報' : '料金プラン'}
+                </button>
+              ))}
+            </div>
+
+            {editTab === 'tools' ? (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                {[
+                  { key: 'name_ja',      label: 'ツール名（日本語）' },
+                  { key: 'name_en',      label: 'ツール名（英語）' },
+                  { key: 'tagline_ja',   label: 'タグライン（日本語）' },
+                  { key: 'tagline_en',   label: 'タグライン（英語）' },
+                  { key: 'official_url', label: '公式URL' },
+                  { key: 'logo_url',     label: 'ロゴURL' },
+                  { key: 'company_name', label: '会社名' },
+                ].map(({ key, label }) => (
+                  <div key={key}>
+                    <label style={LABEL}>{label}</label>
+                    <input value={(editTool as any)[key] ?? ''} onChange={e => setEditTool({ ...editTool, [key]: e.target.value })} style={INPUT()} />
+                  </div>
+                ))}
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={LABEL}>概要（日本語）</label>
+                  <textarea value={editTool.description_ja ?? ''} onChange={e => setEditTool({ ...editTool, description_ja: e.target.value })} rows={4} style={{ ...INPUT(), resize: 'vertical' }} />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={LABEL}>概要（英語）</label>
+                  <textarea value={editTool.description_en ?? ''} onChange={e => setEditTool({ ...editTool, description_en: e.target.value })} rows={4} style={{ ...INPUT(), resize: 'vertical' }} />
+                </div>
+                <div>
+                  <label style={LABEL}>ステータス</label>
+                  <select value={editTool.status} onChange={e => setEditTool({ ...editTool, status: e.target.value })} style={{ ...INPUT(), cursor: 'pointer' }}>
+                    <option value="active">active（稼働中）</option>
+                    <option value="beta">beta</option>
+                    <option value="inactive">inactive（停止）</option>
+                    <option value="deprecated">deprecated（廃止）</option>
+                  </select>
+                </div>
+                <div style={{ gridColumn: '1 / -1', display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
+                  {[
+                    { key: 'is_published',     label: '公開する' },
+                    { key: 'has_free_plan',    label: '無料プランあり' },
+                    { key: 'has_api',          label: 'API提供' },
+                    { key: 'manually_verified', label: 'ツール内容固定（自動更新スキップ）' },
+                  ].map(({ key, label }) => (
+                    <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#9CA3AF', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={!!(editTool as any)[key]} onChange={e => setEditTool({ ...editTool, [key]: e.target.checked ? 1 : 0 })} style={{ accentColor: '#008CED', width: '16px', height: '16px' }} />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <button onClick={addPlan} style={BTN('#10B981', '#000')}>＋ プラン追加</button>
+                </div>
+                {plans.map(plan => (
+                  <div key={plan.id} style={{ background: '#111318', border: `1px solid ${plan.manually_verified ? 'rgba(96,165,250,0.4)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '4px', padding: '1rem', marginBottom: '0.75rem' }}>
+                    {plan.manually_verified ? <div style={{ fontSize: '0.65rem', color: '#60A5FA', fontWeight: 700, marginBottom: '0.5rem', letterSpacing: '0.1em' }}>■ 料金固定中</div> : null}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                      <div><label style={LABEL}>プラン名</label><input value={plan.plan_name ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, plan_name: e.target.value } : p))} style={INPUT()} /></div>
+                      <div><label style={LABEL}>プラン名（日本語）</label><input value={plan.plan_name_ja ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, plan_name_ja: e.target.value } : p))} style={INPUT()} /></div>
+                      <div><label style={LABEL}>請求サイクル</label>
+                        <select value={plan.billing_cycle ?? 'monthly'} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, billing_cycle: e.target.value } : p))} style={{ ...INPUT(), cursor: 'pointer' }}>
+                          <option value="monthly">monthly（月額）</option>
+                          <option value="annual">annual（年額）</option>
+                          <option value="one-time">one-time（買い切り）</option>
+                        </select>
+                      </div>
+                      <div><label style={LABEL}>USD価格/月</label><input type="number" value={plan.price_usd ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, price_usd: e.target.value ? Number(e.target.value) : null } : p))} style={INPUT()} /></div>
+                      <div><label style={LABEL}>円価格/月（公式）</label><input type="number" value={plan.price_jpy_official ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, price_jpy_official: e.target.value ? Number(e.target.value) : null } : p))} style={INPUT()} /></div>
+                      <div><label style={LABEL}>USD価格/年</label><input type="number" value={plan.price_usd_annual ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, price_usd_annual: e.target.value ? Number(e.target.value) : null } : p))} style={INPUT()} /></div>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+                      {[
+                        { key: 'is_free',           label: '無料プラン' },
+                        { key: 'has_japan_pricing',  label: '日本円公式価格あり' },
+                        { key: 'manually_verified',  label: '料金固定（自動更新スキップ）' },
+                      ].map(({ key, label }) => (
+                        <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#9CA3AF', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={!!(plan as any)[key]} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, [key]: e.target.checked ? 1 : 0 } : p))} style={{ accentColor: '#008CED' }} />
+                          {label}
+                        </label>
+                      ))}
+                      <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+                        <button onClick={() => savePlan(plan)} style={BTN()}>保存</button>
+                        <button onClick={() => deletePlan(plan.id)} style={BTN('#DC2626', '#fff')}>削除</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {plans.length === 0 && <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>料金プランがありません</p>}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current); current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
+}

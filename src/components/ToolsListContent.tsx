@@ -1,6 +1,5 @@
 // src/components/ToolsListContent.tsx
 import Link from 'next/link';
-import { Suspense } from 'react';
 import type { Locale, Tool } from '@/types';
 import { t, localizedPath } from '@/lib/i18n';
 import ToolsFilter from './ToolsFilter';
@@ -19,9 +18,11 @@ interface ToolsListContentProps {
   title?: string;
   description?: string;
   categories?: Category[];
+  initialCat?: string;
+  initialQ?: string;
 }
 
-export default function ToolsListContent({ tools, locale, title, description, categories = [] }: ToolsListContentProps) {
+export default function ToolsListContent({ tools, locale, title, description, categories = [], initialCat = '', initialQ = '' }: ToolsListContentProps) {
   const tt = t[locale];
   const pageTitle = title || tt.navTools;
 
@@ -50,9 +51,13 @@ export default function ToolsListContent({ tools, locale, title, description, ca
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
         <AdSlot slot="header" className="mb-8" />
-        <Suspense fallback={<div style={{ color: 'var(--color-text-muted)', padding: '2rem' }}>読み込み中...</div>}>
-          <ToolsFilter tools={tools} locale={locale} categories={categories} />
-        </Suspense>
+        <ToolsFilter
+          tools={tools}
+          locale={locale}
+          categories={categories}
+          initialCat={initialCat}
+          initialQ={initialQ}
+        />
       </div>
     </main>
   );

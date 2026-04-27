@@ -40,14 +40,22 @@ async function getCategories() {
   );
 }
 
-export default async function AllToolsPage() {
+export default async function AllToolsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cat?: string; q?: string }>;
+}) {
+  const sp = await searchParams;
   const [tools, categories] = await Promise.all([getTools(), getCategories()]);
+
   return (
     <ToolsListContent
       tools={tools as any}
       locale="ja"
       title="すべてのAI"
       categories={categories as any}
+      initialCat={sp.cat ?? ''}
+      initialQ={sp.q ?? ''}
     />
   );
 }
