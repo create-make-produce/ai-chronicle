@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 const NEWS_TYPE_LABELS = {
-  price_change: { ja: '価格改定',  en: 'Price Change', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)'  },
-  new_tool:     { ja: '新リリース', en: 'New Release',  color: '#34D399', bg: 'rgba(52,211,153,0.12)'  },
-  new_feature:  { ja: '新機能',    en: 'New Feature',  color: '#60A5FA', bg: 'rgba(96,165,250,0.12)'  },
-  other:        { ja: 'その他',    en: 'Other',        color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)'  },
+  price_change: { ja: '価格改定',  en: 'Price Change', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)',  border: 'rgba(252,211,77,0.3)'  },
+  new_tool:     { ja: '新リリース', en: 'New Release',  color: '#008CED', bg: 'rgba(0,140,237,0.12)',   border: 'rgba(0,140,237,0.3)'   },
+  new_feature:  { ja: '新機能',    en: 'New Feature',  color: '#60A5FA', bg: 'rgba(96,165,250,0.12)',  border: 'rgba(96,165,250,0.3)'  },
+  other:        { ja: 'その他',    en: 'Other',        color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)',  border: 'rgba(156,163,175,0.3)' },
 } as const;
 
 interface NewsRowProps {
@@ -54,7 +54,15 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       <span style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', letterSpacing: '0.02em' }}>
         {date}
       </span>
-      <span style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.color}30` }}>
+      <span style={{
+        fontFamily: 'Fira Sans, sans-serif',
+        fontSize: '0.7rem', fontWeight: 700,
+        color: badge.color,
+        background: badge.bg,
+        padding: '2px 8px', borderRadius: '3px',
+        whiteSpace: 'nowrap',
+        border: `1px solid ${badge.border}`,
+      }}>
         {badgeLabel}
       </span>
       <span style={{ fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: '#B0BAC5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

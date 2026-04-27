@@ -7,7 +7,7 @@ import ToolCard from '@/components/ToolCard';
 
 export const metadata: Metadata = {
   title: '月刊AIアップデート | AI Chronicle',
-  description: '今月アップデートされたAIツールをまとめてチェック。',
+  description: '最新アップデートされたAIツールをまとめてチェック。',
 };
 
 const PER_PAGE = 30;
@@ -49,40 +49,43 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
 
   return (
     <main style={{ minHeight: '100vh', background: '#111318' }}>
-      <section style={{ background: 'linear-gradient(135deg, #0A0D12 0%, #111827 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2.5rem' }}>
+      <section style={{ background: 'linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          {/* パンくず */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
             <Link href="/" style={{ color: '#4A5568', textDecoration: 'none' }}>ホーム</Link>
             <span>/</span>
             <span style={{ color: '#F0EBE1' }}>月刊AIアップデート</span>
           </nav>
-          <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#008CED', marginBottom: '0.75rem' }}>
-            Monthly Update
-          </p>
-          <h1 style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, color: '#F0EBE1', lineHeight: 1.1, marginBottom: '0.75rem' }}>
-            月刊AIアップデート
-          </h1>
-          <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.9rem', color: '#7A8A99' }}>
-            最新アップデートされたAIツールをまとめてチェック
-          </p>
+
+          {/* タイトル行＋ページネーション右側 */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div>
+              <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#008CED', marginBottom: '0.5rem' }}>
+                Monthly Update
+              </p>
+              <h1 style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, color: '#F0EBE1', lineHeight: 1.1, marginBottom: '0.5rem' }}>
+                月刊AIアップデート
+              </h1>
+              <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.9rem', color: '#7A8A99', margin: 0 }}>
+                最新アップデートされたAIツールをまとめてチェック
+              </p>
+            </div>
+
+            {/* ページネーション（右側） */}
+            <div style={{ flexShrink: 0, paddingBottom: '0.25rem' }}>
+              <PageSelect
+                currentPage={currentPage}
+                totalPages={totalPages}
+                basePath="/monthly"
+                lang="ja"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-
-        {/* ページ選択（右上） */}
-        {totalPages > 1 && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
-            <PageSelect
-              currentPage={currentPage}
-              totalPages={totalPages}
-              basePath="/monthly"
-              month=""
-              lang="ja"
-            />
-          </div>
-        )}
-
         {allTools.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#4A5568', fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.9rem' }}>
             アップデート情報はまだありません。
@@ -101,13 +104,13 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
               ))}
             </div>
 
+            {/* 下部ページネーション */}
             {totalPages > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2.5rem' }}>
                 <PageSelect
                   currentPage={currentPage}
                   totalPages={totalPages}
                   basePath="/monthly"
-                  month=""
                   lang="ja"
                 />
               </div>
