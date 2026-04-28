@@ -55,6 +55,7 @@ async function main() {
       );
       console.log(`     topics: ${topics || '(なし)'}`);
       console.log(`     tagline: ${post.tagline}`);
+      console.log(`     website: ${post.website ?? '(null)'}`);
       console.log('');
     });
 

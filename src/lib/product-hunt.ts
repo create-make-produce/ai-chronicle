@@ -158,6 +158,56 @@ async function resolveRedirectUrl(redirectUrl: string): Promise<string | null> {
 }
 
 /**
+ * トラッキングパラメータを除去
+ */
+function stripTrackingParams(url: string): string {
+  try {
+    const u = new URL(url);
+    ['ref', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(p => u.searchParams.delete(p));
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Product HuntページのHTMLから公式URLを取得
+ * website フィールドがnullの場合のフォールバック
+ */
+async function extractWebsiteFromPHPage(phPageUrl: string): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const response = await fetch(phPageUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AI-Chronicle-Bot/1.0)' },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) return null;
+
+    const html = await response.text();
+
+    // 方法1: JSONデータ内のwebsiteUrlを探す（最も確実）
+    const jsonMatch = html.match(/"websiteUrl":"(https?:\/\/[^"]+)"/);
+    if (jsonMatch) return stripTrackingParams(jsonMatch[1]);
+
+    // 方法2: Visit websiteボタンのhrefを探す
+    const btnMatch = html.match(/data-test="visit-website-button"[^>]*href="([^"]+)"/);
+    if (btnMatch) return stripTrackingParams(btnMatch[1]);
+
+    // 方法3: primaryLink.urlを探す
+    const primaryMatch = html.match(/"primaryLink":\{"__typename":"ProductLink","id":"[^"]+","url":"(https?:\/\/[^"]+)"\}/);
+    if (primaryMatch) return stripTrackingParams(primaryMatch[1]);
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * 最新投稿を取得
  * AIカテゴリ関連のトピックでフィルタリング
  */
@@ -174,6 +224,7 @@ export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
             description
             url
             website
+            productLinks { url type }
             votesCount
             createdAt
             thumbnail { url }
@@ -197,6 +248,7 @@ export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
           description: string | null;
           url: string;
           website: string | null;
+          productLinks: Array<{ url: string; type: string }> | null;
           votesCount: number;
           createdAt: string;
           thumbnail: { url: string } | null;
@@ -213,12 +265,27 @@ export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
   // websiteフィールドのリダイレクトURLを実際の公式URLに解決
   const posts = await Promise.all(
     data.posts.edges.map(async (edge) => {
-      let website = edge.node.website;
+      // productLinksからhomepageまたは最初のURLを取得
+      const productLinks = edge.node.productLinks ?? [];
+      const homepage = productLinks.find(l => l.type === 'homepage')?.url
+        ?? productLinks[0]?.url
+        ?? null;
+      let website = edge.node.website ?? homepage ?? null;
 
       // Product HuntのリダイレクトURLなら実際のURLに解決
       if (website && website.includes('producthunt.com')) {
         const resolved = await resolveRedirectUrl(website);
         website = resolved;
+      }
+
+      // websiteがnullの場合はProduct HuntページからURLを抽出
+      if (!website) {
+        website = await extractWebsiteFromPHPage(edge.node.url);
+      }
+
+      // websiteにトラッキングパラメータがあれば除去
+      if (website) {
+        website = stripTrackingParams(website);
       }
 
       return {

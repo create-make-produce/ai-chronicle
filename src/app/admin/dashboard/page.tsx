@@ -70,11 +70,23 @@ export default function AdminDashboard() {
   const [contactLoading, setContactLoading] = useState(false);
   const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null);
 
+  // ロゴエラー検知
+  const [brokenLogos, setBrokenLogos] = useState<string[]>([]);
+
   // 共通
   const [saving, setSaving] = useState(false);
   const [msg,    setMsg]    = useState('');
 
   const showMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000); };
+
+  // ソート
+  const [sortSource, setSortSource] = useState<'asc' | 'desc' | null>(null);
+
+  const filteredTools = sortSource === null ? tools : [...tools].sort((a, b) => {
+    const aVal = a.data_source === 'product_hunt_api' ? 1 : 0;
+    const bVal = b.data_source === 'product_hunt_api' ? 1 : 0;
+    return sortSource === 'asc' ? aVal - bVal : bVal - aVal;
+  });
 
   // ツール取得
   const fetchTools = useCallback(async (q = '') => {
@@ -288,18 +300,43 @@ export default function AdminDashboard() {
                 <button onClick={exportCSV} style={{ ...BTN('#10B981', '#000'), marginLeft: 'auto' }}>CSV出力</button>
               </div>
 
+              {/* 非表示ロゴ読み込み（エラー検知用） */}
+              <div style={{ display: 'none' }}>
+                {tools.map(tool => tool.logo_url ? (
+                  <img key={tool.id} src={tool.logo_url} alt=""
+                    onError={() => setBrokenLogos(prev => prev.includes(tool.name_en) ? prev : [...prev, tool.name_en])}
+                    onLoad={() => setBrokenLogos(prev => prev.filter(n => n !== tool.name_en))}
+                  />
+                ) : null)}
+              </div>
+
+              {/* ロゴエラーパネル */}
+              {brokenLogos.length > 0 && (
+                <div style={{ padding: '10px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.82rem' }}>
+                  <span style={{ color: '#EF4444', fontWeight: 700 }}>⚠ ロゴ読み込みエラー {brokenLogos.length}件：</span>
+                  <span style={{ color: '#9CA3AF', marginLeft: '8px' }}>{brokenLogos.join('、')}</span>
+                </div>
+              )}
+
               {loading ? <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>読み込み中...</p> : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                        {['公開', 'ツール内容固定', 'ツール名(JA)', 'カテゴリ', '公式URL', '更新日', '操作'].map(h => (
+                        {['公開', 'ツール内容固定', 'ツール名'].map(h => (
+                          <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem' }}>{h}</th>
+                        ))}
+                        <th onClick={() => setSortSource(s => s === 'asc' ? 'desc' : 'asc')}
+                          style={{ padding: '8px 10px', textAlign: 'left', color: sortSource ? '#008CED' : '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem', cursor: 'pointer', userSelect: 'none' }}>
+                          ソース {sortSource === 'asc' ? '↑' : sortSource === 'desc' ? '↓' : '↕'}
+                        </th>
+                        {['カテゴリ', '公式URL', '更新日', '操作'].map(h => (
                           <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {tools.map(tool => (
+                      {filteredTools.map(tool => (
                         <tr key={tool.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,140,237,0.04)')}
                           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
@@ -321,6 +358,14 @@ export default function AdminDashboard() {
                           <td style={{ padding: '8px 10px', maxWidth: '200px' }}>
                             <div style={{ fontWeight: 600, color: '#F0EBE1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tool.name_ja}</div>
                             <div style={{ color: '#4A5568', fontSize: '0.7rem' }}>{tool.slug}</div>
+                          </td>
+                          <td style={{ padding: '8px 10px' }}>
+                            <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700,
+                              background: tool.data_source === 'product_hunt_api' ? 'rgba(249,115,22,0.15)' : 'rgba(139,92,246,0.15)',
+                              color: tool.data_source === 'product_hunt_api' ? '#F97316' : '#A78BFA',
+                            }}>
+                              {tool.data_source === 'product_hunt_api' ? 'PH' : '手動'}
+                            </span>
                           </td>
                           <td style={{ padding: '8px 10px', color: '#7A8A99', whiteSpace: 'nowrap' }}>{tool.category_name_ja ?? '—'}</td>
                           <td style={{ padding: '8px 10px', maxWidth: '180px' }}>

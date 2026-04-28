@@ -288,9 +288,54 @@ async function updateToolInDB(toolId: string, info: ExtractedInfo): Promise<void
   }
 }
 
+async function fillMissingUrls(): Promise<void> {
+  console.log('\n--- official_url補完処理 ---');
+
+  const tools = await queryD1<{ id: string; name_en: string; name_ja: string; slug: string }>(
+    `SELECT id, name_en, name_ja, slug FROM tools
+     WHERE official_url IS NULL OR official_url = ''
+     ORDER BY created_at ASC
+     LIMIT 10`
+  );
+
+  if (tools.length === 0) {
+    console.log('  → 補完対象なし');
+    return;
+  }
+
+  console.log(`  → 補完対象: ${tools.length}件`);
+
+  for (const tool of tools) {
+    console.log(`  処理中: ${tool.name_en}`);
+    await sleep(CONFIG.AI_REQUEST_DELAY_MS);
+
+    const prompt = `「${tool.name_en}」というAIツールの公式サイトURLを教えてください。
+確実に実在するURLのみ答えてください。不明な場合はnullにしてください。
+JSONのみ出力してください。マークダウンは使わないでください。
+{"official_url": "https://example.com またはnull"}`;
+
+    const text = await callGemini(prompt);
+    const data = parseJson(text);
+    const url = (data?.official_url as string | null) ?? null;
+
+    if (url && url.startsWith('http')) {
+      await queryD1(
+        `UPDATE tools SET official_url = ?, updated_at = datetime('now') WHERE id = ?`,
+        [url, tool.id]
+      );
+      console.log(`  ✅ ${tool.name_en} → ${url}`);
+    } else {
+      console.log(`  ⚠️ ${tool.name_en} → URL取得失敗`);
+    }
+  }
+}
+
 async function main() {
   console.log('=== update-tools.ts 開始 ===');
   console.log(`最大処理件数: ${CONFIG.MAX_TOOLS_PER_RUN}`);
+
+  // official_urlが空のツールをGeminiで補完
+  await fillMissingUrls();
 
   const tools = await queryD1<{
     id: string; slug: string; name_ja: string; name_en: string;
