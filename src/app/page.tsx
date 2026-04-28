@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 // src/app/page.tsx
 // トップページ（日本語）
 
@@ -10,9 +12,6 @@ import {
   getRecentPriceChanges,
 } from '@/lib/db';
 import { CONFIG } from '@/config';
-
-// ISR
-export const revalidate = 1800; // 30分
 
 export default async function HomePage() {
   const [toolCount, latestNews, newTools, categories, priceChangesRaw] = await Promise.all([

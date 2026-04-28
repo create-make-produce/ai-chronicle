@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 // src/app/en/page.tsx
 // Home page (English)
 
@@ -10,8 +12,6 @@ import {
   getRecentPriceChanges,
 } from '@/lib/db';
 import { CONFIG } from '@/config';
-
-export const revalidate = 1800;
 
 export const metadata = {
   title: 'AI Chronicle - AI Tools Pricing Database',

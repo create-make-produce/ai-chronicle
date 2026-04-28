@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 // src/app/sitemap.ts
 // サイトマップ自動生成：JP/EN 両方のURLを列挙
 
