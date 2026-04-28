@@ -4,7 +4,6 @@
 // → fetch 自体は cache:'no-store'（JSONエラー回避）
 // → 結果の JavaScript オブジェクトを unstable_cache で TTL 管理
 
-import { unstable_cache } from 'next/cache';
 import type {
   Tool,
   PricingPlan,
@@ -81,65 +80,44 @@ async function queryD1<T = Record<string, unknown>>(
 // Tools
 // =============================================
 
-export const getPublishedTools = unstable_cache(
-  async (limit = 30, offset = 0): Promise<Tool[]> => {
+export async function getPublishedTools(limit = 30, offset = 0): Promise<Tool[]>{
     return queryD1<Tool>(
       `SELECT * FROM tools WHERE is_published = 1 ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       [limit, offset],
     );
-  },
-  ['published-tools'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getToolCount = unstable_cache(
-  async (): Promise<number> => {
+export async function getToolCount(): Promise<number>{
     const rows = await queryD1<{ c: number }>(
       `SELECT COUNT(*) AS c FROM tools WHERE is_published = 1`,
     );
     return rows[0]?.c ?? 0;
-  },
-  ['tool-count'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getToolBySlug = unstable_cache(
-  async (slug: string): Promise<Tool | null> => {
+export async function getToolBySlug(slug: string): Promise<Tool | null>{
     const rows = await queryD1<Tool>(
       `SELECT * FROM tools WHERE slug = ? AND is_published = 1 LIMIT 1`,
       [slug],
     );
     return rows[0] ?? null;
-  },
-  ['tool-by-slug'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
-export const getAllToolSlugs = unstable_cache(
-  async (): Promise<string[]> => {
+export async function getAllToolSlugs(): Promise<string[]>{
     const rows = await queryD1<{ slug: string }>(
       `SELECT slug FROM tools WHERE is_published = 1`,
     );
     return rows.map((r) => r.slug);
-  },
-  ['all-tool-slugs'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
-export const getToolById = unstable_cache(
-  async (id: string): Promise<Tool | null> => {
+export async function getToolById(id: string): Promise<Tool | null>{
     const rows = await queryD1<Tool>(
       `SELECT * FROM tools WHERE id = ? AND is_published = 1 LIMIT 1`,
       [id],
     );
     return rows[0] ?? null;
-  },
-  ['tool-by-id'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
-export const getToolsByCategory = unstable_cache(
-  async (categorySlug: string, limit = 30, offset = 0): Promise<Tool[]> => {
+export async function getToolsByCategory(categorySlug: string, limit = 30, offset = 0): Promise<Tool[]>{
     return queryD1<Tool>(
       `SELECT t.* FROM tools t
        JOIN categories c ON t.category_id = c.id
@@ -148,13 +126,9 @@ export const getToolsByCategory = unstable_cache(
        LIMIT ? OFFSET ?`,
       [categorySlug, limit, offset],
     );
-  },
-  ['tools-by-category'],
-  { revalidate: CONFIG.REVALIDATE_CATEGORY_PAGE_SECONDS },
-);
+}
 
-export const getToolCountByCategory = unstable_cache(
-  async (categorySlug: string): Promise<number> => {
+export async function getToolCountByCategory(categorySlug: string): Promise<number>{
     const rows = await queryD1<{ c: number }>(
       `SELECT COUNT(*) AS c FROM tools t
        JOIN categories c ON t.category_id = c.id
@@ -162,13 +136,9 @@ export const getToolCountByCategory = unstable_cache(
       [categorySlug],
     );
     return rows[0]?.c ?? 0;
-  },
-  ['tool-count-by-category'],
-  { revalidate: CONFIG.REVALIDATE_CATEGORY_PAGE_SECONDS },
-);
+}
 
-export const getNewToolsSince = unstable_cache(
-  async (hoursAgo: number, limit = 10): Promise<Tool[]> => {
+export async function getNewToolsSince(hoursAgo: number, limit = 10): Promise<Tool[]>{
     const since = new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
     return queryD1<Tool>(
       `SELECT * FROM tools
@@ -177,13 +147,9 @@ export const getNewToolsSince = unstable_cache(
        LIMIT ?`,
       [since, limit],
     );
-  },
-  ['new-tools-since'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getRecentlyUpdatedTools = unstable_cache(
-  async (limit = 9): Promise<Tool[]> => {
+export async function getRecentlyUpdatedTools(limit = 9): Promise<Tool[]>{
     return queryD1<Tool>(
       `SELECT * FROM tools
        WHERE is_published = 1
@@ -191,13 +157,9 @@ export const getRecentlyUpdatedTools = unstable_cache(
        LIMIT ?`,
       [limit],
     );
-  },
-  ['recently-updated-tools'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getFreeTools = unstable_cache(
-  async (limit = 12): Promise<Tool[]> => {
+export async function getFreeTools(limit = 12): Promise<Tool[]>{
     return queryD1<Tool>(
       `SELECT * FROM tools
        WHERE is_published = 1 AND has_free_plan = 1
@@ -205,13 +167,9 @@ export const getFreeTools = unstable_cache(
        LIMIT ?`,
       [limit],
     );
-  },
-  ['free-tools'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getRelatedTools = unstable_cache(
-  async (categoryId: string | null, excludeId: string, limit = 5): Promise<Tool[]> => {
+export async function getRelatedTools(categoryId: string | null, excludeId: string, limit = 5): Promise<Tool[]>{
     if (!categoryId) return [];
     return queryD1<Tool>(
       `SELECT * FROM tools
@@ -220,30 +178,22 @@ export const getRelatedTools = unstable_cache(
        LIMIT ?`,
       [categoryId, excludeId, limit],
     );
-  },
-  ['related-tools'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
 // =============================================
 // Pricing
 // =============================================
 
-export const getPlansForTool = unstable_cache(
-  async (toolId: string): Promise<PricingPlan[]> => {
+export async function getPlansForTool(toolId: string): Promise<PricingPlan[]>{
     return queryD1<PricingPlan>(
       `SELECT * FROM pricing_plans WHERE tool_id = ? ORDER BY
         CASE WHEN is_free = 1 THEN 0 ELSE 1 END,
         COALESCE(price_usd, 999999) ASC`,
       [toolId],
     );
-  },
-  ['plans-for-tool'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
-export const getRecentPriceChanges = unstable_cache(
-  async (days: number, limit = 5) => {
+export async function getRecentPriceChanges(days: number, limit = 5){
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
     return queryD1<
       PricingPlan & { tool_name_ja: string; tool_name_en: string; tool_slug: string }
@@ -258,55 +208,39 @@ export const getRecentPriceChanges = unstable_cache(
        LIMIT ?`,
       [since, limit],
     );
-  },
-  ['recent-price-changes'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
 // =============================================
 // Categories
 // =============================================
 
-export const getAllCategories = unstable_cache(
-  async (): Promise<Category[]> => {
+export async function getAllCategories(): Promise<Category[]>{
     return queryD1<Category>(
       `SELECT * FROM categories ORDER BY display_order ASC, name_ja ASC`,
     );
-  },
-  ['all-categories'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getCategoryBySlug = unstable_cache(
-  async (slug: string): Promise<Category | null> => {
+export async function getCategoryBySlug(slug: string): Promise<Category | null>{
     const rows = await queryD1<Category>(
       `SELECT * FROM categories WHERE slug = ? LIMIT 1`,
       [slug],
     );
     return rows[0] ?? null;
-  },
-  ['category-by-slug'],
-  { revalidate: CONFIG.REVALIDATE_CATEGORY_PAGE_SECONDS },
-);
+}
 
-export const getCategoryById = unstable_cache(
-  async (id: string): Promise<Category | null> => {
+export async function getCategoryById(id: string): Promise<Category | null>{
     const rows = await queryD1<Category>(
       `SELECT * FROM categories WHERE id = ? LIMIT 1`,
       [id],
     );
     return rows[0] ?? null;
-  },
-  ['category-by-id'],
-  { revalidate: CONFIG.REVALIDATE_CATEGORY_PAGE_SECONDS },
-);
+}
 
 export interface CategoryWithCount extends Category {
   tool_count: number;
 }
 
-export const getCategoriesWithCount = unstable_cache(
-  async (): Promise<CategoryWithCount[]> => {
+export async function getCategoriesWithCount(): Promise<CategoryWithCount[]>{
     return queryD1<CategoryWithCount>(
       `SELECT c.*, COUNT(t.id) AS tool_count
        FROM categories c
@@ -314,62 +248,42 @@ export const getCategoriesWithCount = unstable_cache(
        GROUP BY c.id
        ORDER BY c.display_order ASC, c.name_ja ASC`,
     );
-  },
-  ['categories-with-count'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
 // =============================================
 // News
 // =============================================
 
-export const getLatestNews = unstable_cache(
-  async (limit = 5): Promise<News[]> => {
+export async function getLatestNews(limit = 5): Promise<News[]>{
     return queryD1<News>(
       `SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC LIMIT ?`,
       [limit],
     );
-  },
-  ['latest-news'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getAllNews = unstable_cache(
-  async (limit = 200): Promise<News[]> => {
+export async function getAllNews(limit = 200): Promise<News[]>{
     return queryD1<News>(
       `SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC LIMIT ?`,
       [limit],
     );
-  },
-  ['all-news'],
-  { revalidate: CONFIG.REVALIDATE_TOP_PAGE_SECONDS },
-);
+}
 
-export const getNewsBySlug = unstable_cache(
-  async (slug: string): Promise<News | null> => {
+export async function getNewsBySlug(slug: string): Promise<News | null>{
     const rows = await queryD1<News>(
       `SELECT * FROM news WHERE slug = ? AND is_published = 1 LIMIT 1`,
       [slug],
     );
     return rows[0] ?? null;
-  },
-  ['news-by-slug'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
-export const getAllNewsSlugs = unstable_cache(
-  async (): Promise<string[]> => {
+export async function getAllNewsSlugs(): Promise<string[]>{
     const rows = await queryD1<{ slug: string }>(
       `SELECT slug FROM news WHERE is_published = 1`,
     );
     return rows.map((r) => r.slug);
-  },
-  ['all-news-slugs'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
-export const getRelatedNews = unstable_cache(
-  async (toolId: string | null, excludeId: string, limit = 3): Promise<News[]> => {
+export async function getRelatedNews(toolId: string | null, excludeId: string, limit = 3): Promise<News[]>{
     if (!toolId) return [];
     return queryD1<News>(
       `SELECT * FROM news
@@ -378,17 +292,13 @@ export const getRelatedNews = unstable_cache(
        LIMIT ?`,
       [toolId, excludeId, limit],
     );
-  },
-  ['related-news'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
 
 // =============================================
 // 集約（ツール詳細ページ用）
 // =============================================
 
-export const getToolDetailBySlug = unstable_cache(
-  async (slug: string): Promise<ToolWithPlans | null> => {
+export async function getToolDetailBySlug(slug: string): Promise<ToolWithPlans | null>{
     const tool = await getToolBySlug(slug);
     if (!tool) return null;
     const [plans, category] = await Promise.all([
@@ -396,7 +306,4 @@ export const getToolDetailBySlug = unstable_cache(
       tool.category_id ? getCategoryById(tool.category_id) : Promise.resolve(null),
     ]);
     return { ...tool, plans, category };
-  },
-  ['tool-detail-by-slug'],
-  { revalidate: CONFIG.REVALIDATE_TOOL_PAGE_SECONDS },
-);
+}
