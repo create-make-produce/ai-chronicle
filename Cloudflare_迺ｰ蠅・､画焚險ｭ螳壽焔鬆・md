@@ -1,0 +1,70 @@
+# Cloudflare Pages 環境変数設定手順
+
+## 設定場所
+
+Cloudflare Dashboard → Workers & Pages → `ai-chronicle`（プロジェクト名）
+→ **Settings** → **Environment variables**
+
+---
+
+## 設定する変数一覧
+
+| 変数名 | 値 | 説明 |
+|---|---|---|
+| `CLOUDFLARE_ACCOUNT_ID` | ダッシュボードのURLに含まれるID | 例: `https://dash.cloudflare.com/xxxxxxxx` の `xxxxxxxx` |
+| `CLOUDFLARE_D1_DATABASE_ID` | `f6fecbd5-d72c-4b80-b4ae-42746a527583` | 設計図に記載のD1データベースID |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare APIトークン | 下記「APIトークン取得手順」を参照 |
+| `ADMIN_EMAIL` | 管理者メールアドレス | ログイン用 |
+| `ADMIN_PASSWORD` | 管理者パスワード | ログイン用（強固なものを設定） |
+| `ADMIN_TOKEN` | 任意のランダム文字列 | セッション認証用。例: `openssl rand -hex 32` で生成 |
+
+---
+
+## APIトークン取得手順
+
+1. Cloudflare Dashboard → 右上のアイコン → **My Profile**
+2. 左メニュー **API Tokens** → **Create Token**
+3. **Custom token** を選択
+4. 以下の権限を付与：
+
+| Permission | 権限 |
+|---|---|
+| Account / D1 / Edit | D1データベースの読み書き |
+| Account / Cloudflare Pages / Edit | Pages のデプロイ（任意） |
+
+5. **Account Resources** → 対象アカウントを選択
+6. **Continue to summary** → **Create Token**
+7. 表示されたトークンをコピー（**一度しか表示されない**）
+
+---
+
+## 設定手順
+
+1. **Settings → Environment variables → Add variable** をクリック
+2. 上記テーブルの変数を1つずつ追加
+3. `CLOUDFLARE_API_TOKEN` / `ADMIN_PASSWORD` / `ADMIN_TOKEN` は **Encrypt** にチェックを入れる（セキュリティ）
+4. **Production** と **Preview** 両方に設定する
+5. 全て入力したら **Save** をクリック
+
+---
+
+## 設定後の確認
+
+1. Cloudflare Pages で再デプロイを実行（Settings → Deployments → Retry deployment）
+2. `https://your-domain.pages.dev/admin` にアクセス
+3. `ADMIN_EMAIL` / `ADMIN_PASSWORD` でログインできれば完了
+
+---
+
+## ADMIN_TOKEN の生成方法（ローカル）
+
+```bash
+# Mac / Linux
+openssl rand -hex 32
+
+# 出力例
+a3f8c2d1e9b74f60a1234567890abcdef1234567890abcdef1234567890abcdef
+```
+
+この出力値をそのまま `ADMIN_TOKEN` に設定する。
+
