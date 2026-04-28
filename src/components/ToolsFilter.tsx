@@ -30,8 +30,6 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
   const [inputValue,  setInputValue]  = useState(initialQ);
   const [selectedCat, setSelectedCat] = useState(initialCat || categorySlug || '');
   const [freeOnly,    setFreeOnly]    = useState(false);
-  const [jaOnly,      setJaOnly]      = useState(false);
-  const [apiOnly,     setApiOnly]     = useState(false);
   const [sort,        setSort]        = useState<SortKey>('newest');
   const [currentPage, setCurrentPage] = useState(1);
   const tt = t[locale];
@@ -59,11 +57,6 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
     }
     if (selectedCat) r = r.filter(tool => (tool as any).category_slug === selectedCat);
     if (freeOnly) r = r.filter(tool => tool.has_free_plan === 1);
-    if (apiOnly)  r = r.filter(tool => tool.has_api === 1);
-    if (jaOnly)   r = r.filter(tool => {
-      try { const a = JSON.parse(tool.language_support || '[]'); return Array.isArray(a) && a.includes('ja'); }
-      catch { return false; }
-    });
     if (sort === 'newest') r.sort((a, b) => b.created_at > a.created_at ? 1 : -1);
     if (sort === 'name')   r.sort((a, b) => {
       const an = locale === 'ja' ? a.name_ja : a.name_en;
@@ -71,7 +64,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
       return an.localeCompare(bn);
     });
     return r;
-  }, [tools, query, selectedCat, freeOnly, jaOnly, apiOnly, sort, locale]);
+  }, [tools, query, selectedCat, freeOnly, sort, locale]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
@@ -146,8 +139,6 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
       {/* フィルターバー */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
         <button type="button" onClick={() => { setFreeOnly(!freeOnly); resetPage(); }} style={btnStyle(freeOnly)}>{tt.filterFreeOnly}</button>
-        <button type="button" onClick={() => { setJaOnly(!jaOnly); resetPage(); }} style={btnStyle(jaOnly)}>{tt.filterJaSupport}</button>
-        <button type="button" onClick={() => { setApiOnly(!apiOnly); resetPage(); }} style={btnStyle(apiOnly)}>{tt.filterApiOnly}</button>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
           <span style={{ color: 'var(--color-text-muted)' }}>{locale === 'ja' ? '並べ替え：' : 'Sort:'}</span>
           <select value={sort} onChange={e => { setSort(e.target.value as SortKey); resetPage(); }}

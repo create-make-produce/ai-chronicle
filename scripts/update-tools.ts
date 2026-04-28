@@ -166,18 +166,8 @@ description_ja のルール：
   "has_chrome_ext": true/false,
   "has_api": true/false,
   "has_free_plan": true/false,
-  "has_japan_pricing": true/false,
-  "price_jpy_official": 日本向け公式円価格（数値のみ・なければnull）,
-  "plans": [
-    {
-      "plan_name": "Free",
-      "plan_name_ja": "無料",
-      "is_free": true,
-      "price_usd": null,
-      "price_jpy": null,
-      "has_japan_pricing": false
-    }
-  ],
+  // PRICING_DISABLED: plans は取得しない
+  "plans": [],
   "confidence": 0.0〜1.0（情報の確信度）
 }
 `;
@@ -213,6 +203,9 @@ async function updateToolInDB(toolId: string, info: ExtractedInfo): Promise<void
     [...updateValues, toolId]
   );
 
+  await queryD1(`UPDATE tools SET last_price_checked_at = datetime('now') WHERE id = ?`, [toolId]);
+
+  /* PRICING_DISABLED
   if (info.plans && info.plans.length > 0) {
     const existing = await queryD1<{ plan_name: string; price_usd: number | null; id: string; manually_verified: number }>(
       `SELECT id, plan_name, price_usd, manually_verified FROM pricing_plans WHERE tool_id = ?`,
@@ -285,57 +278,12 @@ async function updateToolInDB(toolId: string, info: ExtractedInfo): Promise<void
     }
 
     await queryD1(`UPDATE tools SET last_price_checked_at = datetime('now') WHERE id = ?`, [toolId]);
-  }
-}
-
-async function fillMissingUrls(): Promise<void> {
-  console.log('\n--- official_url補完処理 ---');
-
-  const tools = await queryD1<{ id: string; name_en: string; name_ja: string; slug: string }>(
-    `SELECT id, name_en, name_ja, slug FROM tools
-     WHERE official_url IS NULL OR official_url = ''
-     ORDER BY created_at ASC
-     LIMIT 10`
-  );
-
-  if (tools.length === 0) {
-    console.log('  → 補完対象なし');
-    return;
-  }
-
-  console.log(`  → 補完対象: ${tools.length}件`);
-
-  for (const tool of tools) {
-    console.log(`  処理中: ${tool.name_en}`);
-    await sleep(CONFIG.AI_REQUEST_DELAY_MS);
-
-    const prompt = `「${tool.name_en}」というAIツールの公式サイトURLを教えてください。
-確実に実在するURLのみ答えてください。不明な場合はnullにしてください。
-JSONのみ出力してください。マークダウンは使わないでください。
-{"official_url": "https://example.com またはnull"}`;
-
-    const text = await callGemini(prompt);
-    const data = parseJson(text);
-    const url = (data?.official_url as string | null) ?? null;
-
-    if (url && url.startsWith('http')) {
-      await queryD1(
-        `UPDATE tools SET official_url = ?, updated_at = datetime('now') WHERE id = ?`,
-        [url, tool.id]
-      );
-      console.log(`  ✅ ${tool.name_en} → ${url}`);
-    } else {
-      console.log(`  ⚠️ ${tool.name_en} → URL取得失敗`);
-    }
-  }
+  } // PRICING_DISABLED end
 }
 
 async function main() {
   console.log('=== update-tools.ts 開始 ===');
   console.log(`最大処理件数: ${CONFIG.MAX_TOOLS_PER_RUN}`);
-
-  // official_urlが空のツールをGeminiで補完
-  await fillMissingUrls();
 
   const tools = await queryD1<{
     id: string; slug: string; name_ja: string; name_en: string;

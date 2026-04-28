@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
              t.manually_verified, t.category_id, t.data_source,
              t.created_at, t.updated_at,
              c.name_ja as category_name_ja, c.slug as category_slug,
-             EXISTS (SELECT 1 FROM pricing_plans WHERE tool_id = t.id AND manually_verified = 1) AS has_verified_pricing
+             EXISTS (SELECT 1 FROM pricing_plans WHERE tool_id = t.id AND manually_verified = 1) AS has_verified_pricing,
+             (SELECT COUNT(*) FROM pricing_plans WHERE tool_id = t.id AND (is_free = 1 OR price_usd IS NOT NULL)) AS pricing_count
       FROM tools t
       LEFT JOIN categories c ON t.category_id = c.id
     `;

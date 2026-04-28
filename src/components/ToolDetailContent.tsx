@@ -3,7 +3,6 @@ import Link from 'next/link';
 import type { Locale, ToolWithPlans, Tool, News } from '@/types';
 import { t, localizedPath, formatDate } from '@/lib/i18n';
 import PriceTable from './PriceTable';
-import SpecTable from './SpecTable';
 import ToolCard from './ToolCard';
 import AdSlot from './AdSlot';
 
@@ -189,7 +188,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             </section>
           )}
 
-          {/* 料金プラン */}
+          {/* 料金プラン - PRICING_DISABLED
           <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
             <div className="flex items-baseline justify-between mb-4">
               <h2 className="font-display text-2xl tracking-tight">
@@ -198,16 +197,9 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             </div>
             <PriceTable plans={tool.plans} locale={locale} lastCheckedAt={tool.last_price_checked_at} />
           </section>
+          PRICING_DISABLED */}
 
           <AdSlot slot="in-content" />
-
-          {/* スペック */}
-          <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
-            <h2 className="font-display text-2xl tracking-tight mb-4">
-              {locale === 'ja' ? 'スペック' : 'Specifications'}
-            </h2>
-            <SpecTable tool={tool} locale={locale} />
-          </section>
 
           {/* メディア */}
           {(tool.demo_url || tool.video_url) && (

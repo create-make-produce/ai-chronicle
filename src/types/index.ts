@@ -22,24 +22,11 @@ export interface Tool {
   founded_year: number | null;
   twitter_handle: string | null;
   github_url: string | null;
-  is_open_source: number;
-  license_type: string | null;
 
   category_id: string | null;
 
   status: string;
   is_published: number;
-
-  os_support: string | null;
-  language_support: string | null;
-  has_api: number;
-  login_methods: string | null;
-  has_mobile_app: number;
-  has_chrome_ext: number;
-  data_storage_region: string | null;
-  gdpr_compliant: number | null;
-  soc2_certified: number | null;
-  integration_list: string | null;
 
   has_free_plan: number;
   free_plan_detail_ja: string | null;

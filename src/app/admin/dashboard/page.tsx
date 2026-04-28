@@ -6,9 +6,9 @@ interface Tool {
   id: string; slug: string; name_ja: string; name_en: string;
   tagline_ja: string; tagline_en: string; description_ja: string; description_en: string;
   official_url: string; logo_url: string; company_name: string;
-  status: string; is_published: number; has_free_plan: number; has_api: number;
+  status: string; is_published: number; has_free_plan: number;
   manually_verified: number; has_verified_pricing: number; category_id: string; category_name_ja: string;
-  data_source: string; created_at: string; updated_at: string;
+  data_source: string; created_at: string; updated_at: string; pricing_count: number;
 }
 
 interface Plan {
@@ -79,14 +79,39 @@ export default function AdminDashboard() {
 
   const showMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000); };
 
-  // ソート
-  const [sortSource, setSortSource] = useState<'asc' | 'desc' | null>(null);
+  // ソート・フィルタ
+  const [sortCol, setSortCol] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
-  const filteredTools = sortSource === null ? tools : [...tools].sort((a, b) => {
-    const aVal = a.data_source === 'product_hunt_api' ? 1 : 0;
-    const bVal = b.data_source === 'product_hunt_api' ? 1 : 0;
-    return sortSource === 'asc' ? aVal - bVal : bVal - aVal;
-  });
+  const handleSort = (col: string) => {
+    if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortCol(col); setSortDir('asc'); }
+  };
+
+  const sortArrow = (col: string) => sortCol === col ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
+
+  const filteredTools = (() => {
+    let list = [...tools];
+    if (!sortCol) return list;
+    return list.sort((a, b) => {
+      let aVal: string | number = '';
+      let bVal: string | number = '';
+      if (sortCol === 'published')  { aVal = a.is_published; bVal = b.is_published; }
+      else if (sortCol === 'fixed') { aVal = a.manually_verified; bVal = b.manually_verified; }
+      else if (sortCol === 'name')  { aVal = a.name_ja ?? ''; bVal = b.name_ja ?? ''; }
+      else if (sortCol === 'source'){ aVal = a.data_source ?? ''; bVal = b.data_source ?? ''; }
+      else if (sortCol === 'desc')  { aVal = a.description_ja ? 1 : 0; bVal = b.description_ja ? 1 : 0; }
+      else if (sortCol === 'url')   { aVal = a.official_url ? 1 : 0; bVal = b.official_url ? 1 : 0; }
+      else if (sortCol === 'company'){ aVal = a.company_name ? 1 : 0; bVal = b.company_name ? 1 : 0; }
+      else if (sortCol === 'pricing'){ aVal = a.pricing_count > 0 ? 1 : 0; bVal = b.pricing_count > 0 ? 1 : 0; }
+      else if (sortCol === 'logo')  { aVal = a.logo_url ? 1 : 0; bVal = b.logo_url ? 1 : 0; }
+      else if (sortCol === 'cat')   { aVal = a.category_name_ja ?? ''; bVal = b.category_name_ja ?? ''; }
+      else if (sortCol === 'updated'){ aVal = a.updated_at ?? ''; bVal = b.updated_at ?? ''; }
+      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  })();
 
   // ツール取得
   const fetchTools = useCallback(async (q = '') => {
@@ -154,7 +179,7 @@ export default function AdminDashboard() {
     setSaving(true);
     const res = await fetch('/api/admin/tools', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editTool),
+      body: JSON.stringify({ ...editTool, manually_verified: 1 }),
     });
     const data = await res.json();
     setSaving(false);
@@ -290,7 +315,7 @@ export default function AdminDashboard() {
             <div style={PANEL()}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
                 <h2 style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7A8A99', margin: 0 }}>
-                  ツール一覧 <span style={{ color: '#008CED' }}>{tools.length}件</span>
+                  ツール一覧 <span style={{ color: '#008CED' }}>{filteredTools.length}件</span>
                 </h2>
                 <input type="text" placeholder="名前・スラッグで検索..."
                   value={search} onChange={e => setSearch(e.target.value)}
@@ -321,18 +346,41 @@ export default function AdminDashboard() {
               {loading ? <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>読み込み中...</p> : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-                    <thead>
+                    <thead style={{ position: 'sticky', top: 0, zIndex: 2 }}>
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                        {['公開', 'ツール内容固定', 'ツール名'].map(h => (
-                          <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem' }}>{h}</th>
+                        {[
+                          { col: 'published', label: '公開' },
+                          { col: 'fixed',     label: '固定' },
+                          { col: 'name',      label: 'ツール名' },
+                          { col: 'source',    label: 'ソース' },
+                        ].map(({ col, label }) => (
+                          <th key={col} onClick={() => handleSort(col)}
+                            style={{ padding: '8px 10px', textAlign: 'left', color: sortCol === col ? '#008CED' : '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem', cursor: 'pointer', userSelect: 'none', background: '#111318' }}>
+                            {label}{sortArrow(col)}
+                          </th>
                         ))}
-                        <th onClick={() => setSortSource(s => s === 'asc' ? 'desc' : 'asc')}
-                          style={{ padding: '8px 10px', textAlign: 'left', color: sortSource ? '#008CED' : '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem', cursor: 'pointer', userSelect: 'none' }}>
-                          ソース {sortSource === 'asc' ? '↑' : sortSource === 'desc' ? '↓' : '↕'}
-                        </th>
-                        {['カテゴリ', '公式URL', '更新日', '操作'].map(h => (
-                          <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem' }}>{h}</th>
+                        {[
+                          { col: 'desc',    label: '概要',   right: 200 },
+                          { col: 'url',     label: '公式URL', right: 150 },
+                          { col: 'company', label: '会社名', right: 100 },
+                          { col: 'pricing', label: '料金',   right: 50  },
+                          { col: 'logo',    label: 'ロゴ',   right: 0   },
+                        ].map(({ col, label, right }) => (
+                          <th key={col} onClick={() => handleSort(col)}
+                            style={{ padding: '8px 6px', textAlign: 'center', color: sortCol === col ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.65rem', whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none', position: 'sticky', right: `${right}px`, background: '#111318', zIndex: 3, width: '50px' }}>
+                            {label}{sortArrow(col)}
+                          </th>
                         ))}
+                        {[
+                          { col: 'cat',     label: 'カテゴリ' },
+                          { col: 'updated', label: '更新日' },
+                        ].map(({ col, label }) => (
+                          <th key={col} onClick={() => handleSort(col)}
+                            style={{ padding: '8px 10px', textAlign: 'left', color: sortCol === col ? '#008CED' : '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem', cursor: 'pointer', userSelect: 'none', background: '#111318' }}>
+                            {label}{sortArrow(col)}
+                          </th>
+                        ))}
+                        <th style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, fontSize: '0.65rem', background: '#111318' }}>操作</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -356,7 +404,10 @@ export default function AdminDashboard() {
                             </div>
                           </td>
                           <td style={{ padding: '8px 10px', maxWidth: '200px' }}>
-                            <div style={{ fontWeight: 600, color: '#F0EBE1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tool.name_ja}</div>
+                            <a href={`/tool/${tool.slug}`} target="_blank" rel="noreferrer"
+                              style={{ fontWeight: 600, color: '#008CED', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', textDecoration: 'none' }}>
+                              {tool.name_ja}
+                            </a>
                             <div style={{ color: '#4A5568', fontSize: '0.7rem' }}>{tool.slug}</div>
                           </td>
                           <td style={{ padding: '8px 10px' }}>
@@ -367,10 +418,22 @@ export default function AdminDashboard() {
                               {tool.data_source === 'product_hunt_api' ? 'PH' : '手動'}
                             </span>
                           </td>
-                          <td style={{ padding: '8px 10px', color: '#7A8A99', whiteSpace: 'nowrap' }}>{tool.category_name_ja ?? '—'}</td>
-                          <td style={{ padding: '8px 10px', maxWidth: '180px' }}>
-                            {tool.official_url ? <a href={tool.official_url} target="_blank" rel="noreferrer" style={{ color: '#008CED', fontSize: '0.7rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{tool.official_url.replace('https://', '')}</a> : <span style={{ color: '#374151' }}>—</span>}
+                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '200px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                            <StatusDot ok={!!tool.description_ja} />
                           </td>
+                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '150px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                            <StatusDot ok={!!tool.official_url} />
+                          </td>
+                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '100px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                            <StatusDot ok={!!tool.company_name} />
+                          </td>
+                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '50px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                            <StatusDot ok={tool.pricing_count > 0} />
+                          </td>
+                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '0px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                            <StatusDot ok={!!tool.logo_url && !brokenLogos.includes(tool.name_en)} error={brokenLogos.includes(tool.name_en)} />
+                          </td>
+                          <td style={{ padding: '8px 10px', color: '#7A8A99', whiteSpace: 'nowrap' }}>{tool.category_name_ja ?? '—'}</td>
                           <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{tool.updated_at?.slice(0, 10)}</td>
                           <td style={{ padding: '8px 10px' }}>
                             <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>
@@ -513,6 +576,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* PRICING_DISABLED - タブ切替を無効化してツール情報のみ表示
             <div style={{ display: 'flex', gap: '4px', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               {(['tools', 'pricing'] as const).map(t => (
                 <button key={t} onClick={() => setEditTab(t)}
@@ -521,6 +585,7 @@ export default function AdminDashboard() {
                 </button>
               ))}
             </div>
+            PRICING_DISABLED */}
 
             {editTab === 'tools' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -532,19 +597,30 @@ export default function AdminDashboard() {
                   { key: 'official_url', label: '公式URL' },
                   { key: 'logo_url',     label: 'ロゴURL' },
                   { key: 'company_name', label: '会社名' },
-                ].map(({ key, label }) => (
-                  <div key={key}>
-                    <label style={LABEL}>{label}</label>
-                    <input value={(editTool as any)[key] ?? ''} onChange={e => setEditTool({ ...editTool, [key]: e.target.value })} style={INPUT()} />
-                  </div>
-                ))}
+                ].map(({ key, label }) => {
+                  const val = (editTool as any)[key] ?? '';
+                  const isEmpty = !val;
+                  return (
+                    <div key={key}>
+                      <label style={{ ...LABEL, color: isEmpty ? '#EF4444' : '#4A5568' }}>{label}{isEmpty ? ' ⚠ 未入力' : ''}</label>
+                      <input value={val} onChange={e => setEditTool({ ...editTool, [key]: e.target.value })}
+                        style={INPUT({ borderColor: isEmpty ? 'rgba(239,68,68,0.6)' : 'rgba(255,255,255,0.1)' })} />
+                    </div>
+                  );
+                })}
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={LABEL}>概要（日本語）</label>
-                  <textarea value={editTool.description_ja ?? ''} onChange={e => setEditTool({ ...editTool, description_ja: e.target.value })} rows={4} style={{ ...INPUT(), resize: 'vertical' }} />
+                  <label style={{ ...LABEL, color: !editTool.description_ja ? '#EF4444' : '#4A5568' }}>
+                    概要（日本語）{!editTool.description_ja ? ' ⚠ 未入力' : ''}
+                  </label>
+                  <textarea value={editTool.description_ja ?? ''} onChange={e => setEditTool({ ...editTool, description_ja: e.target.value })} rows={4}
+                    style={{ ...INPUT(), resize: 'vertical', borderColor: !editTool.description_ja ? 'rgba(239,68,68,0.6)' : 'rgba(255,255,255,0.1)' }} />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={LABEL}>概要（英語）</label>
-                  <textarea value={editTool.description_en ?? ''} onChange={e => setEditTool({ ...editTool, description_en: e.target.value })} rows={4} style={{ ...INPUT(), resize: 'vertical' }} />
+                  <label style={{ ...LABEL, color: !editTool.description_en ? '#EF4444' : '#4A5568' }}>
+                    概要（英語）{!editTool.description_en ? ' ⚠ 未入力' : ''}
+                  </label>
+                  <textarea value={editTool.description_en ?? ''} onChange={e => setEditTool({ ...editTool, description_en: e.target.value })} rows={4}
+                    style={{ ...INPUT(), resize: 'vertical', borderColor: !editTool.description_en ? 'rgba(239,68,68,0.6)' : 'rgba(255,255,255,0.1)' }} />
                 </div>
                 <div>
                   <label style={LABEL}>ステータス</label>
@@ -559,7 +635,6 @@ export default function AdminDashboard() {
                   {[
                     { key: 'is_published',     label: '公開する' },
                     { key: 'has_free_plan',    label: '無料プランあり' },
-                    { key: 'has_api',          label: 'API提供' },
                     { key: 'manually_verified', label: 'ツール内容固定（自動更新スキップ）' },
                   ].map(({ key, label }) => (
                     <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#9CA3AF', cursor: 'pointer' }}>
@@ -569,64 +644,18 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               </div>
-            ) : (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '8px' }}>
-                  <button onClick={addPlan} style={BTN('#10B981', '#000')}>＋ プラン追加</button>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', cursor: 'pointer',
-                    color: plans.some(p => p.manually_verified) ? '#34D399' : '#9CA3AF',
-                    background: plans.some(p => p.manually_verified) ? 'rgba(52,211,153,0.1)' : 'transparent',
-                    border: `1px solid ${plans.some(p => p.manually_verified) ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                    padding: '5px 12px', borderRadius: '4px',
-                  }}>
-                    <input type="checkbox"
-                      checked={plans.length > 0 && plans.every(p => p.manually_verified)}
-                      onChange={e => toggleAllPricingLock(e.target.checked)}
-                      style={{ accentColor: '#34D399', width: '15px', height: '15px' }} />
-                    料金固定（全プラン・自動更新スキップ）
-                  </label>
-                </div>
-                {plans.map(plan => (
-                  <div key={plan.id} style={{ background: '#111318', border: `1px solid ${plan.manually_verified ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '4px', padding: '1rem', marginBottom: '0.75rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                      <div><label style={LABEL}>プラン名</label><input value={plan.plan_name ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, plan_name: e.target.value } : p))} style={INPUT()} /></div>
-                      <div><label style={LABEL}>プラン名（日本語）</label><input value={plan.plan_name_ja ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, plan_name_ja: e.target.value } : p))} style={INPUT()} /></div>
-                      <div><label style={LABEL}>請求サイクル</label>
-                        <select value={plan.billing_cycle ?? 'monthly'} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, billing_cycle: e.target.value } : p))} style={{ ...INPUT(), cursor: 'pointer' }}>
-                          <option value="monthly">monthly（月額）</option>
-                          <option value="annual">annual（年額）</option>
-                          <option value="one-time">one-time（買い切り）</option>
-                        </select>
-                      </div>
-                      <div><label style={LABEL}>USD価格/月</label><input type="number" value={plan.price_usd ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, price_usd: e.target.value ? Number(e.target.value) : null } : p))} style={INPUT()} /></div>
-                      <div><label style={LABEL}>円価格/月（公式）</label><input type="number" value={plan.price_jpy_official ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, price_jpy_official: e.target.value ? Number(e.target.value) : null } : p))} style={INPUT()} /></div>
-                      <div><label style={LABEL}>USD価格/年</label><input type="number" value={plan.price_usd_annual ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, price_usd_annual: e.target.value ? Number(e.target.value) : null } : p))} style={INPUT()} /></div>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
-                      {[
-                        { key: 'is_free',          label: '無料プラン' },
-                        { key: 'has_japan_pricing', label: '日本円公式価格あり' },
-                      ].map(({ key, label }) => (
-                        <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#9CA3AF', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={!!(plan as any)[key]} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, [key]: e.target.checked ? 1 : 0 } : p))} style={{ accentColor: '#008CED' }} />
-                          {label}
-                        </label>
-                      ))}
-                      <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-                        <button onClick={() => savePlan(plan)} style={BTN()}>保存</button>
-                        <button onClick={() => deletePlan(plan.id)} style={BTN('#DC2626', '#fff')}>削除</button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {plans.length === 0 && <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>料金プランがありません</p>}
-              </div>
-            )}
+            ) : null /* PRICING_DISABLED */}
           </div>
         </div>
       )}
     </div>
   );
+}
+
+function StatusDot({ ok, error }: { ok: boolean; error?: boolean }) {
+  if (error) return <span style={{ color: '#EF4444', fontSize: '0.85rem', fontWeight: 700 }} title="404エラー">✕</span>;
+  if (ok)    return <span style={{ color: '#D1D5DB', fontSize: '0.85rem' }}>○</span>;
+  return       <span style={{ color: '#EF4444', fontSize: '0.85rem', fontWeight: 700 }}>✕</span>;
 }
 
 function parseCSVLine(line: string): string[] {
