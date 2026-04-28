@@ -50,6 +50,7 @@ const TOOL_COLUMNS: Record<string, string> = {
   has_free_plan:      '無料プラン(1=あり/0=なし)',
   has_api:            'API提供(1=あり/0=なし)',
   manually_verified:  'ツール内容固定(1=固定/0=自動更新)',
+  has_verified_pricing: '料金固定(1=固定/0=自動更新)',
   category_id:        'カテゴリID',
   category_name_ja:   'カテゴリ名（日本語）',
   data_source:        'データソース',
@@ -65,7 +66,9 @@ export async function GET(req: NextRequest) {
     SELECT t.id, t.slug, t.name_ja, t.name_en, t.tagline_ja, t.tagline_en,
            t.description_ja, t.description_en, t.official_url, t.logo_url,
            t.company_name, t.status, t.is_published, t.has_free_plan, t.has_api,
-           t.manually_verified, t.category_id, t.data_source, t.created_at, t.updated_at,
+           t.manually_verified,
+           EXISTS (SELECT 1 FROM pricing_plans WHERE tool_id = t.id AND manually_verified = 1) AS has_verified_pricing,
+           t.category_id, t.data_source, t.created_at, t.updated_at,
            c.name_ja as category_name_ja
     FROM tools t
     LEFT JOIN categories c ON t.category_id = c.id
@@ -109,6 +112,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'データがありません' }, { status: 400 });
   }
 
+  // 料金固定中のツールでCSVインポートしても価格情報は上書きしない
+  const PRICE_FIELDS = ['has_free_plan'];
   const allowed = [
     'name_ja', 'name_en', 'tagline_ja', 'tagline_en',
     'description_ja', 'description_en', 'official_url', 'logo_url',
@@ -126,7 +131,11 @@ export async function POST(req: NextRequest) {
     const setClauses: string[] = [];
     const params: (string | number | null)[] = [];
 
+    // 料金固定中(has_verified_pricing=1)なら価格関連フィールドはスキップ
+    const isPricingLocked = row['has_verified_pricing'] === '1';
+
     for (const key of allowed) {
+      if (isPricingLocked && PRICE_FIELDS.includes(key)) continue;
       if (key in row && row[key] !== undefined) {
         setClauses.push(`${key} = ?`);
         const val = row[key];

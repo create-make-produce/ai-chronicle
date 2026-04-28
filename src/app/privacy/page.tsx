@@ -1,68 +1,78 @@
 // src/app/privacy/page.tsx
-// プライバシーポリシー（日本国内向けに日本語で表記。英語ユーザーにも同じページで対応）
 
 export const metadata = {
-  title: 'プライバシーポリシー',
+  title: 'プライバシーポリシー | AI Chronicle',
   description: 'AI Chronicleのプライバシーポリシー。',
 };
+
+const SECTIONS = [
+  {
+    title: '1. 個人情報の取得と利用目的',
+    body: '当サイトは、お問い合わせフォーム等を通じて、氏名、メールアドレス等の個人情報を取得する場合があります。取得した個人情報は、お問い合わせへの回答、本人確認、および当サイトのサービス改善のためにのみ利用し、それ以外の目的で利用することはありません。',
+  },
+  {
+    title: '2. アクセス解析ツールについて',
+    body: '当サイトでは、Googleによるアクセス解析ツール「Google Analytics」を利用しています。Google Analyticsは、トラフィックデータの収集のためにCookieを使用します。このトラフィックデータは匿名で収集されており、個人を特定するものではありません。この機能はCookieを無効にすることで収集を拒否することができますので、お使いのブラウザの設定をご確認ください。Google Analyticsのデータ収集および処理の仕組みについては、Googleのポリシーと規約をご確認ください。',
+  },
+  {
+    title: '3. 広告の配信について',
+    body: '当サイトは、第三者配信の広告サービス「Google AdSense」を利用しています。広告配信事業者は、ユーザーの興味に応じた商品やサービスの広告を表示するため、当サイトや他サイトへのアクセスに関する情報（氏名、住所、メールアドレス、電話番号は含まれません）を使用することがあります。\n\nGoogle AdSenseでは、Cookieを使用することにより、ユーザーが当サイトや他のサイトにアクセスした際の情報に基づいて、Googleおよびそのパートナーがユーザーに適切な広告を表示できるようになります。ユーザーは、広告設定でパーソナライズド広告を無効にすることができます。また、www.aboutads.infoにアクセスすれば、第三者配信事業者のCookie使用によるパーソナライズド広告配信を無効にできます。',
+  },
+  {
+    title: '4. アフィリエイトプログラムについて',
+    body: '当サイトは、Amazonアソシエイト、楽天アフィリエイト、A8.netなどのアフィリエイトプログラムを利用する場合があります。アフィリエイトリンクを含む場合は、該当箇所に明記します。これらのプログラムにより、当サイトが紹介料を得ることがあります。',
+  },
+  {
+    title: '5. 免責事項',
+    body: '当サイトに掲載されているAIツールの価格・機能・仕様等の情報は参考情報であり、正確性・完全性を保証するものではありません。最新・正確な情報は各ツールの公式ページをご確認ください。当サイトの利用により生じた損害については、一切の責任を負いかねますのでご了承ください。',
+  },
+  {
+    title: '6. 著作権について',
+    body: '当サイトで掲載している画像・ロゴ等の著作権・肖像権は各権利所有者に帰属します。掲載内容に関して問題がありましたら、お問い合わせフォームよりご連絡ください。著作権法で認められている引用の範囲を超えて、当サイトのコンテンツを無断で転載、複製、改変することを禁じます。',
+  },
+  {
+    title: '7. 個人情報の安全管理措置',
+    body: '当サイトは、個人情報の漏えい、滅失または毀損の防止、その他の個人情報の安全管理のために、必要かつ適切な措置を講じます。具体的には、SSLによる通信の暗号化、アクセス制限の実施などを行います。',
+  },
+  {
+    title: '8. 個人情報の開示・訂正・削除等',
+    body: '利用者ご本人からの個人情報の開示、訂正、削除等のご請求があった場合には、ご本人であることを確認の上、個人情報保護法の定めに従い、速やかに対応いたします。ご請求は、お問い合わせフォームよりご連絡ください。',
+  },
+  {
+    title: '9. プライバシーポリシーの変更',
+    body: '本プライバシーポリシーの内容は、法令の改正、当サイトのサービス内容の変更等に伴い、利用者への通知なく変更されることがあります。変更後のプライバシーポリシーは、本ページに掲載した時点から効力を生じるものとします。',
+  },
+  {
+    title: '10. 外部送信規律について',
+    body: '当サイトでは、Google AnalyticsやGoogle AdSenseなどのサービスを利用しており、これらのサービスはCookie等の情報を外部に送信しています。送信される情報は、アクセス状況の分析や広告配信の最適化を目的としており、個人を特定するものではありません。送信先の詳細については、各サービスのプライバシーポリシーをご確認ください。',
+  },
+];
 
 export default function PrivacyPage() {
   return (
     <main className="flex-1">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="hero-title text-3xl sm:text-4xl mt-3 mb-8">プライバシーポリシー</h1>
+        <h1 className="hero-title text-3xl sm:text-4xl mt-3 mb-2">プライバシーポリシー</h1>
+        <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: '2.5rem' }}>
+          AI Chronicle（以下「当サイト」といいます）は、以下のプライバシーポリシーに基づき、利用者の皆様の個人情報保護に努めます。
+        </p>
 
-        <div className="prose prose-sm max-w-none space-y-6 text-[var(--color-text)]">
-          <section>
-            <h2 className="font-display text-xl mb-2">1. 個人情報の取得</h2>
-            <p className="leading-relaxed">
-              AI Chronicle（以下「当サイト」といいます）は、お問い合わせフォーム等を通じて、利用者の個人情報を取得する場合があります。
-            </p>
-          </section>
+        <div className="space-y-8 text-[var(--color-text)]">
+          {SECTIONS.map(({ title, body }) => (
+            <section key={title}>
+              <h2 className="font-display text-xl mb-3">{title}</h2>
+              {body.split('\n\n').map((para, i) => (
+                <p key={i} className="leading-relaxed text-[var(--color-text-sub)] mb-3">
+                  {para}
+                </p>
+              ))}
+            </section>
+          ))}
+        </div>
 
-          <section>
-            <h2 className="font-display text-xl mb-2">2. アクセス解析ツールについて</h2>
-            <p className="leading-relaxed">
-              当サイトでは、Googleによるアクセス解析ツール「Google Analytics」を利用する場合があります。Google
-              Analyticsはトラフィックデータの収集のためにCookieを使用しています。このトラフィックデータは匿名で収集されており、個人を特定するものではありません。
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl mb-2">3. 広告の配信について</h2>
-            <p className="leading-relaxed">
-              当サイトは、第三者配信の広告サービス「Google
-              AdSense」を利用する場合があります。広告配信事業者は、ユーザーの興味に応じた商品やサービスの広告を表示するため、当サイトや他サイトへのアクセスに関する情報（氏名、住所、メールアドレス、電話番号は含まれません）を使用することがあります。
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl mb-2">4. アフィリエイトプログラムについて</h2>
-            <p className="leading-relaxed">
-              当サイトは、その他のアフィリエイトプログラムを利用する場合があります。アフィリエイトリンクを含む場合は、該当箇所に明記します。
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl mb-2">5. 免責事項</h2>
-            <p className="leading-relaxed">
-              当サイトに掲載されているAIツールの価格・機能・仕様等の情報は参考情報であり、正確性・完全性を保証するものではありません。最新・正確な情報は各ツールの公式ページをご確認ください。
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl mb-2">6. 著作権について</h2>
-            <p className="leading-relaxed">
-              当サイトで掲載している画像・ロゴ等の著作権・肖像権は各権利所有者に帰属します。掲載内容に関して問題がありましたら、お問い合わせフォームよりご連絡ください。
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-xl mb-2">7. プライバシーポリシーの変更</h2>
-            <p className="leading-relaxed">
-              本プライバシーポリシーの内容は、利用者への通知なく変更されることがあります。変更後のプライバシーポリシーは、本ページに掲載した時点から効力を生じるものとします。
-            </p>
-          </section>
+        <div style={{ marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)', fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
+          <p>制定日：2026年4月27日</p>
+          <p>AI Chronicle 運営事務局</p>
         </div>
       </article>
     </main>

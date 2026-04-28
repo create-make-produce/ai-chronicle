@@ -50,13 +50,13 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
       <main className="flex-1">
 
         {/* ヘッダーセクション - TOPページのニュースセクションと同じ背景 */}
-        <section style={{ background: 'linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '1.5rem 1.5rem 2rem' }}>
+        <section style={{ background: 'linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2rem' }}>
           <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
             {/* パンくず */}
             <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.5rem' }}>
               <Link href={localizedPath(locale, '/')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navHome}</Link>
               <span>/</span>
-              <Link href={localizedPath(locale, '/tools')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navTools}</Link>
+              <Link href={localizedPath(locale, '/tools')} style={{ color: '#4A5568', textDecoration: 'none' }}>{locale === 'ja' ? 'すべてのAI' : 'All AI Tools'}</Link>
               {tool.category && (
                 <>
                   <span>/</span>

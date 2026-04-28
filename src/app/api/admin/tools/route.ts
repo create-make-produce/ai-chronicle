@@ -35,7 +35,8 @@ export async function GET(req: NextRequest) {
              t.company_name, t.status, t.is_published, t.has_free_plan, t.has_api,
              t.manually_verified, t.category_id, t.data_source,
              t.created_at, t.updated_at,
-             c.name_ja as category_name_ja, c.slug as category_slug
+             c.name_ja as category_name_ja, c.slug as category_slug,
+             EXISTS (SELECT 1 FROM pricing_plans WHERE tool_id = t.id AND manually_verified = 1) AS has_verified_pricing
       FROM tools t
       LEFT JOIN categories c ON t.category_id = c.id
     `;

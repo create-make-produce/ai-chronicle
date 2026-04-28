@@ -7,7 +7,7 @@ interface Tool {
   tagline_ja: string; tagline_en: string; description_ja: string; description_en: string;
   official_url: string; logo_url: string; company_name: string;
   status: string; is_published: number; has_free_plan: number; has_api: number;
-  manually_verified: number; category_id: string; category_name_ja: string;
+  manually_verified: number; has_verified_pricing: number; category_id: string; category_name_ja: string;
   data_source: string; created_at: string; updated_at: string;
 }
 
@@ -160,6 +160,23 @@ export default function AdminDashboard() {
     else showMsg('❌ 保存失敗');
   };
 
+  // 全プランの料金固定を即時DB保存
+  const toggleAllPricingLock = async (locked: boolean) => {
+    if (plans.length === 0) return;
+    const updated = plans.map(p => ({ ...p, manually_verified: locked ? 1 : 0 }));
+    setPlans(updated);
+    setSaving(true);
+    await Promise.all(updated.map(plan =>
+      fetch('/api/admin/pricing', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(plan),
+      })
+    ));
+    setSaving(false);
+    fetchTools(search);
+    showMsg(locked ? '✅ 料金を固定しました（全プラン）' : '✅ 料金固定を解除しました');
+  };
+
   const addPlan = async () => {
     if (!editTool) return;
     await fetch('/api/admin/pricing', {
@@ -232,12 +249,17 @@ export default function AdminDashboard() {
       <div style={{ background: '#111318', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 1.5rem' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '4px' }}>
           {[
-            { key: 'tools',    label: 'ツール一覧' },
-            { key: 'contacts', label: `お問い合わせ${uncheckedCount > 0 ? ` (${uncheckedCount})` : ''}` },
-          ].map(({ key, label }) => (
+            { key: 'tools',    label: 'ツール一覧',    badge: null },
+            { key: 'contacts', label: 'お問い合わせ', badge: uncheckedCount > 0 ? uncheckedCount : null },
+          ].map(({ key, label, badge }) => (
             <button key={key} onClick={() => setMainTab(key as any)}
-              style={{ padding: '12px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${mainTab === key ? '#008CED' : 'transparent'}`, color: mainTab === key ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              style={{ padding: '12px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${mainTab === key ? '#008CED' : 'transparent'}`, color: mainTab === key ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
               {label}
+              {badge !== null && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: '18px', height: '18px', borderRadius: '50%', background: '#F97316', color: '#fff', fontSize: '0.6rem', fontWeight: 800, padding: '0 3px', lineHeight: 1 }}>
+                  {badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -287,7 +309,14 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td style={{ padding: '8px 10px' }}>
-                            {tool.manually_verified ? <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA' }}>固定中</span> : ''}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                              {tool.manually_verified ? (
+                                <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA', whiteSpace: 'nowrap' }}>ツール固定</span>
+                              ) : null}
+                              {tool.has_verified_pricing ? (
+                                <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(52,211,153,0.15)', color: '#34D399', whiteSpace: 'nowrap' }}>料金固定</span>
+                              ) : null}
+                            </div>
                           </td>
                           <td style={{ padding: '8px 10px', maxWidth: '200px' }}>
                             <div style={{ fontWeight: 600, color: '#F0EBE1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tool.name_ja}</div>
@@ -497,12 +526,23 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <div>
-                <div style={{ marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '8px' }}>
                   <button onClick={addPlan} style={BTN('#10B981', '#000')}>＋ プラン追加</button>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', cursor: 'pointer',
+                    color: plans.some(p => p.manually_verified) ? '#34D399' : '#9CA3AF',
+                    background: plans.some(p => p.manually_verified) ? 'rgba(52,211,153,0.1)' : 'transparent',
+                    border: `1px solid ${plans.some(p => p.manually_verified) ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                    padding: '5px 12px', borderRadius: '4px',
+                  }}>
+                    <input type="checkbox"
+                      checked={plans.length > 0 && plans.every(p => p.manually_verified)}
+                      onChange={e => toggleAllPricingLock(e.target.checked)}
+                      style={{ accentColor: '#34D399', width: '15px', height: '15px' }} />
+                    料金固定（全プラン・自動更新スキップ）
+                  </label>
                 </div>
                 {plans.map(plan => (
-                  <div key={plan.id} style={{ background: '#111318', border: `1px solid ${plan.manually_verified ? 'rgba(96,165,250,0.4)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '4px', padding: '1rem', marginBottom: '0.75rem' }}>
-                    {plan.manually_verified ? <div style={{ fontSize: '0.65rem', color: '#60A5FA', fontWeight: 700, marginBottom: '0.5rem', letterSpacing: '0.1em' }}>■ 料金固定中</div> : null}
+                  <div key={plan.id} style={{ background: '#111318', border: `1px solid ${plan.manually_verified ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '4px', padding: '1rem', marginBottom: '0.75rem' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '0.75rem' }}>
                       <div><label style={LABEL}>プラン名</label><input value={plan.plan_name ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, plan_name: e.target.value } : p))} style={INPUT()} /></div>
                       <div><label style={LABEL}>プラン名（日本語）</label><input value={plan.plan_name_ja ?? ''} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, plan_name_ja: e.target.value } : p))} style={INPUT()} /></div>
@@ -519,9 +559,8 @@ export default function AdminDashboard() {
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
                       {[
-                        { key: 'is_free',           label: '無料プラン' },
-                        { key: 'has_japan_pricing',  label: '日本円公式価格あり' },
-                        { key: 'manually_verified',  label: '料金固定（自動更新スキップ）' },
+                        { key: 'is_free',          label: '無料プラン' },
+                        { key: 'has_japan_pricing', label: '日本円公式価格あり' },
                       ].map(({ key, label }) => (
                         <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#9CA3AF', cursor: 'pointer' }}>
                           <input type="checkbox" checked={!!(plan as any)[key]} onChange={e => setPlans(plans.map(p => p.id === plan.id ? { ...p, [key]: e.target.checked ? 1 : 0 } : p))} style={{ accentColor: '#008CED' }} />

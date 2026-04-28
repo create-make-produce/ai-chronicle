@@ -35,7 +35,7 @@ export default function HomeContent(p: HomeContentProps) {
 
       {/* カテゴリ */}
       {categories.length > 0 && (
-        <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)" paddingBottom={64}>
+        <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)" paddingBottom={48}>
           <SectionHead label={locale==='ja'?'AIカテゴリ':'AI Categories'} />
           <CategoryGrid categories={categories} locale={locale} />
         </Sec>
@@ -113,7 +113,7 @@ function Sec({ children, dark, bg, paddingBottom }: { children: React.ReactNode;
   return (
     <section style={{ background }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        style={{ paddingTop: '8px', paddingBottom: paddingBottom ?? 16 }}>
+        style={{ paddingTop: '24px', paddingBottom: paddingBottom ?? 8 }}>
         {children}
       </div>
     </section>

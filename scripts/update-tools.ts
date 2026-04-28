@@ -214,8 +214,8 @@ async function updateToolInDB(toolId: string, info: ExtractedInfo): Promise<void
   );
 
   if (info.plans && info.plans.length > 0) {
-    const existing = await queryD1<{ plan_name: string; price_usd: number | null; id: string }>(
-      `SELECT id, plan_name, price_usd FROM pricing_plans WHERE tool_id = ?`,
+    const existing = await queryD1<{ plan_name: string; price_usd: number | null; id: string; manually_verified: number }>(
+      `SELECT id, plan_name, price_usd, manually_verified FROM pricing_plans WHERE tool_id = ?`,
       [toolId]
     );
 
@@ -223,10 +223,38 @@ async function updateToolInDB(toolId: string, info: ExtractedInfo): Promise<void
       const existingPlan = existing.find(e => e.plan_name.toLowerCase() === plan.plan_name.toLowerCase());
 
       if (existingPlan) {
+        // 料金固定中のプランはスキップ
+        if (existingPlan.manually_verified === 1) {
+          console.log(`  → 料金固定中のためスキップ: ${plan.plan_name}`);
+          continue;
+        }
+
         const priceChanged = existingPlan.price_usd !== plan.price_usd && plan.price_usd !== null;
         const trend = priceChanged
           ? ((plan.price_usd ?? 0) > (existingPlan.price_usd ?? 0) ? 'up' : 'down')
           : null;
+
+        // 価格改定を検知したらお問い合わせに自動記録
+        if (priceChanged && trend) {
+          const arrow = trend === 'up' ? '↑ 値上げ' : '↓ 値下げ';
+          const toolRow = await queryD1<{ name_ja: string; slug: string }>(
+            `SELECT name_ja, slug FROM tools WHERE id = ?`, [toolId]
+          );
+          const toolName = toolRow[0]?.name_ja ?? toolId;
+          const toolSlug = toolRow[0]?.slug ?? toolId;
+          const contactId = `pc-${toolId.slice(0, 8)}-${plan.plan_name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+          await queryD1(
+            `INSERT OR IGNORE INTO contacts (id, category, subject, body, email, checked, created_at)
+             VALUES (?, ?, ?, ?, '', 0, datetime('now'))`,
+            [
+              contactId,
+              '価格改定',
+              `【${arrow}】${toolName} — ${plan.plan_name}プラン`,
+              `ツール: ${toolName} (${toolSlug})\nプラン: ${plan.plan_name} (${plan.plan_name_ja})\n変更前: $${existingPlan.price_usd ?? '?'}/月\n変更後: $${plan.price_usd}/月\n方向: ${arrow}\n検知日時: ${new Date().toISOString()}`,
+            ]
+          );
+          console.log(`  → 価格改定を記録: ${toolName} [${plan.plan_name}] $${existingPlan.price_usd} → $${plan.price_usd} (${arrow})`);
+        }
 
         await queryD1(
           `UPDATE pricing_plans SET
