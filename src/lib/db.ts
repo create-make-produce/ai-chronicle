@@ -48,7 +48,6 @@ async function queryD1<T = Record<string, unknown>>(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ sql, params }),
-      cache: 'no-store', // HTTP レスポンスはキャッシュしない（JSONエラー回避）
     });
 
     if (!res.ok) {
