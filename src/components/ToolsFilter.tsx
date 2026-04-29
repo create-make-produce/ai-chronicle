@@ -138,7 +138,6 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
 
       {/* フィルターバー */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
-        <button type="button" onClick={() => { setFreeOnly(!freeOnly); resetPage(); }} style={btnStyle(freeOnly)}>{tt.filterFreeOnly}</button>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
           <span style={{ color: 'var(--color-text-muted)' }}>{locale === 'ja' ? '並べ替え：' : 'Sort:'}</span>
           <select value={sort} onChange={e => { setSort(e.target.value as SortKey); resetPage(); }}

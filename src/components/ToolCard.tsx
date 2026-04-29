@@ -115,14 +115,6 @@ export default function ToolCard({ tool, locale, index = 0, categoryName }: Tool
           <div style={{ padding: '1rem', paddingTop: '1.25rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             {/* バッジ行 */}
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', marginBottom: '10px', flexShrink: 0 }}>
-              {tool.has_free_plan === 1 && (
-                <span style={{
-                  background: '#1A56DB', color: '#FFFFFF',
-                  fontSize: '0.6875rem', fontWeight: 700,
-                  letterSpacing: '0.06em', textTransform: 'none' as const,
-                  padding: '2px 8px', borderRadius: '2px',
-                }}>{locale === 'ja' ? '無料プラン' : 'FREE'}</span>
-              )}
               {categoryName && (
                 <span style={{
                   background: '#0F3D8C', color: '#FFFFFF',

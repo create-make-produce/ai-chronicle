@@ -346,7 +346,7 @@ export default function AdminDashboard() {
               {loading ? <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>読み込み中...</p> : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-                    <thead style={{ position: 'sticky', top: 0, zIndex: 2 }}>
+                    <thead style={{ position: 'sticky', top: 0, zIndex: 2, background: '#111318' }}>
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         {[
                           { col: 'published', label: '公開' },
@@ -360,10 +360,8 @@ export default function AdminDashboard() {
                           </th>
                         ))}
                         {[
-                          { col: 'desc',    label: '概要',   right: 200 },
-                          { col: 'url',     label: '公式URL', right: 150 },
-                          { col: 'company', label: '会社名', right: 100 },
-                          { col: 'pricing', label: '料金',   right: 50  },
+                          { col: 'desc',    label: '概要',   right: 100 },
+                          { col: 'url',     label: '公式URL', right: 50 },
                           { col: 'logo',    label: 'ロゴ',   right: 0   },
                         ].map(({ col, label, right }) => (
                           <th key={col} onClick={() => handleSort(col)}
@@ -372,7 +370,6 @@ export default function AdminDashboard() {
                           </th>
                         ))}
                         {[
-                          { col: 'cat',     label: 'カテゴリ' },
                           { col: 'updated', label: '更新日' },
                         ].map(({ col, label }) => (
                           <th key={col} onClick={() => handleSort(col)}
@@ -418,22 +415,15 @@ export default function AdminDashboard() {
                               {tool.data_source === 'product_hunt_api' ? 'PH' : '手動'}
                             </span>
                           </td>
-                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '200px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '100px', background: 'inherit', zIndex: 1, width: '50px' }}>
                             <StatusDot ok={!!tool.description_ja} />
                           </td>
-                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '150px', background: 'inherit', zIndex: 1, width: '50px' }}>
-                            <StatusDot ok={!!tool.official_url} />
-                          </td>
-                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '100px', background: 'inherit', zIndex: 1, width: '50px' }}>
-                            <StatusDot ok={!!tool.company_name} />
-                          </td>
                           <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '50px', background: 'inherit', zIndex: 1, width: '50px' }}>
-                            <StatusDot ok={tool.pricing_count > 0} />
+                            <StatusDot ok={!!tool.official_url} />
                           </td>
                           <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '0px', background: 'inherit', zIndex: 1, width: '50px' }}>
                             <StatusDot ok={!!tool.logo_url && !brokenLogos.includes(tool.name_en)} error={brokenLogos.includes(tool.name_en)} />
                           </td>
-                          <td style={{ padding: '8px 10px', color: '#7A8A99', whiteSpace: 'nowrap' }}>{tool.category_name_ja ?? '—'}</td>
                           <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{tool.updated_at?.slice(0, 10)}</td>
                           <td style={{ padding: '8px 10px' }}>
                             <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>

@@ -88,11 +88,6 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                       {statusLabel()}
                     </span>
                   )}
-                  {tool.has_free_plan === 1 && (
-                    <span style={{ background: '#1A56DB', color: '#FFFFFF', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', padding: '2px 8px', borderRadius: '2px' }}>
-                      {locale === 'ja' ? '無料プラン' : 'FREE'}
-                    </span>
-                  )}
                   {tool.category && (
                     <Link href={localizedPath(locale, `/tools?cat=${tool.category.slug}`)}
                       className="link-underline"
