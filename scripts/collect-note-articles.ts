@@ -1,7 +1,5 @@
 // =============================================
 // AI Chronicle - Note記事収集（人気順）
-// note.com/hashtag/AI 人気100件
-// 複数ツール名マッチ対応
 // =============================================
 // 実行: tsx scripts/collect-note-articles.ts
 // GitHub Actions: 毎日 UTC 03:00（JST 12:00）
@@ -40,13 +38,12 @@ async function fetchNoteArticles(url: string): Promise<NoteArticle[]> {
 
   const articles: NoteArticle[] = [];
 
-  // noteUrl + title を正規表現で抽出
   const noteUrls = [...html.matchAll(/"noteUrl"\s*:\s*"(https:\/\/note\.com\/[^"]+)"/g)].map(m => m[1]);
   const titles   = [...html.matchAll(/"name"\s*:\s*"([^"]+)","noteUrl"/g)].map(m => m[1]);
   const likes    = [...html.matchAll(/"likeCount"\s*:\s*(\d+)/g)].map(m => parseInt(m[1], 10));
   const thumbs   = [...html.matchAll(/"eyecatch(?:Url)?"\s*:\s*"(https:\/\/[^"]+)"/g)].map(m => m[1]);
   const authors  = [...html.matchAll(/"nickname"\s*:\s*"([^"]+)"/g)].map(m => m[1]);
-  // タグ: "hashtag":"xxx" パターン
+
   const tagMap: Record<string, string[]> = {};
   const tagMatches = [...html.matchAll(/"noteUrl"\s*:\s*"([^"]+)"[^}]*?"hashtag"\s*:\s*\[(.*?)\]/gs)];
   for (const m of tagMatches) {
@@ -68,7 +65,7 @@ async function fetchNoteArticles(url: string): Promise<NoteArticle[]> {
     });
   }
 
-  // フォールバック: JSON-LDから
+  // フォールバック: JSON-LD
   if (articles.length < 5) {
     const jsonLdMatches = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)];
     for (const match of jsonLdMatches) {
@@ -95,42 +92,23 @@ async function fetchNoteArticles(url: string): Promise<NoteArticle[]> {
   return articles;
 }
 
-/**
- * 記事がどのツールにマッチするか全件返す（複数マッチ対応）
- */
 function findMatchingTools(
   article: NoteArticle,
   tools: { id: string; name_ja: string; name_en: string }[]
 ): { id: string; name_en: string }[] {
   const titleAndTags = (article.title + ' ' + article.tags.join(' ')).toLowerCase();
   const matched: { id: string; name_en: string }[] = [];
-
   for (const tool of tools) {
     const enNorm = tool.name_en.toLowerCase().replace(/\s+/g, '');
     const jaNorm = tool.name_ja.toLowerCase();
-
-    if (enNorm.length >= 3 && titleAndTags.replace(/\s+/g, '').includes(enNorm)) {
-      matched.push(tool);
-      continue;
-    }
-    if (tool.name_en.length >= 3 && titleAndTags.includes(tool.name_en.toLowerCase())) {
-      matched.push(tool);
-      continue;
-    }
-    if (jaNorm.length >= 3 && titleAndTags.includes(jaNorm)) {
-      matched.push(tool);
-    }
+    if (enNorm.length >= 3 && titleAndTags.replace(/\s+/g, '').includes(enNorm)) { matched.push(tool); continue; }
+    if (tool.name_en.length >= 3 && titleAndTags.includes(tool.name_en.toLowerCase())) { matched.push(tool); continue; }
+    if (jaNorm.length >= 3 && titleAndTags.includes(jaNorm)) { matched.push(tool); }
   }
-
   return matched;
 }
 
-async function saveArticleForTool(
-  db: D1Client,
-  toolId: string,
-  article: NoteArticle
-): Promise<boolean> {
-  // 同じURL・同じツールの組み合わせが既存ならスキップ
+async function saveArticleForTool(db: D1Client, toolId: string, article: NoteArticle): Promise<boolean> {
   const existing = await db.first<{ id: string }>(
     `SELECT id FROM tool_note_articles WHERE note_url = ? AND tool_id = ? LIMIT 1`,
     [article.note_url, toolId]
@@ -138,14 +116,9 @@ async function saveArticleForTool(
   if (existing) return false;
 
   await db.execute(
-    `INSERT OR IGNORE INTO tool_note_articles
-     (id, tool_id, title, thumbnail_url, author_name, author_icon_url, note_url, likes_count, published_at, created_at)
+    `INSERT OR IGNORE INTO tool_note_articles (id, tool_id, title, thumbnail_url, author_name, author_icon_url, note_url, likes_count, published_at, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-    [
-      generateId('note'), toolId,
-      article.title, article.thumbnail_url, article.author_name, article.author_icon_url,
-      article.note_url, article.likes_count, article.published_at,
-    ]
+    [generateId('note'), toolId, article.title, article.thumbnail_url, article.author_name, article.author_icon_url, article.note_url, article.likes_count, article.published_at]
   );
   return true;
 }
@@ -172,9 +145,11 @@ async function main() {
       return;
     }
 
-    const tools = await db.all<{ id: string; name_ja: string; name_en: string }>(
+    // db.all の代わりに queryD1 相当の処理
+    const toolRows = await db.execute(
       `SELECT id, name_ja, name_en FROM tools WHERE is_published = 1`
     );
+    const tools = (toolRows as any)?.results ?? toolRows ?? [];
     console.log(`  → ${tools.length}件のツールと照合`);
 
     for (const article of articles) {

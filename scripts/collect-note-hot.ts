@@ -1,6 +1,5 @@
 // =============================================
 // AI Chronicle - Note記事収集（急上昇）
-// note.com/hashtag/AI 急上昇50件
 // =============================================
 // 実行: tsx scripts/collect-note-hot.ts
 // GitHub Actions: 毎日 UTC 15:00（JST 00:00）
@@ -97,9 +96,11 @@ async function main() {
       return;
     }
 
-    const tools = await db.all<{ id: string; name_ja: string; name_en: string }>(
+    const toolRows = await db.execute(
       `SELECT id, name_ja, name_en FROM tools WHERE is_published = 1`
     );
+    const tools = (toolRows as any)?.results ?? toolRows ?? [];
+    console.log(`  → ${tools.length}件のツールと照合`);
 
     for (const article of articles) {
       if (!article.note_url || !article.title) continue;
