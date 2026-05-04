@@ -270,7 +270,7 @@ export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
       const homepage = productLinks.find(l => l.type === 'homepage')?.url
         ?? productLinks[0]?.url
         ?? null;
-      let website = edge.node.website ?? homepage ?? null;
+      let website: string | null = edge.node.website ?? homepage ?? null;
 
       // Product HuntのリダイレクトURLなら実際のURLに解決
       if (website && website.includes('producthunt.com')) {

@@ -55,7 +55,7 @@ export default function HomeContent(p: HomeContentProps) {
                 <time className="shrink-0 w-20 text-xs font-mono" style={{ color:'#AABBCC' }}>
                   {formatDateShort(n.published_at)}
                 </time>
-                <span className="shrink-0 badge badge-accent">{newsLabel(n.news_type, tt)}</span>
+                <NewsBadge type={n.news_type} tt={tt} />
                 <span className="flex-1 text-sm font-medium truncate" style={{ color:'var(--color-text)' }}>
                   {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
                 </span>
@@ -161,6 +161,25 @@ function SectionHeadWithTime({ label, isoTime, locale }: { label: string; isoTim
       </div>
       <div className="mt-2 h-px w-10" style={{ background:'var(--color-accent)' }} />
     </motion.div>
+  );
+}
+
+const NEWS_TYPE_STYLE: Record<string, { color: string; bg: string; border: string }> = {
+  price_change: { color: '#FCD34D', bg: 'rgba(252,211,77,0.12)',  border: 'rgba(252,211,77,0.3)' },
+  new_tool:     { color: '#008CED', bg: 'rgba(0,140,237,0.12)',   border: 'rgba(0,140,237,0.3)' },
+  new_feature:  { color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
+  other:        { color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
+};
+
+function NewsBadge({ type, tt }: { type: string; tt: TDict }) {
+  const s = NEWS_TYPE_STYLE[type] ?? NEWS_TYPE_STYLE.other;
+  const label = newsLabel(type, tt);
+  return (
+    <span className="shrink-0" style={{
+      fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px',
+      borderRadius: '3px', whiteSpace: 'nowrap' as const,
+      color: s.color, background: s.bg, border: `1px solid ${s.border}`,
+    }}>{label}</span>
   );
 }
 

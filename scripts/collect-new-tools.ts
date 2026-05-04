@@ -100,8 +100,8 @@ async function saveToolLaunch(db: D1Client, toolId: string, post: ProductHuntPos
 async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]): Promise<number> {
   let saved = 0;
   for (const post of posts) {
-    const tool = await db.first<{ id: string; name_en: string }>(
-      `SELECT id, name_en FROM tools WHERE product_hunt_id = ? LIMIT 1`, [post.id]
+    const tool = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
+      `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? LIMIT 1`, [post.id]
     );
     if (!tool) continue;
     const existing = await db.first<{ id: string }>(
@@ -110,6 +110,23 @@ async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]):
     if (existing) continue;
     console.log(`  🔄 既存ツール新ローンチ: ${tool.name_en} → ${post.name}`);
     await saveToolLaunch(db, tool.id, post);
+
+    // ニュース生成（new_feature）
+    const taglineJa = post.tagline ? await translateLaunchTagline(post.tagline).catch(() => null) : null;
+    const launchDate = (post as any).featuredAt
+      ? String((post as any).featuredAt).substring(0, 10)
+      : null;
+    await createNews(db, {
+      type: 'new_feature',
+      tool: { id: tool.id, slug: tool.slug, name_ja: tool.name_ja, name_en: tool.name_en },
+      launch: {
+        launch_name: post.name,
+        tagline: post.tagline ?? null,
+        tagline_ja: taglineJa,
+        launch_date: launchDate,
+      },
+    });
+
     saved++;
   }
   return saved;
