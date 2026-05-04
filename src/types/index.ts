@@ -10,16 +10,28 @@ export interface Tool {
   company_name: string | null; company_country: string | null;
   founded_year: number | null; twitter_handle: string | null; github_url: string | null;
   category_id: string | null; status: string; is_published: number;
-  has_free_plan: number; free_plan_detail_ja: string | null; free_plan_detail_en: string | null;
-  has_free_trial: number; free_trial_days: number | null;
-  screenshot_urls: string | null; demo_url: string | null; video_url: string | null;
-  ios_url: string | null; android_url: string | null;
+  // スペック
+  os_support: string | null;
+  language_support: string | null;
   has_api: number;
+  login_methods: string | null;
   has_mobile_app: number;
   has_chrome_ext: number;
-  language_support: string | null;
-  os_support: string | null;
+  data_storage_region: string | null;
+  gdpr_compliant: number | null;
+  soc2_certified: number | null;
+  integration_list: string | null;
+  is_open_source: number;
+  license_type: string | null;
+  // 料金
+  has_free_plan: number; free_plan_detail_ja: string | null; free_plan_detail_en: string | null;
+  has_free_trial: number; free_trial_days: number | null;
+  // メディア
+  screenshot_urls: string | null; demo_url: string | null; video_url: string | null;
+  ios_url: string | null; android_url: string | null;
+  // PH
   product_hunt_id: string | null; product_hunt_url: string | null;
+  // その他
   user_count_label: string | null;
   affiliate_url: string | null; affiliate_rate: number | null; has_affiliate: number;
   ai_confidence_score: number | null; needs_manual_review: number;
