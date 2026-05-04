@@ -314,8 +314,8 @@ async function main() {
   const MAX_PH_REQUESTS = 70;
 
   for (const tool of tools) {
-    // データ完全（description_jaが150文字以上）→ スキップ
-    if (tool.product_hunt_id && tool.tagline_ja && tool.description_ja && tool.description_ja.length >= 150) {
+    - description_ja：最大4文、合計200文字以内、「。」を文末につけその直後に改行文字（\nのみ・<br>禁止）を入れる
+    if (tool.product_hunt_id && tool.tagline_ja && tool.description_ja && tool.description_ja.length <= 200) {
       console.log(`⏭️ スキップ（完全）: ${tool.name_en}`);
       skipped++;
       continue;

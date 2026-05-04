@@ -164,7 +164,7 @@ async function translateToJapanese(tagline: string | null, description: string |
 - description: ${description ?? '（なし）'}
 
 tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、最大2文（「。」区切り）、句読点は2文目末のみ可、会社名・製品名禁止
-description_jaルール：最大5文（「。」＋改行で区切る）、1文が長くなるのはOK、最低120文字、会社名・製品名・バージョン禁止
+description_jaルール：最大4文、合計200文字以内、「。」を文末につけその直後に改行文字（\nのみ・<br>禁止）を入れる、会社名・製品名・バージョン禁止
 
 {"tagline_ja":"翻訳結果","description_ja":"翻訳結果"}`;
   const raw = await callAI(prompt);
