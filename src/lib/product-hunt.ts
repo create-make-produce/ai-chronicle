@@ -275,7 +275,7 @@ export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
       // Product HuntのリダイレクトURLなら実際のURLに解決
       if (website && website.includes('producthunt.com')) {
         const resolved = await resolveRedirectUrl(website);
-        website = resolved;
+        website = resolved ?? null;
       }
 
       // websiteがnullの場合はProduct HuntページからURLを抽出
