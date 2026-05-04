@@ -465,7 +465,7 @@ export default function AdminDashboard() {
                             <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{tool.updated_at?.slice(0, 10)}</td>
                             <td style={{ padding: '8px 10px', textAlign: 'center' }}>
                               {(() => {
-                                const phSlug = tool.product_hunt_url?.split('/posts/')?.[1]?.split('?')?.[0];
+                                const phSlug = (tool as unknown as { product_hunt_url?: string }).product_hunt_url?.split('/posts/')?.[1]?.split('?')?.[0];
                                 const phUrl = phSlug ? `https://www.producthunt.com/products/${phSlug}/launches` : null;
                                 return phUrl ? (
                                   <a href={phUrl} target="_blank" rel="noreferrer"
