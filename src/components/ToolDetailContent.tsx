@@ -137,9 +137,17 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                 <h1 style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, color: '#F0EBE1', lineHeight: 1.1, letterSpacing: '0.02em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
                   {name}
                 </h1>
-                {tagline && (
-                  <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: '#7A8A99', margin: 0 }}>{tagline}</p>
-                )}
+                {tagline && (() => {
+                  const parts = tagline.split('。').map(s => s.trim()).filter(Boolean);
+                  return parts.length > 1 ? (
+                    <div>
+                      <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: '#9CA3AF', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
+                      <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: '#6B7280', margin: '2px 0 0 0', lineHeight: 1.6 }}>{parts[1]}</p>
+                    </div>
+                  ) : (
+                    <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: '#7A8A99', margin: 0 }}>{tagline.replace(/。/g, '')}</p>
+                  );
+                })()}
               </div>
             </div>
           </div>

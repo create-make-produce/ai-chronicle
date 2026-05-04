@@ -1,44 +1,72 @@
+// =============================================
+// AI Chronicle - 新着ツール収集
+// =============================================
+// 実行: tsx scripts/collect-new-tools.ts
 
-    console.log(`  ✅ ローンチ保存: ${post.name}${taglineJa ? ` →「${taglineJa}」` : ''}`);
-  } catch (error) {
-    console.warn(`  ⚠️ ローンチ保存失敗: ${error instanceof Error ? error.message : String(error)}`);
+import { config as loadEnv } from 'dotenv';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+const envLocalPath = resolve(process.cwd(), '.env.local');
+if (existsSync(envLocalPath)) { loadEnv({ path: envLocalPath }); } else { loadEnv(); }
+
+import { CONFIG } from '../src/config';
+import { D1Client } from '../src/lib/d1-rest';
+import { callAI, parseJsonResponse } from '../src/lib/ai';
+import { fetchLatestAIPosts, fetchLatestPosts, type ProductHuntPost } from '../src/lib/product-hunt';
+import { fetchHtml, htmlToText, extractMeta, guessFaviconUrl, truncateForAI } from '../src/lib/scraper';
+import { generateId } from '../src/lib/uuid';
+import { slugify, slugifyFromUrl } from '../src/lib/slug';
+import { createNews } from '../src/lib/news-generator';
+
+interface ExtractedToolData {
+  is_ai_tool: boolean;
+  tool_name: string | null;
+  tagline: string | null;
+  description: string | null;
+  company_name: string | null;
+  has_free_plan: boolean | null;
+  starting_price_usd: number | null;
+  category_hint: string | null;
+  tags: string[] | null;
+  has_api: boolean | null;
+  supported_languages: string[] | null;
+}
+
+const CATEGORY_MAP: Record<string, string> = {
+  'text-generation': 'text-generation', text: 'text-generation', writing: 'text-generation', chat: 'text-generation',
+  'image-generation': 'image-generation', image: 'image-generation',
+  'video-generation': 'video-generation', video: 'video-generation',
+  coding: 'coding', code: 'coding', developer: 'coding',
+  audio: 'audio', music: 'audio', voice: 'audio', speech: 'audio',
+  'data-analysis': 'data-analysis', data: 'data-analysis', analytics: 'data-analysis',
+  productivity: 'productivity', workflow: 'productivity', automation: 'productivity',
+};
+
+const FAILED_IDS_JOB = 'collect_failed_ids';
+
+async function loadFailedProductHuntIds(db: D1Client): Promise<string[]> {
+  const row = await db.first<{ errors: string | null }>(
+    `SELECT errors FROM scrape_logs WHERE job_name = ? ORDER BY started_at DESC LIMIT 1`, [FAILED_IDS_JOB]
+  );
+  if (!row || !row.errors) return [];
+  try { const p = JSON.parse(row.errors) as string[]; return Array.isArray(p) ? p : []; } catch { return []; }
+}
+
+async function saveFailedProductHuntIds(db: D1Client, ids: string[]): Promise<void> {
+  if (ids.length === 0) {
+    await db.execute(`DELETE FROM scrape_logs WHERE job_name = ?`, [FAILED_IDS_JOB]);
+    return;
+  }
+  const existing = await db.first<{ id: string }>(`SELECT id FROM scrape_logs WHERE job_name = ? LIMIT 1`, [FAILED_IDS_JOB]);
+  if (existing) {
+    await db.execute(`UPDATE scrape_logs SET errors = ?, started_at = datetime('now'), finished_at = datetime('now') WHERE id = ?`, [JSON.stringify(ids), existing.id]);
+  } else {
+    await db.execute(`INSERT INTO scrape_logs (id, job_name, status, errors, started_at, finished_at) VALUES (?, ?, 'error', ?, datetime('now'), datetime('now'))`, [generateId('log'), FAILED_IDS_JOB, JSON.stringify(ids)]);
   }
 }
 
-async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]): Promise<number> {
-  let saved = 0;
-  for (const post of posts) {
-    const tool = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
-      `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? LIMIT 1`, [post.id]
-    );
-    if (!tool) continue;
-    const existing = await db.first<{ id: string }>(
-      `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`, [tool.id, post.name]
-    );
-    if (existing) continue;
-    console.log(`  🔄 既存ツール新ローンチ: ${tool.name_en} → ${post.name}`);
-    await saveToolLaunch(db, tool.id, post);
 
-    // ニュース生成（new_feature）
-    const taglineJa = post.tagline ? await translateLaunchTagline(post.tagline).catch(() => null) : null;
-    const launchDate = (post as any).featuredAt
-      ? String((post as any).featuredAt).substring(0, 10)
-      : null;
-    await createNews(db, {
-      type: 'new_feature',
-      tool: { id: tool.id, slug: tool.slug, name_ja: tool.name_ja, name_en: tool.name_en },
-      launch: {
-        launch_name: post.name,
-        tagline: post.tagline ?? null,
-        tagline_ja: taglineJa,
-        launch_date: launchDate,
-      },
-    });
 
-    saved++;
-  }
-  return saved;
-}
 
 async function extractToolData(post: ProductHuntPost, pageText: string | null): Promise<ExtractedToolData> {
   const prompt = `以下のツール情報を分析してください。JSONのみ出力。
@@ -68,21 +96,8 @@ async function translateToJapanese(tagline: string | null, description: string |
 - tagline: ${tagline ?? '（なし）'}
 - description: ${description ?? '（なし）'}
 
-【厳守ルール】
-- 会社名・製品名・モデル名・バージョン番号は記載禁止（機能と用途のみ記述）
-- 「、」は文中で使用可
-- 「。」は各文の文末に必ずつけ、その後に改行（
-）を入れる
-- 文をスペースで区切ることは禁止
-- 120文字以上（多い分はOK）、3〜5文構成
-- ツールの機能・用途・対象ユーザーを具体的に記述
-- tagline_ja：「[カテゴリ] [キャッチコピー]」形式、25文字以内、句読点不要
-- 良い例: "テキスト生成やコード作成に対応した対話型AIサービス。
-画像の分析やウェブ検索など幅広いタスクに活用できる。
-無料から利用でき、学生からビジネスパーソンまで幅広いユーザーに対応している。"
-- 悪い例（会社名あり）: "OpenAIが提供するAIサービス。GPT-4oを搭載している。"
-- 悪い例（スペース区切り）: "テキスト生成に対応 画像分析もできる"
-- 悪い例（短すぎ）: "AIチャットサービス。" 
+tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、最大2文（「。」区切り）、句読点は2文目末のみ可、会社名・製品名禁止
+description_jaルール：最大5文（「。」＋改行で区切る）、1文が長くなるのはOK、最低120文字、会社名・製品名・バージョン禁止
 
 {"tagline_ja":"翻訳結果","description_ja":"翻訳結果"}`;
   const raw = await callAI(prompt);
@@ -180,7 +195,6 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     /* PRICING_DISABLED */
 
-    await saveToolLaunch(db, toolId, post);
 
     console.log(`  ✅ 登録完了: ${slug}（${isPublished ? '公開' : '非公開'}）`);
 
@@ -227,7 +241,6 @@ async function main() {
     console.log(`  → ${allPosts.length}件取得`);
 
     console.log('\n--- 既存ツールの新ローンチ確認 ---');
-    launchesAdded = await saveExistingToolLaunches(db, allPosts);
 
     if (failedIds.length > 0) {
       console.log(`\n--- 前回失敗分再処理（${failedIds.length}件）---`);
