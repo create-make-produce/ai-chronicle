@@ -393,6 +393,7 @@ async function main() {
 
       // ローンチ保存（1件）
       const saved = await saveLaunch(db, tool.id, phPost);
+      if (saved) { console.log(`  🚀 ローンチ保存: ${phPost.name}`); }
       else { console.log(`  ℹ️ ローンチ: スキップ（既存）`); }
 
       updated++;
