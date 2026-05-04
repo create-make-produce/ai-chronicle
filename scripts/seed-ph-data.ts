@@ -215,6 +215,24 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+
+/** PHポストをtool_launchesに1件保存（重複スキップ） */
+async function saveLaunch(db: D1Client, toolId: string, post: PHPost): Promise<boolean> {
+  const existing = await db.first<{ id: string }>(
+    `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`,
+    [toolId, post.name]
+  );
+  if (existing) return false;
+
+  const launchDate = post.featuredAt ? String(post.featuredAt).substring(0, 10) : null;
+  await db.execute(
+    `INSERT INTO tool_launches (id, tool_id, launch_name, tagline, tagline_ja, launch_date, thumbnail_url, url, created_at)
+     VALUES (?, ?, ?, ?, NULL, ?, ?, ?, datetime('now'))`,
+    [generateId('launch'), toolId, post.name, post.tagline ?? null, launchDate, post.thumbnail?.url ?? null, post.url]
+  );
+  return true;
+}
+
 /** description_ja / tagline_ja が未設定の場合にGeminiで翻訳 */
 async function translateIfNeeded(db: D1Client, tool: ToolRow, taglineEn: string | null, descEn: string | null): Promise<void> {
   if (tool.tagline_ja && tool.description_ja) return;
