@@ -55,7 +55,11 @@ async function translate(tool: ToolRow): Promise<TranslateResult> {
 {"tagline_ja":"翻訳結果またはnull","description_ja":"翻訳結果"}`;
 
   const raw = await callAI(prompt);
-  return parseJsonResponse<TranslateResult>(raw);
+  // JSON文字列値内の生の改行をエスケープに変換（Geminiが実際の改行を出力する場合の対策）
+  const sanitized = raw.replace(/("(?:[^"\\]|\\.)*")/g, (match) =>
+    match.replace(/\n/g, '\\n').replace(/\r/g, '\\r')
+  );
+  return parseJsonResponse<TranslateResult>(sanitized);
 }
 
 async function main() {
