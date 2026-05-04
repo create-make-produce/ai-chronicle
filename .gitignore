@@ -53,3 +53,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Note収集スクリプト（ローカルのみ・GitHubに上げない）
+scripts/collect-note-articles.ts
+scripts/collect-note-hot.ts
