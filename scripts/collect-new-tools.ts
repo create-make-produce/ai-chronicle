@@ -68,6 +68,73 @@ async function saveFailedProductHuntIds(db: D1Client, ids: string[]): Promise<vo
 
 
 
+
+async function translateLaunchTagline(tagline: string): Promise<string | null> {
+  try {
+    const raw = await callAI(`以下の英語テキストを自然な日本語に翻訳してください。JSONのみ出力。句読点不要。\n【翻訳対象】\n${tagline}\n【出力形式】\n{"tagline_ja": "翻訳結果"}`);
+    const result = parseJsonResponse<{ tagline_ja: string | null }>(raw);
+    return result.tagline_ja ?? null;
+  } catch { return null; }
+}
+
+async function saveToolLaunch(db: D1Client, toolId: string, post: ProductHuntPost): Promise<void> {
+  try {
+    const existing = await db.first<{ id: string }>(
+      `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`, [toolId, post.name]
+    );
+    if (existing) return;
+
+    let taglineJa: string | null = null;
+    if (post.tagline) taglineJa = await translateLaunchTagline(post.tagline);
+
+    const url = (post as any).primaryLinkUrl ?? post.website ?? null;
+    const launchDate = (post as any).featuredAt ? String((post as any).featuredAt).substring(0, 10) : null;
+
+    await db.execute(
+      `INSERT INTO tool_launches (id, tool_id, launch_name, tagline, tagline_ja, launch_date, launch_number, thumbnail_url, url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      [generateId('launch'), toolId, post.name, post.tagline ?? null, taglineJa, launchDate, null, post.thumbnail?.url ?? null, url]
+    );
+    console.log(`  ✅ ローンチ保存: ${post.name}${taglineJa ? ` →「${taglineJa}」` : ''}`);
+  } catch (error) {
+    console.warn(`  ⚠️ ローンチ保存失敗: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]): Promise<number> {
+  let saved = 0;
+  for (const post of posts) {
+    const tool = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
+      `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? LIMIT 1`, [post.id]
+    );
+    if (!tool) continue;
+    const existing = await db.first<{ id: string }>(
+      `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`, [tool.id, post.name]
+    );
+    if (existing) continue;
+    console.log(`  🔄 既存ツール新ローンチ: ${tool.name_en} → ${post.name}`);
+    await saveToolLaunch(db, tool.id, post);
+
+    // ニュース生成（new_feature）
+    const taglineJa = post.tagline ? await translateLaunchTagline(post.tagline).catch(() => null) : null;
+    const launchDate = (post as any).featuredAt
+      ? String((post as any).featuredAt).substring(0, 10)
+      : null;
+    await createNews(db, {
+      type: 'new_feature',
+      tool: { id: tool.id, slug: tool.slug, name_ja: tool.name_ja, name_en: tool.name_en },
+      launch: {
+        launch_name: post.name,
+        tagline: post.tagline ?? null,
+        tagline_ja: taglineJa,
+        launch_date: launchDate,
+      },
+    });
+
+    saved++;
+  }
+  return saved;
+}
+
 async function extractToolData(post: ProductHuntPost, pageText: string | null): Promise<ExtractedToolData> {
   const prompt = `以下のツール情報を分析してください。JSONのみ出力。
 
@@ -241,6 +308,7 @@ async function main() {
     console.log(`  → ${allPosts.length}件取得`);
 
     console.log('\n--- 既存ツールの新ローンチ確認 ---');
+    launchesAdded = await saveExistingToolLaunches(db, allPosts);
 
     if (failedIds.length > 0) {
       console.log(`\n--- 前回失敗分再処理（${failedIds.length}件）---`);

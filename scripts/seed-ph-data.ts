@@ -292,6 +292,7 @@ async function main() {
   );
   console.log(`\n対象ツール: ${tools.length}件\n`);
 
+  let updated = 0, skipped = 0, notFound = 0, errorCount = 0, phRequests = 0;
   const MAX_PH_REQUESTS = 70;
 
   for (const tool of tools) {
