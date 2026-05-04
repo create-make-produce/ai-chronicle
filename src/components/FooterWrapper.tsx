@@ -1,9 +1,7 @@
 'use client';
-import { usePathname } from 'next/navigation';
+// src/components/FooterWrapper.tsx
 import Footer from './Footer';
 
 export default function FooterWrapper() {
-  const pathname = usePathname();
-  const isEn = pathname.startsWith('/en');
-  return <Footer lang={isEn ? 'en' : 'ja'} />;
+  return <Footer lang="ja" />;
 }

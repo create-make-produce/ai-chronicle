@@ -28,6 +28,13 @@ interface ContactDetail extends Contact {
   body: string;
 }
 
+interface NoteArticle {
+  id: string; tool_id: string; title: string;
+  thumbnail_url: string | null; author_name: string | null;
+  note_url: string; likes_count: number; published_at: string | null;
+  created_at: string;
+}
+
 const INPUT = (extra?: React.CSSProperties): React.CSSProperties => ({
   width: '100%', padding: '7px 10px', background: '#111318',
   border: '1px solid rgba(255,255,255,0.1)', borderRadius: '2px',
@@ -53,45 +60,41 @@ const PANEL = (accent = '#008CED'): React.CSSProperties => ({
 export default function AdminDashboard() {
   const router = useRouter();
 
-  // メインタブ
   const [mainTab, setMainTab] = useState<'tools' | 'contacts'>('tools');
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [editTool, setEditTool] = useState<Tool | null>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [editTab, setEditTab] = useState<'tools' | 'pricing'>('tools');
+  const [csvText, setCsvText] = useState('');
 
-  // ツール関連
-  const [tools,     setTools]     = useState<Tool[]>([]);
-  const [search,    setSearch]    = useState('');
-  const [loading,   setLoading]   = useState(true);
-  const [editTool,  setEditTool]  = useState<Tool | null>(null);
-  const [plans,     setPlans]     = useState<Plan[]>([]);
-  const [editTab,   setEditTab]   = useState<'tools' | 'pricing'>('tools');
-  const [csvText,   setCsvText]   = useState('');
-
-  // お問い合わせ関連
-  const [contacts,       setContacts]       = useState<Contact[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactLoading, setContactLoading] = useState(false);
   const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null);
 
-  // ロゴエラー検知
   const [brokenLogos, setBrokenLogos] = useState<string[]>([]);
-
-  // 共通
   const [saving, setSaving] = useState(false);
-  const [msg,    setMsg]    = useState('');
+  const [msg, setMsg] = useState('');
 
-  const showMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000); };
+  // Note関連
+  const [noteCountMap, setNoteCountMap] = useState<Record<string, number>>({});
+  const [noteModal, setNoteModal] = useState<{ tool: Tool; articles: NoteArticle[] } | null>(null);
+  const [noteLoading, setNoteLoading] = useState(false);
 
-  // ソート・フィルタ
   const [sortCol, setSortCol] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const showMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000); };
 
   const handleSort = (col: string) => {
     if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortCol(col); setSortDir('asc'); }
   };
-
   const sortArrow = (col: string) => sortCol === col ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
 
   const filteredTools = (() => {
-    let list = [...tools];
+    const list = [...tools];
     if (!sortCol) return list;
     return list.sort((a, b) => {
       let aVal: string | number = '';
@@ -102,10 +105,8 @@ export default function AdminDashboard() {
       else if (sortCol === 'source'){ aVal = a.data_source ?? ''; bVal = b.data_source ?? ''; }
       else if (sortCol === 'desc')  { aVal = a.description_ja ? 1 : 0; bVal = b.description_ja ? 1 : 0; }
       else if (sortCol === 'url')   { aVal = a.official_url ? 1 : 0; bVal = b.official_url ? 1 : 0; }
-      else if (sortCol === 'company'){ aVal = a.company_name ? 1 : 0; bVal = b.company_name ? 1 : 0; }
-      else if (sortCol === 'pricing'){ aVal = a.pricing_count > 0 ? 1 : 0; bVal = b.pricing_count > 0 ? 1 : 0; }
       else if (sortCol === 'logo')  { aVal = a.logo_url ? 1 : 0; bVal = b.logo_url ? 1 : 0; }
-      else if (sortCol === 'cat')   { aVal = a.category_name_ja ?? ''; bVal = b.category_name_ja ?? ''; }
+      else if (sortCol === 'note')  { aVal = (noteCountMap[a.id] ?? 0) > 0 ? 1 : 0; bVal = (noteCountMap[b.id] ?? 0) > 0 ? 1 : 0; }
       else if (sortCol === 'updated'){ aVal = a.updated_at ?? ''; bVal = b.updated_at ?? ''; }
       if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
@@ -113,7 +114,6 @@ export default function AdminDashboard() {
     });
   })();
 
-  // ツール取得
   const fetchTools = useCallback(async (q = '') => {
     setLoading(true);
     const res = await fetch(`/api/admin/tools?q=${encodeURIComponent(q)}`);
@@ -123,7 +123,13 @@ export default function AdminDashboard() {
     setLoading(false);
   }, [router]);
 
-  // お問い合わせ取得
+  const fetchNoteCounts = useCallback(async () => {
+    const res = await fetch('/api/admin/notes?counts=1');
+    if (!res.ok) return;
+    const data = await res.json();
+    setNoteCountMap(data.counts ?? {});
+  }, []);
+
   const fetchContacts = useCallback(async () => {
     setContactLoading(true);
     const res = await fetch('/api/admin/contacts');
@@ -133,8 +139,32 @@ export default function AdminDashboard() {
     setContactLoading(false);
   }, [router]);
 
-  useEffect(() => { fetchTools(); }, [fetchTools]);
+  useEffect(() => { fetchTools(); fetchNoteCounts(); }, [fetchTools, fetchNoteCounts]);
   useEffect(() => { if (mainTab === 'contacts') fetchContacts(); }, [mainTab, fetchContacts]);
+
+  // Note記事モーダルを開く
+  const openNoteModal = async (tool: Tool) => {
+    setNoteLoading(true);
+    const res = await fetch(`/api/admin/notes?tool_id=${tool.id}`);
+    const data = await res.json();
+    setNoteModal({ tool, articles: data.articles ?? [] });
+    setNoteLoading(false);
+  };
+
+  // Note記事を削除
+  const deleteNoteArticle = async (articleId: string) => {
+    if (!confirm('このNote記事をDBから削除しますか？')) return;
+    await fetch(`/api/admin/notes?id=${articleId}`, { method: 'DELETE' });
+    if (noteModal) {
+      setNoteModal({ ...noteModal, articles: noteModal.articles.filter(a => a.id !== articleId) });
+      // カウントマップ更新
+      setNoteCountMap(prev => ({
+        ...prev,
+        [noteModal.tool.id]: Math.max(0, (prev[noteModal.tool.id] ?? 1) - 1),
+      }));
+    }
+    showMsg('✅ Note記事を削除しました');
+  };
 
   const openContact = async (contact: Contact) => {
     const res = await fetch('/api/admin/contacts', {
@@ -165,7 +195,6 @@ export default function AdminDashboard() {
     showMsg('✅ 削除しました');
   };
 
-  // ツール編集
   const openEdit = async (tool: Tool) => {
     setEditTool({ ...tool });
     const res = await fetch(`/api/admin/pricing?tool_id=${tool.id}`);
@@ -197,7 +226,6 @@ export default function AdminDashboard() {
     else showMsg('❌ 保存失敗');
   };
 
-  // 全プランの料金固定を即時DB保存
   const toggleAllPricingLock = async (locked: boolean) => {
     if (plans.length === 0) return;
     const updated = plans.map(p => ({ ...p, manually_verified: locked ? 1 : 0 }));
@@ -325,7 +353,7 @@ export default function AdminDashboard() {
                 <button onClick={exportCSV} style={{ ...BTN('#10B981', '#000'), marginLeft: 'auto' }}>CSV出力</button>
               </div>
 
-              {/* 非表示ロゴ読み込み（エラー検知用） */}
+              {/* 非表示ロゴ読み込み */}
               <div style={{ display: 'none' }}>
                 {tools.map(tool => tool.logo_url ? (
                   <img key={tool.id} src={tool.logo_url} alt=""
@@ -335,7 +363,6 @@ export default function AdminDashboard() {
                 ) : null)}
               </div>
 
-              {/* ロゴエラーパネル */}
               {brokenLogos.length > 0 && (
                 <div style={{ padding: '10px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.82rem' }}>
                   <span style={{ color: '#EF4444', fontWeight: 700 }}>⚠ ロゴ読み込みエラー {brokenLogos.length}件：</span>
@@ -359,77 +386,88 @@ export default function AdminDashboard() {
                             {label}{sortArrow(col)}
                           </th>
                         ))}
+                        {/* Note列 */}
+                        <th onClick={() => handleSort('note')}
+                          style={{ padding: '8px 10px', textAlign: 'center', color: sortCol === 'note' ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.65rem', whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none', background: '#111318', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                          Note{sortArrow('note')}
+                        </th>
                         {[
-                          { col: 'desc',    label: '概要',   right: 100 },
-                          { col: 'url',     label: '公式URL', right: 50 },
-                          { col: 'logo',    label: 'ロゴ',   right: 0   },
+                          { col: 'desc',  label: '概要',    right: 100 },
+                          { col: 'url',   label: '公式URL', right: 50 },
+                          { col: 'logo',  label: 'ロゴ',    right: 0 },
                         ].map(({ col, label, right }) => (
                           <th key={col} onClick={() => handleSort(col)}
                             style={{ padding: '8px 6px', textAlign: 'center', color: sortCol === col ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.65rem', whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none', position: 'sticky', right: `${right}px`, background: '#111318', zIndex: 3, width: '50px' }}>
                             {label}{sortArrow(col)}
                           </th>
                         ))}
-                        {[
-                          { col: 'updated', label: '更新日' },
-                        ].map(({ col, label }) => (
-                          <th key={col} onClick={() => handleSort(col)}
-                            style={{ padding: '8px 10px', textAlign: 'left', color: sortCol === col ? '#008CED' : '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem', cursor: 'pointer', userSelect: 'none', background: '#111318' }}>
-                            {label}{sortArrow(col)}
-                          </th>
-                        ))}
+                        <th onClick={() => handleSort('updated')}
+                          style={{ padding: '8px 10px', textAlign: 'left', color: sortCol === 'updated' ? '#008CED' : '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem', cursor: 'pointer', userSelect: 'none', background: '#111318' }}>
+                          更新日{sortArrow('updated')}
+                        </th>
                         <th style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, fontSize: '0.65rem', background: '#111318' }}>操作</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredTools.map(tool => (
-                        <tr key={tool.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,140,237,0.04)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                          <td style={{ padding: '8px 10px' }}>
-                            <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: tool.is_published ? 'rgba(52,211,153,0.15)' : 'rgba(156,163,175,0.1)', color: tool.is_published ? '#34D399' : '#6B7280' }}>
-                              {tool.is_published ? '公開' : '非公開'}
-                            </span>
-                          </td>
-                          <td style={{ padding: '8px 10px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                              {tool.manually_verified ? (
-                                <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA', whiteSpace: 'nowrap' }}>ツール固定</span>
-                              ) : null}
-                              {tool.has_verified_pricing ? (
-                                <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(52,211,153,0.15)', color: '#34D399', whiteSpace: 'nowrap' }}>料金固定</span>
-                              ) : null}
-                            </div>
-                          </td>
-                          <td style={{ padding: '8px 10px', maxWidth: '200px' }}>
-                            <a href={`/tool/${tool.slug}`} target="_blank" rel="noreferrer"
-                              style={{ fontWeight: 600, color: '#008CED', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', textDecoration: 'none' }}>
-                              {tool.name_ja}
-                            </a>
-                            <div style={{ color: '#4A5568', fontSize: '0.7rem' }}>{tool.slug}</div>
-                          </td>
-                          <td style={{ padding: '8px 10px' }}>
-                            <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700,
-                              background: tool.data_source === 'product_hunt_api' ? 'rgba(249,115,22,0.15)' : 'rgba(139,92,246,0.15)',
-                              color: tool.data_source === 'product_hunt_api' ? '#F97316' : '#A78BFA',
-                            }}>
-                              {tool.data_source === 'product_hunt_api' ? 'PH' : '手動'}
-                            </span>
-                          </td>
-                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '100px', background: 'inherit', zIndex: 1, width: '50px' }}>
-                            <StatusDot ok={!!tool.description_ja} />
-                          </td>
-                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '50px', background: 'inherit', zIndex: 1, width: '50px' }}>
-                            <StatusDot ok={!!tool.official_url} />
-                          </td>
-                          <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '0px', background: 'inherit', zIndex: 1, width: '50px' }}>
-                            <StatusDot ok={!!tool.logo_url && !brokenLogos.includes(tool.name_en)} error={brokenLogos.includes(tool.name_en)} />
-                          </td>
-                          <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{tool.updated_at?.slice(0, 10)}</td>
-                          <td style={{ padding: '8px 10px' }}>
-                            <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>
-                          </td>
-                        </tr>
-                      ))}
+                      {filteredTools.map(tool => {
+                        const noteCount = noteCountMap[tool.id] ?? 0;
+                        return (
+                          <tr key={tool.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,140,237,0.04)')}
+                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                            <td style={{ padding: '8px 10px' }}>
+                              <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: tool.is_published ? 'rgba(52,211,153,0.15)' : 'rgba(156,163,175,0.1)', color: tool.is_published ? '#34D399' : '#6B7280' }}>
+                                {tool.is_published ? '公開' : '非公開'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                {tool.manually_verified ? (
+                                  <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA', whiteSpace: 'nowrap' }}>ツール固定</span>
+                                ) : null}
+                              </div>
+                            </td>
+                            <td style={{ padding: '8px 10px', maxWidth: '200px' }}>
+                              <a href={`/tool/${tool.slug}`} target="_blank" rel="noreferrer"
+                                style={{ fontWeight: 600, color: '#008CED', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', textDecoration: 'none' }}>
+                                {tool.name_ja}
+                              </a>
+                              <div style={{ color: '#4A5568', fontSize: '0.7rem' }}>{tool.slug}</div>
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700,
+                                background: tool.data_source === 'product_hunt_api' ? 'rgba(249,115,22,0.15)' : 'rgba(139,92,246,0.15)',
+                                color: tool.data_source === 'product_hunt_api' ? '#F97316' : '#A78BFA',
+                              }}>
+                                {tool.data_source === 'product_hunt_api' ? 'PH' : '手動'}
+                              </span>
+                            </td>
+                            {/* Note列 */}
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                              <button
+                                onClick={() => openNoteModal(tool)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', borderRadius: '3px', fontSize: '0.82rem', color: noteCount > 0 ? '#34D399' : '#EF4444', fontWeight: 700 }}
+                                title={noteCount > 0 ? `${noteCount}件のNote記事` : 'Note記事なし'}
+                              >
+                                {noteCount > 0 ? `○ ${noteCount}` : '×'}
+                              </button>
+                            </td>
+                            <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '100px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                              <StatusDot ok={!!tool.description_ja} />
+                            </td>
+                            <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '50px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                              <StatusDot ok={!!tool.official_url} />
+                            </td>
+                            <td style={{ padding: '8px 6px', textAlign: 'center', position: 'sticky', right: '0px', background: 'inherit', zIndex: 1, width: '50px' }}>
+                              <StatusDot ok={!!tool.logo_url && !brokenLogos.includes(tool.name_en)} error={brokenLogos.includes(tool.name_en)} />
+                            </td>
+                            <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{tool.updated_at?.slice(0, 10)}</td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -466,7 +504,6 @@ export default function AdminDashboard() {
 
             {contactLoading ? <p style={{ color: '#4A5568' }}>読み込み中...</p> : (
               <div style={{ display: 'grid', gridTemplateColumns: selectedContact ? '1fr 1fr' : '1fr', gap: '1rem' }}>
-                {/* 一覧 */}
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
                     <thead>
@@ -505,16 +542,13 @@ export default function AdminDashboard() {
                   </table>
                 </div>
 
-                {/* 詳細パネル */}
                 {selectedContact && (
                   <div style={{ background: '#111318', border: '1px solid rgba(96,165,250,0.2)', borderRadius: '4px', padding: '1.5rem', position: 'sticky', top: '1rem', alignSelf: 'start' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                       <span style={{ padding: '3px 10px', borderRadius: '2px', fontSize: '0.7rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA' }}>{selectedContact.category}</span>
                       <button onClick={() => setSelectedContact(null)} style={{ background: 'transparent', border: 'none', color: '#4A5568', cursor: 'pointer', fontSize: '1.1rem' }}>✕</button>
                     </div>
-
                     <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#F0EBE1', marginBottom: '1rem', lineHeight: 1.4 }}>{selectedContact.subject}</h3>
-
                     <div style={{ display: 'grid', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '0.78rem' }}>
                       <div style={{ display: 'flex', gap: '1rem' }}>
                         <span style={{ color: '#4A5568', minWidth: '60px' }}>受信日時</span>
@@ -529,15 +563,13 @@ export default function AdminDashboard() {
                       {selectedContact.checked_at && (
                         <div style={{ display: 'flex', gap: '1rem' }}>
                           <span style={{ color: '#4A5568', minWidth: '60px' }}>確認日時</span>
-                          <span style={{ color: '#34D399', fontSize: '0.72rem' }}>{selectedContact.checked_at?.slice(0, 16)} ✓（7日後に自動削除）</span>
+                          <span style={{ color: '#34D399', fontSize: '0.72rem' }}>{selectedContact.checked_at?.slice(0, 16)} ✓</span>
                         </div>
                       )}
                     </div>
-
                     <div style={{ background: '#1A1D24', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px', padding: '1rem', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#D1D5DB', lineHeight: 1.8, whiteSpace: 'pre-wrap', maxHeight: '300px', overflowY: 'auto' }}>
                       {selectedContact.body}
                     </div>
-
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button onClick={() => toggleCheck(selectedContact.id, !selectedContact.checked)}
                         style={BTN(selectedContact.checked ? '#374151' : '#008CED', selectedContact.checked ? '#9CA3AF' : '#000')}>
@@ -553,7 +585,56 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* ツール編集モーダル */}
+      {/* ===== Note記事モーダル ===== */}
+      {noteModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, overflowY: 'auto', padding: '2rem' }}
+          onClick={e => e.target === e.currentTarget && setNoteModal(null)}>
+          <div style={{ maxWidth: '900px', margin: '0 auto', background: '#1A1D24', border: '1px solid rgba(0,140,237,0.2)', borderTop: '3px solid #34D399', borderRadius: '4px', padding: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <div>
+                <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#F0EBE1', margin: 0 }}>
+                  Note記事 — {noteModal.tool.name_ja}
+                </h2>
+                <p style={{ fontSize: '0.75rem', color: '#4A5568', marginTop: '4px' }}>{noteModal.articles.length}件</p>
+              </div>
+              <button onClick={() => setNoteModal(null)} style={BTN('#374151', '#9CA3AF')}>閉じる</button>
+            </div>
+
+            {noteLoading ? (
+              <p style={{ color: '#4A5568' }}>読み込み中...</p>
+            ) : noteModal.articles.length === 0 ? (
+              <p style={{ color: '#4A5568', textAlign: 'center', padding: '2rem' }}>Note記事はありません</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {noteModal.articles.map(article => (
+                  <div key={article.id} style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '0.75rem', background: '#111318', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px' }}>
+                    {article.thumbnail_url && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={article.thumbnail_url} alt="" style={{ width: '80px', height: '54px', objectFit: 'cover', borderRadius: '3px', flexShrink: 0 }} />
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <a href={article.note_url} target="_blank" rel="noopener noreferrer"
+                        style={{ color: '#F0EBE1', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {article.title}
+                      </a>
+                      <div style={{ fontSize: '0.72rem', color: '#4A5568', marginTop: '3px' }}>
+                        {article.author_name && <span style={{ marginRight: '12px' }}>{article.author_name}</span>}
+                        {article.likes_count > 0 && <span style={{ marginRight: '12px' }}>♡ {article.likes_count}</span>}
+                        {article.published_at && <span>{article.published_at?.slice(0, 10)}</span>}
+                      </div>
+                    </div>
+                    <button onClick={() => deleteNoteArticle(article.id)} style={{ ...BTN('#DC2626', '#fff'), flexShrink: 0, whiteSpace: 'nowrap' }}>
+                      削除
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ===== ツール編集モーダル ===== */}
       {editTool && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 100, overflowY: 'auto', padding: '2rem' }}
           onClick={e => e.target === e.currentTarget && setEditTool(null)}>
@@ -566,16 +647,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* PRICING_DISABLED - タブ切替を無効化してツール情報のみ表示
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              {(['tools', 'pricing'] as const).map(t => (
-                <button key={t} onClick={() => setEditTab(t)}
-                  style={{ padding: '8px 16px', background: 'transparent', border: 'none', borderBottom: `2px solid ${editTab === t ? '#008CED' : 'transparent'}`, color: editTab === t ? '#008CED' : '#4A5568', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  {t === 'tools' ? 'ツール情報' : '料金プラン'}
-                </button>
-              ))}
-            </div>
-            PRICING_DISABLED */}
+            {/* PRICING_DISABLED */}
 
             {editTab === 'tools' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -634,7 +706,7 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               </div>
-            ) : null /* PRICING_DISABLED */}
+            ) : null}
           </div>
         </div>
       )}

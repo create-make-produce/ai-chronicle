@@ -1,8 +1,6 @@
 export const runtime = 'edge';
 
 // src/app/tool/[slug]/page.tsx
-// ツール詳細（日本語）
-
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import ToolDetailContent from '@/components/ToolDetailContent';
@@ -22,7 +20,6 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ sql, params }),
-      next: { revalidate: 3600 },
     }
   );
   const data = await res.json();
@@ -31,10 +28,21 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
 
 async function getToolNews(toolId: string) {
   return queryD1(
-    `SELECT * FROM news
-     WHERE tool_id = ? AND is_published = 1
-     ORDER BY published_at DESC
-     LIMIT 5`,
+    `SELECT * FROM news WHERE tool_id = ? AND is_published = 1 ORDER BY published_at DESC LIMIT 5`,
+    [toolId]
+  );
+}
+
+async function getToolLaunches(toolId: string) {
+  return queryD1(
+    `SELECT * FROM tool_launches WHERE tool_id = ? ORDER BY launch_number DESC LIMIT 100`,
+    [toolId]
+  );
+}
+
+async function getNoteArticles(toolId: string) {
+  return queryD1(
+    `SELECT * FROM tool_note_articles WHERE tool_id = ? ORDER BY likes_count DESC, published_at DESC LIMIT 60`,
     [toolId]
   );
 }
@@ -47,13 +55,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const tagline = tool.tagline_ja || '';
   return {
     title: `${name}の料金・評判・使い方`,
-    description: tagline || `${name}の機能・料金プラン・使い方を詳細解説。USD・日本円価格を併記。`,
+    description: tagline || `${name}の機能・料金プラン・使い方を詳細解説。`,
     alternates: {
       canonical: `/tool/${tool.slug}`,
-      languages: {
-        ja: `/tool/${tool.slug}`,
-        en: `/en/tool/${tool.slug}`,
-      },
     },
   };
 }
@@ -63,10 +67,21 @@ export default async function ToolDetailPage({ params }: Params) {
   const tool = await getToolDetailBySlug(slug);
   if (!tool) notFound();
 
-  const [related, toolNews] = await Promise.all([
+  const [related, toolNews, toolLaunches, noteArticles] = await Promise.all([
     getRelatedTools(tool.category_id, tool.id, 6),
     getToolNews(tool.id),
+    getToolLaunches(tool.id),
+    getNoteArticles(tool.id),
   ]);
 
-  return <ToolDetailContent tool={tool} relatedTools={related} locale="ja" toolNews={toolNews} />;
+  return (
+    <ToolDetailContent
+      tool={tool}
+      relatedTools={related}
+      locale="ja"
+      toolNews={toolNews}
+      toolLaunches={toolLaunches}
+      noteArticles={noteArticles}
+    />
+  );
 }

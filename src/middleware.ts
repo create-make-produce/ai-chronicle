@@ -2,8 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const LOCALE_COOKIE = 'NEXT_LOCALE';
-const ADMIN_COOKIE  = 'admin_session';
+const ADMIN_COOKIE = 'admin_session';
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -12,7 +11,6 @@ export function middleware(req: NextRequest) {
   // 管理者ページの認証チェック
   // =============================================
   if (pathname.startsWith('/admin')) {
-    // ログインページ自体は素通し
     if (pathname === '/admin' || pathname === '/admin/') {
       return NextResponse.next();
     }
@@ -27,36 +25,12 @@ export function middleware(req: NextRequest) {
   }
 
   // =============================================
-  // 通常の言語判定
+  // /en/* → 日本語パスに301リダイレクト
   // =============================================
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/static') ||
-    pathname.startsWith('/en') ||
-    pathname === '/sitemap.xml' ||
-    pathname === '/robots.txt' ||
-    /\.[a-zA-Z0-9]+$/.test(pathname)
-  ) {
-    return NextResponse.next();
-  }
-
-  const cookieLocale = req.cookies.get(LOCALE_COOKIE)?.value;
-  if (cookieLocale === 'en') {
+  if (pathname.startsWith('/en')) {
     const url = req.nextUrl.clone();
-    url.pathname = `/en${pathname === '/' ? '' : pathname}`;
-    return NextResponse.redirect(url);
-  }
-  if (cookieLocale === 'ja') {
-    return NextResponse.next();
-  }
-
-  const acceptLang  = req.headers.get('accept-language') ?? '';
-  const prefersEnglish = /^en\b/i.test(acceptLang.split(',')[0] ?? '');
-  if (prefersEnglish) {
-    const url = req.nextUrl.clone();
-    url.pathname = `/en${pathname === '/' ? '' : pathname}`;
-    return NextResponse.redirect(url);
+    url.pathname = pathname.replace(/^\/en/, '') || '/';
+    return NextResponse.redirect(url, 301);
   }
 
   return NextResponse.next();

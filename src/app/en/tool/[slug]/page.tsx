@@ -39,6 +39,16 @@ async function getToolNews(toolId: string) {
   );
 }
 
+async function getToolLaunches(toolId: string) {
+  return queryD1(
+    `SELECT * FROM tool_launches
+     WHERE tool_id = ?
+     ORDER BY launch_number DESC
+     LIMIT 20`,
+    [toolId]
+  );
+}
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const tool = await getToolDetailBySlug(slug);
@@ -63,10 +73,11 @@ export default async function ToolDetailPageEn({ params }: Params) {
   const tool = await getToolDetailBySlug(slug);
   if (!tool) notFound();
 
-  const [related, toolNews] = await Promise.all([
+  const [related, toolNews, toolLaunches] = await Promise.all([
     getRelatedTools(tool.category_id, tool.id, 6),
     getToolNews(tool.id),
+    getToolLaunches(tool.id),
   ]);
 
-  return <ToolDetailContent tool={tool} relatedTools={related} locale="en" toolNews={toolNews} />;
+  return <ToolDetailContent tool={tool} relatedTools={related} locale="en" toolNews={toolNews} toolLaunches={toolLaunches} />;
 }

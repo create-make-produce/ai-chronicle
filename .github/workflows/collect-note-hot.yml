@@ -1,0 +1,26 @@
+name: Note記事収集（急上昇）
+
+on:
+  schedule:
+    # 毎日 UTC 15:00（JST 00:00）
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+jobs:
+  collect-note-hot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Collect Note articles (hot)
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx tsx scripts/collect-note-hot.ts
