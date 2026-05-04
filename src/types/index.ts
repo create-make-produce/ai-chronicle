@@ -14,10 +14,16 @@ export interface Tool {
   has_free_trial: number; free_trial_days: number | null;
   screenshot_urls: string | null; demo_url: string | null; video_url: string | null;
   ios_url: string | null; android_url: string | null;
+  has_api: number;
+  has_mobile_app: number;
+  has_chrome_ext: number;
+  language_support: string | null;
+  os_support: string | null;
   product_hunt_id: string | null; product_hunt_url: string | null;
   user_count_label: string | null;
   affiliate_url: string | null; affiliate_rate: number | null; has_affiliate: number;
   ai_confidence_score: number | null; needs_manual_review: number;
+  manually_verified: number;
   data_source: string | null; source_url: string | null;
   last_scraped_at: string | null; last_price_checked_at: string | null;
   created_at: string; updated_at: string;
