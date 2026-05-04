@@ -160,8 +160,13 @@ async function translateToJapanese(tagline: string | null, description: string |
 - tagline: ${tagline ?? '（なし）'}
 - description: ${description ?? '（なし）'}
 
-tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、25文字以内、句読点不要
-description_jaルール：2〜3文、体言止め、句読点不要
+【厳守ルール】
+- 句読点（。、）は文中・文末ともに絶対に使用禁止
+- tagline_ja：「[カテゴリ] [キャッチコピー]」形式、25文字以内
+- description_ja：150文字以上（多い分はOK）、3〜5文を半角スペースで区切る、体言止め、ツールの主な機能・特徴・用途・対象ユーザーを具体的に記述
+- 良い例: "AIチャットで多様なキャラクターと会話できるサービス 自分だけのキャラクターを作成して公開することも可能 エンタメ用途からメンタルケアまで幅広く活用されている 世界中のユーザーが作成した数千万のキャラクターと対話できる"
+- 悪い例（短すぎ）: "AIチャットサービス"
+- 悪い例（句読点）: "AIで会話できるサービス。キャラクターを作成できる。
 
 {"tagline_ja":"翻訳結果","description_ja":"翻訳結果"}`;
   const raw = await callAI(prompt);

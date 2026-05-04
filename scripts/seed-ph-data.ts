@@ -53,6 +53,17 @@ async function graphqlQuery<T>(query: string, variables: Record<string, unknown>
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables }),
   });
+
+  // 429: レート制限 → reset_in秒待ってリトライ
+  if (response.status === 429) {
+    const body = await response.json() as { errors?: Array<{ details?: { reset_in?: number } }> };
+    const resetIn = body.errors?.[0]?.details?.reset_in ?? 60;
+    const waitSec = resetIn + 10; // 余裕を持たせる
+    console.log(`  ⏳ レート制限 → ${waitSec}秒待機中...（リセットまで: ${resetIn}秒）`);
+    await sleep(waitSec * 1000);
+    return graphqlQuery<T>(query, variables); // リトライ
+  }
+
   if (!response.ok) throw new Error(`PH GraphQLエラー (${response.status}): ${await response.text()}`);
   const json = await response.json() as { data?: T; errors?: Array<{ message: string }> };
   if (json.errors?.length) throw new Error(json.errors.map((e) => e.message).join(', '));
@@ -216,8 +227,13 @@ async function translateIfNeeded(db: D1Client, tool: ToolRow, taglineEn: string 
 - tagline: ${taglineEn ?? '（なし）'}
 - description: ${descEn ?? '（なし）'}
 
-tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、25文字以内、句読点不要
-description_jaルール：2〜3文、体言止め、句読点不要
+【厳守ルール】
+- 句読点（。、）は文中・文末ともに絶対に使用禁止
+- tagline_ja：「[カテゴリ] [キャッチコピー]」形式、25文字以内
+- description_ja：150文字以上（多い分はOK）、3〜5文を半角スペースで区切る、体言止め、ツールの主な機能・特徴・用途・対象ユーザーを具体的に記述
+- 良い例: "AIチャットで多様なキャラクターと会話できるサービス 自分だけのキャラクターを作成して公開することも可能 エンタメ用途からメンタルケアまで幅広く活用されている 世界中のユーザーが作成した数千万のキャラクターと対話できる"
+- 悪い例（短すぎ）: "AIチャットサービス"
+- 悪い例（句読点）: "AIで会話できるサービス。キャラクターを作成できる。
 
 {"tagline_ja":"翻訳結果またはnull","description_ja":"翻訳結果またはnull"}`;
 
@@ -264,6 +280,19 @@ async function main() {
   console.log('🚀 AI Chronicle - PHデータ一括補完 開始');
   const db = D1Client.fromEnv();
 
+  // 既存データの「。」を除去（句読点不要ルール適用）
+  console.log('\n🧹 既存データの句読点クリーンアップ...');
+  await db.execute(
+    `UPDATE tools SET
+      description_ja = REPLACE(description_ja, '。', ' '),
+      tagline_ja     = REPLACE(tagline_ja,     '。', ''),
+      tagline_ja     = REPLACE(tagline_ja,     '、', ''),
+      updated_at     = datetime('now')
+     WHERE data_source IS NULL
+       AND (description_ja LIKE '%。%' OR tagline_ja LIKE '%。%' OR tagline_ja LIKE '%、%')`
+  );
+  console.log('  ✅ クリーンアップ完了');
+
   const tools = await db.query<ToolRow>(
     `SELECT id, name_en, tagline_ja, tagline_en, description_ja, description_en,
             product_hunt_id, product_hunt_url, official_url, ios_url, android_url
@@ -275,8 +304,8 @@ async function main() {
   const MAX_PH_REQUESTS = 70;
 
   for (const tool of tools) {
-    // データ完全 → スキップ
-    if (tool.product_hunt_id && tool.description_ja && tool.tagline_ja) {
+    // データ完全（description_jaが150文字以上）→ スキップ
+    if (tool.product_hunt_id && tool.tagline_ja && tool.description_ja && tool.description_ja.length >= 150) {
       console.log(`⏭️ スキップ（完全）: ${tool.name_en}`);
       skipped++;
       continue;

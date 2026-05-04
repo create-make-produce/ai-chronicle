@@ -3,6 +3,9 @@
 // =============================================
 // 実行: tsx scripts/collect-note-hot.ts
 // GitHub Actions: 毎日 UTC 15:00（JST 00:00）
+//
+// V9.1修正: __NEXT_DATA__ JSONパース方式に変更
+//   → note.comのHTML構造変更に強いアーキテクチャ
 
 import { config as loadEnv } from 'dotenv';
 import { existsSync } from 'node:fs';
@@ -23,27 +26,78 @@ interface NoteArticle {
   tags: string[];
 }
 
-async function fetchNoteHotArticles(): Promise<NoteArticle[]> {
-  const url = 'https://note.com/hashtag/AI?f=hot&paid_only=false';
-  console.log(`  → フェッチ中: ${url}`);
-  const res = await fetch(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (compatible; AI-Chronicle-Bot/1.0)',
-      'Accept': 'text/html,application/xhtml+xml',
-      'Accept-Language': 'ja,en;q=0.9',
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const html = await res.text();
+// =============================================
+// __NEXT_DATA__ パース（メイン方式）
+// =============================================
 
-  const articles: NoteArticle[] = [];
+function traverseForNotes(obj: unknown, results: NoteArticle[], limit: number): void {
+  if (results.length >= limit || !obj || typeof obj !== 'object') return;
+
+  if (Array.isArray(obj)) {
+    for (const item of obj) traverseForNotes(item, results, limit);
+    return;
+  }
+
+  const record = obj as Record<string, unknown>;
+
+  if (typeof record.noteUrl === 'string' && record.noteUrl.startsWith('https://note.com/')) {
+    const user = (record.user as Record<string, unknown> | null) ?? {};
+    const tags: string[] = [];
+    if (Array.isArray(record.hashtags)) {
+      for (const t of record.hashtags) {
+        if (typeof t === 'string') tags.push(t);
+        else if (t && typeof t === 'object' && typeof (t as Record<string, unknown>).name === 'string') {
+          tags.push((t as Record<string, unknown>).name as string);
+        }
+      }
+    }
+    results.push({
+      title: String(record.name ?? record.title ?? ''),
+      thumbnail_url: (String(record.eyecatchUrl ?? record.thumbnailUrl ?? '') || null),
+      author_name: (String(user.nickname ?? user.name ?? '') || null),
+      note_url: record.noteUrl,
+      likes_count: Number(record.likeCount ?? record.likesCount ?? 0),
+      published_at: (String(record.publishAt ?? record.publishedAt ?? '') || null),
+      tags,
+    });
+    return;
+  }
+
+  for (const value of Object.values(record)) {
+    if (results.length >= limit) break;
+    traverseForNotes(value, results, limit);
+  }
+}
+
+function extractFromNextData(html: string, limit: number): NoteArticle[] {
+  const match = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  if (!match) {
+    console.log('  ⚠️ __NEXT_DATA__が見つかりません');
+    return [];
+  }
+  try {
+    const data = JSON.parse(match[1]);
+    const articles: NoteArticle[] = [];
+    traverseForNotes(data, articles, limit);
+    return articles;
+  } catch {
+    console.log('  ⚠️ __NEXT_DATA__のJSONパース失敗');
+    return [];
+  }
+}
+
+// フォールバック: 旧regex方式
+function extractFromRegex(html: string, limit: number): NoteArticle[] {
   const noteUrls = [...html.matchAll(/"noteUrl"\s*:\s*"(https:\/\/note\.com\/[^"]+)"/g)].map(m => m[1]);
+  if (noteUrls.length === 0) return [];
+
   const titles   = [...html.matchAll(/"name"\s*:\s*"([^"]+)","noteUrl"/g)].map(m => m[1]);
   const likes    = [...html.matchAll(/"likeCount"\s*:\s*(\d+)/g)].map(m => parseInt(m[1], 10));
   const thumbs   = [...html.matchAll(/"eyecatch(?:Url)?"\s*:\s*"(https:\/\/[^"]+)"/g)].map(m => m[1]);
   const authors  = [...html.matchAll(/"nickname"\s*:\s*"([^"]+)"/g)].map(m => m[1]);
 
-  for (let i = 0; i < noteUrls.length && i < 50; i++) {
+  const articles: NoteArticle[] = [];
+  for (let i = 0; i < noteUrls.length && i < limit; i++) {
     if (!noteUrls[i]) continue;
     articles.push({
       title: titles[i] ?? '',
@@ -55,9 +109,42 @@ async function fetchNoteHotArticles(): Promise<NoteArticle[]> {
       tags: [],
     });
   }
-
-  console.log(`  → ${articles.length}件取得`);
   return articles;
+}
+
+async function fetchNoteHotArticles(): Promise<NoteArticle[]> {
+  const url = 'https://note.com/hashtag/AI?f=hot&paid_only=false';
+  console.log(`  → フェッチ中: ${url}`);
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+      'Accept-Encoding': 'gzip, deflate, br',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const html = await res.text();
+
+  console.log(`  → HTML取得完了 (${Math.round(html.length / 1024)}KB)`);
+
+  // 方法1: __NEXT_DATA__パース
+  let articles = extractFromNextData(html, 50);
+  if (articles.length > 0) {
+    console.log(`  → __NEXT_DATA__から${articles.length}件取得`);
+    return articles;
+  }
+
+  // 方法2: regex（フォールバック）
+  articles = extractFromRegex(html, 50);
+  if (articles.length > 0) {
+    console.log(`  → regex fallbackから${articles.length}件取得`);
+    return articles;
+  }
+
+  const noteCount = (html.match(/https:\/\/note\.com\//g) ?? []).length;
+  console.log(`  ⚠️ 0件 → note.com URL数: ${noteCount} / __NEXT_DATA__あり: ${html.includes('__NEXT_DATA__')}`);
+  return [];
 }
 
 function findMatchingTools(
@@ -96,10 +183,9 @@ async function main() {
       return;
     }
 
-    const toolRows = await db.execute(
+    const tools = await db.query<{ id: string; name_ja: string; name_en: string }>(
       `SELECT id, name_ja, name_en FROM tools WHERE is_published = 1`
     );
-    const tools = (toolRows as any)?.results ?? toolRows ?? [];
     console.log(`  → ${tools.length}件のツールと照合`);
 
     for (const article of articles) {
