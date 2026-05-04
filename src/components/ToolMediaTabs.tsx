@@ -25,7 +25,7 @@ export default function ToolMediaTabs({ noteArticles, launches, locale, toolName
 
   const tabs = [
     { id: 'note'     as const, label: 'Note紹介' },
-    { id: 'launches' as const, label: launches.length > 0 ? `リリース履歴（${launches.length}件）` : 'リリース履歴' },
+    { id: 'launches' as const, label: '機能・アップデート' },
   ];
 
   return (
