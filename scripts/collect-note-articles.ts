@@ -36,8 +36,11 @@ interface NoteArticle {
 }
 
 async function fetchNoteArticles(sort: 'popular' | 'hot', limit: number): Promise<NoteArticle[]> {
-  const url = `https://note.com/api/v2/hashtags/AI/notes?sort=${sort}&paid_only=false&page=1`;
+  // v3/searches API（v2/hashtags/{name}/notesは廃止）
+  const sortParam = sort === 'popular' ? 'popular' : 'hot';
+  const url = `https://note.com/api/v3/searches?context=note&q=AI&sort=${sortParam}&size=${limit}&paid_only=false`;
   console.log(`  → APIフェッチ: ${url}`);
+
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -46,10 +49,20 @@ async function fetchNoteArticles(sort: 'popular' | 'hot', limit: number): Promis
       'Referer': 'https://note.com/',
     },
   });
+
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json = await res.json() as { data: { notes: NoteApiNote[] } };
-  const notes = json?.data?.notes ?? [];
+
+  const json = await res.json() as {
+    data?: {
+      notes?: {
+        contents?: NoteApiNote[];
+      };
+    };
+  };
+
+  const notes = json?.data?.notes?.contents ?? [];
   console.log(`  → ${notes.length}件取得`);
+
   return notes.slice(0, limit).map((n) => ({
     title: n.name ?? '',
     thumbnail_url: n.eyecatch_url ?? null,

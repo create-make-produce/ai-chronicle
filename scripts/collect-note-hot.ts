@@ -34,7 +34,7 @@ interface NoteArticle {
 }
 
 async function fetchNoteHotArticles(): Promise<NoteArticle[]> {
-  const url = 'https://note.com/api/v2/hashtags/AI/notes?sort=hot&paid_only=false&page=1';
+  const url = 'https://note.com/api/v3/searches?context=note&q=AI&sort=hot&size=50&paid_only=false';
   console.log(`  → APIフェッチ: ${url}`);
   const res = await fetch(url, {
     headers: {
@@ -45,8 +45,8 @@ async function fetchNoteHotArticles(): Promise<NoteArticle[]> {
     },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json = await res.json() as { data: { notes: NoteApiNote[] } };
-  const notes = json?.data?.notes ?? [];
+  const json = await res.json() as { data?: { notes?: { contents?: NoteApiNote[] } } };
+  const notes = json?.data?.notes?.contents ?? [];
   console.log(`  → ${notes.length}件取得`);
   return notes.slice(0, 50).map((n) => ({
     title: n.name ?? '',
