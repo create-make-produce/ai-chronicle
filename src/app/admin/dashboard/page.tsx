@@ -405,6 +405,7 @@ export default function AdminDashboard() {
                           style={{ padding: '8px 10px', textAlign: 'left', color: sortCol === 'updated' ? '#008CED' : '#4A5568', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontSize: '0.65rem', cursor: 'pointer', userSelect: 'none', background: '#111318' }}>
                           更新日{sortArrow('updated')}
                         </th>
+                        <th style={{ padding: '8px 10px', textAlign: 'center', color: '#4A5568', fontWeight: 700, fontSize: '0.65rem', background: '#111318' }}>PH</th>
                         <th style={{ padding: '8px 10px', textAlign: 'left', color: '#4A5568', fontWeight: 700, fontSize: '0.65rem', background: '#111318' }}>操作</th>
                       </tr>
                     </thead>
@@ -462,6 +463,18 @@ export default function AdminDashboard() {
                               <StatusDot ok={!!tool.logo_url && !brokenLogos.includes(tool.name_en)} error={brokenLogos.includes(tool.name_en)} />
                             </td>
                             <td style={{ padding: '8px 10px', color: '#4A5568', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{tool.updated_at?.slice(0, 10)}</td>
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                              {(() => {
+                                const phSlug = tool.product_hunt_url?.split('/posts/')?.[1]?.split('?')?.[0];
+                                const phUrl = phSlug ? `https://www.producthunt.com/products/${phSlug}/launches` : null;
+                                return phUrl ? (
+                                  <a href={phUrl} target="_blank" rel="noreferrer"
+                                    style={{ display: 'inline-block', padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(249,115,22,0.15)', color: '#F97316', textDecoration: 'none' }}>
+                                    PH
+                                  </a>
+                                ) : <span style={{ color: '#4A5568', fontSize: '0.65rem' }}>—</span>;
+                              })()}
+                            </td>
                             <td style={{ padding: '8px 10px' }}>
                               <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>
                             </td>

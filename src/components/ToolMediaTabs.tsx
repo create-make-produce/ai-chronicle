@@ -24,9 +24,9 @@ export default function ToolMediaTabs({ noteArticles, launches, locale, toolName
   const pagedNotes = noteArticles.slice(notePage * NOTES_PER_PAGE, (notePage + 1) * NOTES_PER_PAGE);
 
   const tabs = [
-    { id: 'note'     as const, label: 'Note紹介' },
-    { id: 'launches' as const, label: 'リリース' },
-  ];
+    { id: 'note' as const, label: 'Note紹介' },
+    ...(launches.length > 0 ? [{ id: 'launches' as const, label: 'リリース' }] : []),
+  ] as { id: 'note' | 'launches'; label: string }[];
 
   return (
     <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', overflow: 'hidden' }}>
@@ -154,7 +154,7 @@ export default function ToolMediaTabs({ noteArticles, launches, locale, toolName
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ marginBottom: '2px' }}>
                           <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 700, fontSize: '0.88rem', color: '#F0EBE1' }}>
-                            {launch.url ? (
+                            {launch.url && !launch.url.includes('producthunt.com') ? (
                               <a href={launch.url} target="_blank" rel="noopener noreferrer"
                                 style={{ color: '#F0EBE1', textDecoration: 'none' }} className="link-underline">
                                 {launch.launch_name}
