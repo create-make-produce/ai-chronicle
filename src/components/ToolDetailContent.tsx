@@ -1,6 +1,6 @@
 // src/components/ToolDetailContent.tsx
 import Link from 'next/link';
-import type { Locale, ToolWithPlans, Tool, News, ToolLaunch, NoteArticle } from '@/types';
+import type { Locale, ToolWithPlans, Tool, News, NoteArticle } from '@/types';
 import { t, localizedPath } from '@/lib/i18n';
 import ToolCard from './ToolCard';
 import AdSlot from './AdSlot';
@@ -11,7 +11,6 @@ interface ToolDetailContentProps {
   relatedTools: Tool[];
   locale: Locale;
   toolNews?: News[];
-  toolLaunches?: ToolLaunch[];
   noteArticles?: NoteArticle[];
 }
 
@@ -67,7 +66,7 @@ function LinkBadge({ href, icon, topLabel, bottomLabel }: {
   );
 }
 
-export default function ToolDetailContent({ tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [] }: ToolDetailContentProps) {
+export default function ToolDetailContent({ tool, relatedTools, locale, toolNews = [], noteArticles = [] }: ToolDetailContentProps) {
   const tt = t[locale];
   const name = locale === 'ja' ? tool.name_ja : tool.name_en;
   const tagline = locale === 'ja' ? tool.tagline_ja : tool.tagline_en;
@@ -210,7 +209,6 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
           {/* Note紹介 + リリース履歴タブ */}
           <ToolMediaTabs
             noteArticles={noteArticles}
-            launches={toolLaunches}
             locale={locale}
             toolName={name}
           />

@@ -263,22 +263,6 @@ async function translateIfNeeded(db: D1Client, tool: ToolRow, taglineEn: string 
   }
 }
 
-/** PHポストをtool_launchesに1件保存（重複スキップ） */
-async function saveLaunch(db: D1Client, toolId: string, post: PHPost): Promise<boolean> {
-  const existing = await db.first<{ id: string }>(
-    `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`,
-    [toolId, post.name]
-  );
-  if (existing) return false;
-
-  const launchDate = post.featuredAt ? String(post.featuredAt).substring(0, 10) : null;
-  await db.execute(
-    `INSERT INTO tool_launches (id, tool_id, launch_name, tagline, tagline_ja, launch_date, thumbnail_url, url, created_at)
-     VALUES (?, ?, ?, ?, NULL, ?, ?, ?, datetime('now'))`,
-    [generateId('launch'), toolId, post.name, post.tagline ?? null, launchDate, post.thumbnail?.url ?? null, post.url]
-  );
-  return true;
-}
 
 // =============================================
 // メイン
@@ -308,7 +292,6 @@ async function main() {
   );
   console.log(`\n対象ツール: ${tools.length}件\n`);
 
-  let updated = 0, launchesSaved = 0, skipped = 0, notFound = 0, errorCount = 0, phRequests = 0;
   const MAX_PH_REQUESTS = 70;
 
   for (const tool of tools) {
@@ -391,7 +374,6 @@ async function main() {
 
       // ローンチ保存（1件）
       const saved = await saveLaunch(db, tool.id, phPost);
-      if (saved) { console.log(`  🚀 ローンチ保存: ${phPost.name}`); launchesSaved++; }
       else { console.log(`  ℹ️ ローンチ: スキップ（既存）`); }
 
       updated++;
@@ -406,7 +388,6 @@ async function main() {
 
   console.log('\n========== 結果 ==========');
   console.log(`  ✅ 更新完了        : ${updated}件`);
-  console.log(`  🚀 ローンチ保存    : ${launchesSaved}件`);
   console.log(`  ⏭️ スキップ（完全）: ${skipped}件`);
   console.log(`  ❓ PH未発見        : ${notFound}件`);
   console.log(`  ❌ エラー          : ${errorCount}件`);

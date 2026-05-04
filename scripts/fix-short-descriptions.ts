@@ -70,7 +70,7 @@ async function main() {
   const tools = await db.query<ToolRow>(
     `SELECT id, name_en, tagline_en, description_en, description_ja
      FROM tools
-     WHERE description_ja IS NULL OR LENGTH(description_ja) < ${MIN_LENGTH}
+     WHERE description_en IS NOT NULL OR tagline_en IS NOT NULL
      ORDER BY name_en`
   );
 
