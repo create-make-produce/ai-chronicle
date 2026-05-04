@@ -80,7 +80,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
   })();
 
   const initials = name.slice(0, 2).toUpperCase();
-  const hasLinks = officialUrl || tool.twitter_handle || tool.github_url || tool.product_hunt_url || tool.ios_url || tool.android_url;
+  const hasLinks = officialUrl || tool.twitter_handle || tool.github_url || tool.ios_url || tool.android_url;
 
   const statusLabel = () => {
     switch (tool.status) {
@@ -173,11 +173,10 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                     {tool.android_url && (
                       <LinkBadge href={tool.android_url} icon={<GooglePlayIcon />} topLabel="ダウンロード" bottomLabel="Google Play" />
                     )}
-                    {(tool.twitter_handle || tool.github_url || tool.product_hunt_url) && (
+                    {(tool.twitter_handle || tool.github_url) && (
                       <div style={{ display: 'flex', gap: '1rem', fontSize: '0.88rem', alignItems: 'center' }}>
                         {tool.twitter_handle && <a href={`https://x.com/${tool.twitter_handle}`} target="_blank" rel="noopener noreferrer" className="link-underline">X @{tool.twitter_handle}</a>}
                         {tool.github_url && <a href={tool.github_url} target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a>}
-                        {tool.product_hunt_url && <a href={tool.product_hunt_url} target="_blank" rel="noopener noreferrer" className="link-underline">Product Hunt</a>}
                       </div>
                     )}
                   </div>
