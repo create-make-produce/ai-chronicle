@@ -1,9 +1,6 @@
 // =============================================
 // AI Chronicle - Product Hunt APIクライアント
 // =============================================
-// Product Hunt v2 API（GraphQL）を使用
-// Client Credentials方式でアクセストークンを取得
-// =============================================
 
 import { CONFIG } from '../config';
 
@@ -11,31 +8,28 @@ import { CONFIG } from '../config';
  * Product Huntの投稿データ型
  */
 export interface ProductHuntPost {
-  id: string;
+  id: string;               // post ID（ローンチ単位）
   name: string;
-  slug: string;
+  slug: string;             // post slug
   tagline: string;
   description: string | null;
-  url: string;                    // Product HuntページURL
-  website: string | null;         // 公式サイトURL
+  url: string;              // PHローンチページURL
+  website: string | null;   // ローンチ固有の公式URL
   votesCount: number;
-  createdAt: string;              // ISO8601
+  createdAt: string;
   thumbnail: { url: string } | null;
   topics: Array<{ name: string; slug: string }>;
   ios_url: string | null;
   android_url: string | null;
+  // 製品単位の情報（ローンチ照合に使用）
+  product_id: string | null;    // Product ID（製品単位）
+  product_slug: string | null;  // Product slug（照合キー: "claude", "chatgpt"等）
+  product_url: string | null;   // PHの製品ページURL
 }
 
-/**
- * アクセストークンキャッシュ
- */
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
-/**
- * Client Credentials方式でアクセストークン取得
- */
 async function getAccessToken(): Promise<string> {
-  // キャッシュが有効ならそれを返す
   if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
     return cachedToken.token;
   }
@@ -44,9 +38,7 @@ async function getAccessToken(): Promise<string> {
   const clientSecret = process.env.PRODUCT_HUNT_API_SECRET;
 
   if (!clientId || !clientSecret) {
-    throw new Error(
-      '環境変数 PRODUCT_HUNT_API_KEY / PRODUCT_HUNT_API_SECRET が必要です'
-    );
+    throw new Error('環境変数 PRODUCT_HUNT_API_KEY / PRODUCT_HUNT_API_SECRET が必要です');
   }
 
   const response = await fetch('https://api.producthunt.com/v2/oauth/token', {
@@ -66,11 +58,9 @@ async function getAccessToken(): Promise<string> {
 
   const json = (await response.json()) as {
     access_token: string;
-    token_type: string;
     expires_in: number;
   };
 
-  // 有効期限（秒）→ 絶対時刻（ms）
   cachedToken = {
     token: json.access_token,
     expiresAt: Date.now() + json.expires_in * 1000,
@@ -79,9 +69,6 @@ async function getAccessToken(): Promise<string> {
   return json.access_token;
 }
 
-/**
- * GraphQLクエリを実行
- */
 async function graphqlQuery<T>(
   query: string,
   variables: Record<string, unknown> = {}
@@ -108,9 +95,7 @@ async function graphqlQuery<T>(
   };
 
   if (json.errors && json.errors.length > 0) {
-    throw new Error(
-      `Product Hunt GraphQLエラー: ${json.errors.map((e) => e.message).join(', ')}`
-    );
+    throw new Error(`Product Hunt GraphQLエラー: ${json.errors.map((e) => e.message).join(', ')}`);
   }
 
   if (!json.data) {
@@ -120,12 +105,6 @@ async function graphqlQuery<T>(
   return json.data;
 }
 
-
-/**
- * Product HuntのリダイレクトURLを実際の公式URLに解決する
- * HEADリクエストでリダイレクト先を追いかける
- * 失敗した場合はnullを返す（処理は続行）
- */
 async function resolveRedirectUrl(redirectUrl: string): Promise<string | null> {
   if (!redirectUrl || !redirectUrl.includes('producthunt.com')) {
     return redirectUrl;
@@ -138,30 +117,19 @@ async function resolveRedirectUrl(redirectUrl: string): Promise<string | null> {
     const response = await fetch(redirectUrl, {
       method: 'HEAD',
       redirect: 'follow',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; AI-Chronicle-Bot/1.0)',
-      },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AI-Chronicle-Bot/1.0)' },
       signal: controller.signal,
     });
-
     clearTimeout(timeout);
 
     const finalUrl = response.url;
-
-    // リダイレクト先がまだProduct HuntのURLなら失敗とみなす
-    if (finalUrl.includes('producthunt.com')) {
-      return null;
-    }
-
+    if (finalUrl.includes('producthunt.com')) return null;
     return finalUrl;
   } catch {
     return null;
   }
 }
 
-/**
- * トラッキングパラメータを除去
- */
 function stripTrackingParams(url: string): string {
   try {
     const u = new URL(url);
@@ -172,10 +140,6 @@ function stripTrackingParams(url: string): string {
   }
 }
 
-/**
- * Product HuntページのHTMLから公式URLを取得
- * website フィールドがnullの場合のフォールバック
- */
 async function extractWebsiteFromPHPage(phPageUrl: string): Promise<string | null> {
   try {
     const controller = new AbortController();
@@ -191,17 +155,18 @@ async function extractWebsiteFromPHPage(phPageUrl: string): Promise<string | nul
 
     const html = await response.text();
 
-    // 方法1: JSONデータ内のwebsiteUrlを探す（最も確実）
     const jsonMatch = html.match(/"websiteUrl":"(https?:\/\/[^"]+)"/);
     if (jsonMatch) return stripTrackingParams(jsonMatch[1]);
 
-    // 方法2: Visit websiteボタンのhrefを探す
     const btnMatch = html.match(/data-test="visit-website-button"[^>]*href="([^"]+)"/);
     if (btnMatch) return stripTrackingParams(btnMatch[1]);
 
-    // 方法3: primaryLink.urlを探す
     const primaryMatch = html.match(/"primaryLink":\{"__typename":"ProductLink","id":"[^"]+","url":"(https?:\/\/[^"]+)"\}/);
     if (primaryMatch) return stripTrackingParams(primaryMatch[1]);
+
+    // 方法4: href に ref=producthunt が付いた外部リンク（Plurai等で確認）
+    const refHrefMatch = html.match(/href="(https?:\/\/(?!(?:www\.)?producthunt\.com)[^"]+ref=producthunt[^"]*)"/);
+    if (refHrefMatch) return stripTrackingParams(refHrefMatch[1]);
 
     return null;
   } catch {
@@ -210,147 +175,179 @@ async function extractWebsiteFromPHPage(phPageUrl: string): Promise<string | nul
 }
 
 /**
- * 最新投稿を取得
- * AIカテゴリ関連のトピックでフィルタリング
+ * GraphQL ノードの共通型
+ */
+type RawPostNode = {
+  id: string;
+  name: string;
+  slug: string;
+  tagline: string;
+  description: string | null;
+  url: string;
+  website: string | null;
+  productLinks: Array<{ url: string; type: string }> | null;
+  votesCount: number;
+  createdAt: string;
+  thumbnail: { url: string } | null;
+  topics: { edges: Array<{ node: { name: string; slug: string } }> };
+};
+
+/**
+ * 共通エッジ処理（fetchLatestPosts / fetchTopAIPosts 両方で使用）
+ */
+async function processPostNode(node: RawPostNode): Promise<ProductHuntPost> {
+  const productLinks = node.productLinks ?? [];
+  const homepage = productLinks.find(l => l.type === 'homepage')?.url
+    ?? productLinks[0]?.url
+    ?? null;
+  let website: string | null = node.website ?? homepage ?? null;
+
+  if (website && website.includes('producthunt.com')) {
+    const resolved = await resolveRedirectUrl(website);
+    website = resolved ?? null;
+  }
+
+  if (!website) {
+    website = await extractWebsiteFromPHPage(node.url);
+  }
+
+  if (website) {
+    website = stripTrackingParams(website);
+  }
+
+  return {
+    id: node.id,
+    name: node.name,
+    slug: node.slug,
+    tagline: node.tagline,
+    description: node.description,
+    url: node.url,
+    website,
+    votesCount: node.votesCount,
+    createdAt: node.createdAt,
+    thumbnail: node.thumbnail,
+    topics: node.topics.edges.map((t) => t.node),
+    ios_url: productLinks.find(l =>
+      l.type === 'ios_app' || l.url.includes('apps.apple.com')
+    )?.url ?? null,
+    android_url: productLinks.find(l =>
+      l.type === 'android_app' || l.url.includes('play.google.com')
+    )?.url ?? null,
+    // ph_slugはAPI経由では取得不可（管理画面から手動設定）
+    product_id: null,
+    product_slug: null,
+    product_url: null,
+  };
+}
+
+/**
+ * 共通フィールド定義（product情報を含む）
+ */
+const POST_FIELDS = `
+  id name slug tagline description url website
+  productLinks { url type }
+  votesCount createdAt
+  thumbnail { url }
+  topics(first: 5) { edges { node { name slug } } }
+`;
+
+/**
+ * 最新投稿を取得（collect-new-toolsで使用）
  */
 export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
   const query = `
     query RecentPosts($first: Int!) {
       posts(first: $first, order: NEWEST) {
-        edges {
-          node {
-            id
-            name
-            slug
-            tagline
-            description
-            url
-            website
-            productLinks { url type }
-            votesCount
-            createdAt
-            thumbnail { url }
-            topics(first: 5) {
-              edges { node { name slug } }
-            }
-          }
-        }
+        edges { node { ${POST_FIELDS} } }
       }
     }
   `;
 
   type ResponseType = {
-    posts: {
-      edges: Array<{
-        node: {
-          id: string;
-          name: string;
-          slug: string;
-          tagline: string;
-          description: string | null;
-          url: string;
-          website: string | null;
-          productLinks: Array<{ url: string; type: string }> | null;
-          votesCount: number;
-          createdAt: string;
-          thumbnail: { url: string } | null;
-          topics: { edges: Array<{ node: { name: string; slug: string } }> };
-        };
-      }>;
-    };
+    posts: { edges: Array<{ node: RawPostNode }> };
   };
 
   const data = await graphqlQuery<ResponseType>(query, {
     first: CONFIG.PRODUCT_HUNT_POSTS_PER_REQUEST,
   });
 
-  // websiteフィールドのリダイレクトURLを実際の公式URLに解決
-  const posts = await Promise.all(
-    data.posts.edges.map(async (edge) => {
-      // productLinksからhomepageまたは最初のURLを取得
-      const productLinks = edge.node.productLinks ?? [];
-      const homepage = productLinks.find(l => l.type === 'homepage')?.url
-        ?? productLinks[0]?.url
-        ?? null;
-      let website: string | null = edge.node.website ?? homepage ?? null;
-
-      // Product HuntのリダイレクトURLなら実際のURLに解決
-      if (website && website.includes('producthunt.com')) {
-        const resolved = await resolveRedirectUrl(website);
-        website = resolved ?? null;
-      }
-
-      // websiteがnullの場合はProduct HuntページからURLを抽出
-      if (!website) {
-        website = await extractWebsiteFromPHPage(edge.node.url);
-      }
-
-      // websiteにトラッキングパラメータがあれば除去
-      if (website) {
-        website = stripTrackingParams(website);
-      }
-
-      return {
-        id: edge.node.id,
-        name: edge.node.name,
-        slug: edge.node.slug,
-        tagline: edge.node.tagline,
-        description: edge.node.description,
-        url: edge.node.url,
-        website,
-        votesCount: edge.node.votesCount,
-        createdAt: edge.node.createdAt,
-        thumbnail: edge.node.thumbnail,
-        topics: edge.node.topics.edges.map((t) => t.node),
-        ios_url: productLinks.find(l => l.type === 'ios_app' || l.url.includes('apps.apple.com'))?.url ?? null,
-        android_url: productLinks.find(l => l.type === 'android_app' || l.url.includes('play.google.com'))?.url ?? null,
-      };
-    })
-  );
-
-  return posts;
+  return Promise.all(data.posts.edges.map(e => processPostNode(e.node)));
 }
 
 /**
  * AIカテゴリ関連のトピックキーワード
- * これらのいずれかに該当するトピックがあればAI関連と判定
  */
 const AI_TOPIC_KEYWORDS = [
-  'artificial-intelligence',
-  'ai',
-  'machine-learning',
-  'chatbots',
-  'gpt',
-  'llm',
-  'generative-ai',
-  'ai-tools',
-  'ai-assistant',
-  'no-code-ai',
-  'ai-powered',
+  'artificial-intelligence', 'ai', 'machine-learning', 'chatbots',
+  'gpt', 'llm', 'generative-ai', 'ai-tools', 'ai-assistant',
+  'no-code-ai', 'ai-powered',
 ];
 
-/**
- * 投稿がAI関連か判定
- */
 export function isAITool(post: ProductHuntPost): boolean {
   const topicSlugs = post.topics.map((t) => t.slug.toLowerCase());
   const hasAITopic = topicSlugs.some((slug) =>
     AI_TOPIC_KEYWORDS.some((kw) => slug.includes(kw))
   );
-
   if (hasAITopic) return true;
 
-  // フォールバック：taglineやdescriptionにAIキーワードが含まれる
   const text = `${post.tagline} ${post.description ?? ''}`.toLowerCase();
   return /\b(ai|gpt|llm|chatbot|machine learning|generative)\b/i.test(text);
 }
 
 /**
- * AIツールの投稿のみに絞り込む
+ * AIツールの最新投稿のみに絞り込む（collect-new-toolsで使用）
  */
 export async function fetchLatestAIPosts(): Promise<ProductHuntPost[]> {
   const posts = await fetchLatestPosts();
   return posts
     .filter((p) => p.votesCount >= CONFIG.PRODUCT_HUNT_MIN_VOTES)
     .filter(isAITool);
+}
+
+/**
+ * AI topic の人気上位ツールを取得（seed-ph-top100で使用）
+ */
+export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntPost[]> {
+  const perPage = 50;
+  const pages = Math.ceil(count / perPage);
+  const allPosts: ProductHuntPost[] = [];
+  let cursor: string | null = null;
+
+  const query = `
+    query TopAIPosts($first: Int!, $after: String) {
+      posts(first: $first, after: $after, topic: "artificial-intelligence", order: VOTES) {
+        edges { node { ${POST_FIELDS} } }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  `;
+
+  type ResponseType = {
+    posts: {
+      edges: Array<{ node: RawPostNode }>;
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+    };
+  };
+
+  for (let page = 0; page < pages; page++) {
+    console.log(`  PH API取得中... ${page + 1}/${pages}ページ`);
+
+    const data = await graphqlQuery<ResponseType>(query, {
+      first: perPage,
+      after: cursor ?? undefined,
+    });
+
+    const posts = await Promise.all(
+      data.posts.edges.map(e => processPostNode(e.node))
+    );
+    allPosts.push(...posts);
+
+    const pageInfo = data.posts.pageInfo;
+    if (!pageInfo.hasNextPage || !pageInfo.endCursor) break;
+    cursor = pageInfo.endCursor;
+
+    if (page < pages - 1) await new Promise(r => setTimeout(r, 1500));
+  }
+
+  return allPosts.slice(0, count);
 }

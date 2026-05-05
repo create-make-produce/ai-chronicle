@@ -34,11 +34,12 @@ export async function GET(req: NextRequest) {
       SELECT t.id, t.slug, t.name_ja, t.name_en, t.tagline_ja, t.tagline_en,
              t.description_ja, t.description_en, t.official_url, t.logo_url,
              t.company_name, t.status, t.is_published, t.has_free_plan, t.has_api,
-             t.manually_verified, t.category_id, t.data_source,
+             t.manually_verified, t.category_id, t.product_hunt_url, t.ph_slug,
+             t.ph_name, t.search_keywords,
              t.created_at, t.updated_at,
              c.name_ja as category_name_ja, c.slug as category_slug,
              EXISTS (SELECT 1 FROM pricing_plans WHERE tool_id = t.id AND manually_verified = 1) AS has_verified_pricing,
-             (SELECT COUNT(*) FROM pricing_plans WHERE tool_id = t.id AND (is_free = 1 OR price_usd IS NOT NULL)) AS pricing_count
+             (SELECT COUNT(*) FROM tool_launches WHERE tool_id = t.id) AS launch_count
       FROM tools t
       LEFT JOIN categories c ON t.category_id = c.id
     `;
@@ -71,6 +72,7 @@ export async function PUT(req: NextRequest) {
     'description_ja', 'description_en', 'official_url', 'logo_url',
     'company_name', 'status', 'is_published', 'has_free_plan', 'has_api',
     'category_id', 'manually_verified',
+    'ph_name', 'search_keywords',
   ];
 
   const setClauses: string[] = [];

@@ -4,6 +4,10 @@ export type Locale = 'ja' | 'en';
 export interface Tool {
   id: string; slug: string; parent_tool_id: string | null;
   name_ja: string; name_en: string;
+  /** Product Hunt正式名（例: "Claude by Anthropic"） */
+  ph_name: string | null;
+  /** Note記事マッチング用キーワード（カンマ区切り・例: "Claude,クロード,Claude AI"） */
+  search_keywords: string | null;
   tagline_ja: string | null; tagline_en: string | null;
   description_ja: string | null; description_en: string | null;
   official_url: string | null; logo_url: string | null;

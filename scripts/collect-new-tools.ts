@@ -65,15 +65,11 @@ async function saveFailedProductHuntIds(db: D1Client, ids: string[]): Promise<vo
   }
 }
 
-
-
-
-
 async function translateLaunchTagline(tagline: string): Promise<string | null> {
   try {
     const raw = await callAI(`以下の英語テキストを自然な日本語に翻訳してください。JSONのみ出力。句読点不要。\n【翻訳対象】\n${tagline}\n【出力形式】\n{"tagline_ja": "翻訳結果"}`);
-    const sanitized1 = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
-    const result = parseJsonResponse<{ tagline_ja: string | null }>(sanitized1);
+    const sanitized = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+    const result = parseJsonResponse<{ tagline_ja: string | null }>(sanitized);
     return result.tagline_ja ?? null;
   } catch { return null; }
 }
@@ -88,7 +84,8 @@ async function saveToolLaunch(db: D1Client, toolId: string, post: ProductHuntPos
     let taglineJa: string | null = null;
     if (post.tagline) taglineJa = await translateLaunchTagline(post.tagline);
 
-    const url = (post as any).primaryLinkUrl ?? post.website ?? null;
+    // ローンチ固有の公式URL（そのローンチの機能ページ等）
+    const url = post.website ?? null;
     const launchDate = (post as any).featuredAt ? String((post as any).featuredAt).substring(0, 10) : null;
 
     await db.execute(
@@ -101,21 +98,66 @@ async function saveToolLaunch(db: D1Client, toolId: string, post: ProductHuntPos
   }
 }
 
+/**
+ * 既存ツールの照合（ph_slug優先 → product_hunt_id フォールバック）
+ *
+ * 新しいローンチ "Claude Opus 4.7"（post.product_slug = "claude"）が来た場合：
+ *   → tools.ph_slug = "claude" のツールを見つけて新ローンチとして保存
+ * 旧データ（ph_slugなし）の場合：
+ *   → product_hunt_id = post.id で照合（後方互換）
+ */
+async function findExistingTool(
+  db: D1Client,
+  post: ProductHuntPost
+): Promise<{ id: string; name_ja: string; name_en: string; slug: string } | null> {
+  // ph_slug による照合（推奨・製品単位）
+  if (post.product_slug) {
+    const bySlug = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
+      `SELECT id, name_ja, name_en, slug FROM tools WHERE ph_slug = ? LIMIT 1`,
+      [post.product_slug]
+    );
+    if (bySlug) return bySlug;
+  }
+
+  // product_hunt_id による照合（後方互換・旧データ用）
+  const byId = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
+    `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? LIMIT 1`,
+    [post.id]
+  );
+  return byId ?? null;
+}
+
+/**
+ * 新規ツールとして未登録か確認（ph_slug優先）
+ */
+async function isNewTool(db: D1Client, post: ProductHuntPost): Promise<boolean> {
+  if (post.product_slug) {
+    const bySlug = await db.first<{ count: number }>(
+      `SELECT COUNT(*) AS count FROM tools WHERE ph_slug = ?`, [post.product_slug]
+    );
+    if (bySlug && bySlug.count > 0) return false;
+  }
+
+  const byId = await db.first<{ count: number }>(
+    `SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?`, [post.id]
+  );
+  return !byId || byId.count === 0;
+}
+
 async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]): Promise<number> {
   let saved = 0;
   for (const post of posts) {
-    const tool = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
-      `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? LIMIT 1`, [post.id]
-    );
+    const tool = await findExistingTool(db, post);
     if (!tool) continue;
+
     const existing = await db.first<{ id: string }>(
       `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`, [tool.id, post.name]
     );
     if (existing) continue;
+
     console.log(`  🔄 既存ツール新ローンチ: ${tool.name_en} → ${post.name}`);
     await saveToolLaunch(db, tool.id, post);
 
-    // ニュース生成（new_feature）
     const taglineJa = post.tagline ? await translateLaunchTagline(post.tagline).catch(() => null) : null;
     const launchDate = (post as any).featuredAt
       ? String((post as any).featuredAt).substring(0, 10)
@@ -151,27 +193,36 @@ ${pageText ? truncateForAI(pageText, 8000) : '（取得失敗）'}
 
 AIツール定義：機械学習・LLM・画像生成AI・音声AI・コード補完AIを核心機能として使用するソフトウェア。
 
-{"is_ai_tool":true/false,"tool_name":"正式名称またはnull","tagline":"英語キャッチコピーまたはnull","description":"3文以内英語またはnull","company_name":"会社名またはnull","has_free_plan":true/false/null,"category_hint":"text-generation/image-generation/video-generation/coding/audio/data-analysis/productivity/other","tags":["タグ"],"has_api":true/false/null,"supported_languages":["en"]またはnull}`;
+{"is_ai_tool":true/false,"tool_name":"製品名のみ（会社名は含めない）またはnull","tagline":"英語キャッチコピーまたはnull","description":"3文以内英語またはnull","company_name":"会社名またはnull","has_free_plan":true/false/null,"starting_price_usd":数値またはnull,"category_hint":"text-generation/image-generation/video-generation/coding/audio/data-analysis/productivity/other","tags":["タグ"],"has_api":true/false/null,"supported_languages":["en"]またはnull}`;
   const raw = await callAI(prompt);
-  const sanitized2 = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
-  return parseJsonResponse<ExtractedToolData>(sanitized2);
+  const sanitized = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+  return parseJsonResponse<ExtractedToolData>(sanitized);
 }
 
-async function translateToJapanese(tagline: string | null, description: string | null): Promise<{ tagline_ja: string | null; description_ja: string | null }> {
-  if (!tagline && !description) return { tagline_ja: null, description_ja: null };
+async function translateToJapanese(phName: string, tagline: string | null, description: string | null): Promise<{ tagline_ja: string | null; description_ja: string | null; search_keywords: string }> {
+  const cleanName = phName.replace(/\s+by\s+.+$/i, '').trim();
+  if (!tagline && !description) return { tagline_ja: null, description_ja: null, search_keywords: cleanName };
   const prompt = `以下の英語テキストを日本語に翻訳してください。JSONのみ出力。
+
+【ツール名（Product Hunt正式名）】: ${phName}
 
 【翻訳対象】
 - tagline: ${tagline ?? '（なし）'}
 - description: ${description ?? '（なし）'}
 
 tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、最大2文（「。」区切り）、句読点は2文目末のみ可、会社名・製品名禁止
-description_jaルール：最大4文、合計200文字以内、「。」を文末につけその直後に改行文字（\nのみ・<br>禁止）を入れる、会社名・製品名・バージョン禁止
+description_jaルール：最大4文、合計200文字以内、「。」を文末につけその直後に改行文字（\\nのみ・<br>禁止）を入れる、会社名・製品名・バージョン禁止
+search_keywordsルール：製品名のみ（機能説明・会社名・バージョン番号は絶対に入れない）英語の製品名とカタカナ読みのみ 例: "Fathom,ファザム" / "Claude,クロード" / "ChatGPT,チャットGPT"
 
-{"tagline_ja":"翻訳結果","description_ja":"翻訳結果"}`;
+{"tagline_ja":"翻訳結果またはnull","description_ja":"翻訳結果またはnull","search_keywords":"keyword1,keyword2"}`;
   const raw = await callAI(prompt);
-  const sanitized3 = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
-  return parseJsonResponse<{ tagline_ja: string | null; description_ja: string | null }>(sanitized3);
+  const sanitized = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+  const result = parseJsonResponse<{ tagline_ja: string | null; description_ja: string | null; search_keywords: string | null }>(sanitized);
+  return {
+    tagline_ja: result.tagline_ja ?? null,
+    description_ja: result.description_ja ?? null,
+    search_keywords: result.search_keywords ?? cleanName,
+  };
 }
 
 function calculateConfidence(extracted: ExtractedToolData): number {
@@ -215,13 +266,11 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       try {
         const html = await fetchHtml(post.website);
         pageText = htmlToText(html);
-        const meta = extractMeta(html);
-        logoUrl = meta.ogImage ?? guessFaviconUrl(post.website);
+        // ロゴはGoogleファビコンサービス優先（og:imageはバナー画像のことが多い）
+        logoUrl = guessFaviconUrl(post.website);
       } catch {
-        logoUrl = post.thumbnail?.url ?? null;
+        logoUrl = null;
       }
-    } else {
-      logoUrl = post.thumbnail?.url ?? null;
     }
 
     const extracted = await extractToolData(post, pageText);
@@ -231,12 +280,12 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     }
 
     const confidence = calculateConfidence(extracted);
-    const translated = await translateToJapanese(extracted.tagline ?? post.tagline, extracted.description ?? post.description);
+    const translated = await translateToJapanese(post.name, extracted.tagline ?? post.tagline, extracted.description ?? post.description);
     const categoryId = await resolveCategoryId(db, extracted.category_hint);
-    const slug = await generateUniqueSlug(db, extracted.tool_name ?? post.name, post.website);
+    const nameEn = extracted.tool_name ?? post.name;
+    const slug = await generateUniqueSlug(db, nameEn, post.website);
     const toolId = generateId('tool');
 
-    // 公式URLがない場合は非公開
     const officialUrl = post.website ?? null;
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
@@ -248,17 +297,43 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     }
 
     await db.execute(
-      `INSERT INTO tools (id, slug, name_ja, name_en, tagline_ja, tagline_en, description_ja, description_en, official_url, logo_url, company_name, category_id, status, is_published, has_api, has_free_plan, product_hunt_id, product_hunt_url, ai_confidence_score, needs_manual_review, data_source, source_url, language_support, ios_url, android_url, last_scraped_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, 'product_hunt_api', ?, ?, ?, ?, datetime('now'), datetime('now'), datetime('now'))`,
+      `INSERT INTO tools (
+        id, slug, name_ja, name_en, ph_name, ph_slug, search_keywords,
+        tagline_ja, tagline_en, description_ja, description_en,
+        official_url, logo_url, company_name, category_id,
+        status, is_published, has_api, has_free_plan,
+        product_hunt_id, product_hunt_url,
+        ai_confidence_score, needs_manual_review,
+        data_source, source_url, language_support,
+        ios_url, android_url,
+        last_scraped_at, created_at, updated_at
+      ) VALUES (
+        ?, ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?,
+        ?, ?, ?, ?,
+        'active', ?, ?, ?,
+        ?, ?,
+        ?, ?,
+        'product_hunt_api', ?, ?,
+        ?, ?,
+        datetime('now'), datetime('now'), datetime('now')
+      )`,
       [
         toolId, slug,
-        extracted.tool_name ?? post.name, extracted.tool_name ?? post.name,
+        nameEn, nameEn,
+        post.name,                          // ph_name（PH正式名）
+        post.product_slug ?? null,          // ph_slug（製品照合キー）
+        translated.search_keywords,         // Noteマッチング用キーワード
         translated.tagline_ja, extracted.tagline ?? post.tagline,
         translated.description_ja, extracted.description ?? post.description,
-        officialUrl, logoUrl, extracted.company_name, categoryId, isPublished,
+        officialUrl, logoUrl, extracted.company_name, categoryId,
+        isPublished,
         extracted.has_api === true ? 1 : 0,
         extracted.has_free_plan === true ? 1 : 0,
-        post.id, post.url, confidence, needsReview, post.url,
+        post.product_id ?? post.id,
+        post.product_url ?? post.url,
+        confidence, needsReview,
+        post.url,
         extracted.supported_languages ? JSON.stringify(extracted.supported_languages) : null,
         post.ios_url ?? null, post.android_url ?? null,
       ]
@@ -266,8 +341,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     /* PRICING_DISABLED */
 
-
-    console.log(`  ✅ 登録完了: ${slug}（${isPublished ? '公開' : '非公開'}）`);
+    console.log(`  ✅ 登録完了: ${slug}（${isPublished ? '公開' : '非公開'}）ph_slug: ${post.product_slug ?? 'なし'}`);
 
     if (isPublished) {
       const category = categoryId ? await db.first<{ name_ja: string }>('SELECT name_ja FROM categories WHERE id = ?', [categoryId]) : null;
@@ -275,8 +349,8 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         type: 'new_tool',
         tool: {
           id: toolId, slug,
-          name_ja: extracted.tool_name ?? post.name,
-          name_en: extracted.tool_name ?? post.name,
+          name_ja: nameEn,
+          name_en: nameEn,
           tagline_ja: translated.tagline_ja,
           tagline_en: extracted.tagline ?? post.tagline,
           description_ja: translated.description_ja,
@@ -318,8 +392,8 @@ async function main() {
       console.log(`\n--- 前回失敗分再処理（${failedIds.length}件）---`);
       const retryPosts = (await fetchLatestPosts()).filter(p => failedIds.includes(p.id));
       for (const post of retryPosts) {
-        const ex = await db.first<{ count: number }>('SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?', [post.id]);
-        if (ex && ex.count > 0) { failedIds = failedIds.filter(id => id !== post.id); continue; }
+        const isNew = await isNewTool(db, post);
+        if (!isNew) { failedIds = failedIds.filter(id => id !== post.id); continue; }
         const result = await processSingleTool(db, post);
         if (result.skipped || result.success) {
           failedIds = failedIds.filter(id => id !== post.id);
@@ -342,8 +416,7 @@ async function main() {
     console.log('\n--- 新着ツール登録 ---');
     const newPosts: ProductHuntPost[] = [];
     for (const post of allPosts) {
-      const ex = await db.first<{ count: number }>('SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?', [post.id]);
-      if (!ex || ex.count === 0) newPosts.push(post);
+      if (await isNewTool(db, post)) newPosts.push(post);
     }
     console.log(`  → 未登録: ${newPosts.length}件`);
     const targets = newPosts.slice(0, CONFIG.MAX_NEW_TOOLS_PER_RUN);
