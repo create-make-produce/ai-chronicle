@@ -322,7 +322,7 @@ export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntP
     }
   `;
 
-  type ResponseType = {
+  type TopAIResponse = {
     posts: {
       edges: Array<{ node: RawPostNode }>;
       pageInfo: { hasNextPage: boolean; endCursor: string | null };
@@ -332,7 +332,7 @@ export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntP
   for (let page = 0; page < pages; page++) {
     console.log(`  PH API取得中... ${page + 1}/${pages}ページ`);
 
-    const result = await graphqlQuery<ResponseType>(query, {
+    const result = await graphqlQuery<TopAIResponse>(query, {
       first: perPage,
       after: cursor ?? undefined,
     });
