@@ -199,6 +199,11 @@ async function extractFromPHPage(phPageUrl: string): Promise<{
       if (androidDirect) android_url = stripTrackingParams(androidDirect[1]);
     }
 
+    // App StoreのURLをUS→JPに変換
+    if (ios_url && ios_url.includes('apps.apple.com/us/')) {
+      ios_url = ios_url.replace('apps.apple.com/us/', 'apps.apple.com/jp/');
+    }
+
     return { website, ios_url, android_url };
   } catch {
     return empty;

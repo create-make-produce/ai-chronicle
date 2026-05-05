@@ -13,7 +13,18 @@ interface Tool {
   search_keywords: string;  // Noteマッチング用キーワード（例: "Claude,クロード,Claude AI"）
   launch_count: number;
   ios_url: string | null; android_url: string | null;
+  admin_checked: number; admin_memo: string | null;
   created_at: string; updated_at: string;
+}
+
+interface Launch {
+  id: string;
+  launch_name: string;
+  tagline: string | null;
+  tagline_ja: string | null;
+  launch_date: string | null;
+  thumbnail_url: string | null;
+  url: string | null;
 }
 
 interface Plan {
@@ -71,7 +82,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [editTool, setEditTool] = useState<Tool | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [editTab, setEditTab] = useState<'tools' | 'pricing'>('tools');
+  const [editTab, setEditTab] = useState<'tools' | 'launches'>('tools');
+  const [launches, setLaunches] = useState<Launch[]>([]);
+  const [editLaunch, setEditLaunch] = useState<Launch | null>(null);
   const [csvText, setCsvText] = useState('');
 
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -87,10 +100,21 @@ export default function AdminDashboard() {
   const [noteModal, setNoteModal] = useState<{ tool: Tool; articles: NoteArticle[] } | null>(null);
   const [noteLoading, setNoteLoading] = useState(false);
 
+  const [checkModal, setCheckModal] = useState<{ tool: Tool; memo: string } | null>(null);
   const [sortCol, setSortCol] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const showMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000); };
+
+  const saveCheck = async (tool: Tool, checked: number, memo: string) => {
+    await fetch('/api/admin/tools', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: tool.id, admin_checked: checked, admin_memo: memo }),
+    });
+    setTools(tools.map(t => t.id === tool.id ? { ...t, admin_checked: checked, admin_memo: memo } : t));
+    showMsg('✅ チェック状態を保存しました');
+  };
 
   const handleSort = (col: string) => {
     if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -108,6 +132,7 @@ export default function AdminDashboard() {
       else if (sortCol === 'company')   { aVal = a.company_name ?? ''; bVal = b.company_name ?? ''; }
       else if (sortCol === 'name')      { aVal = a.name_ja ?? ''; bVal = b.name_ja ?? ''; }
       else if (sortCol === 'launch')    { aVal = a.launch_count ?? 0; bVal = b.launch_count ?? 0; }
+      else if (sortCol === 'check')      { aVal = a.admin_checked; bVal = b.admin_checked; }
       else if (sortCol === 'ios')        { aVal = a.ios_url ? 1 : 0; bVal = b.ios_url ? 1 : 0; }
       else if (sortCol === 'android')    { aVal = a.android_url ? 1 : 0; bVal = b.android_url ? 1 : 0; }
       else if (sortCol === 'note')      { aVal = (noteCountMap[a.id] ?? 0) > 0 ? 1 : 0; bVal = (noteCountMap[b.id] ?? 0) > 0 ? 1 : 0; }
@@ -211,12 +236,41 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchLaunches = async (toolId: string) => {
+    try {
+      const res = await fetch(`/api/admin/launches?tool_id=${toolId}`);
+      const data = await res.json() as { launches: Launch[] };
+      setLaunches(data.launches ?? []);
+    } catch { setLaunches([]); }
+  };
+
+  const saveLaunch = async () => {
+    if (!editLaunch) return;
+    setSaving(true);
+    try {
+      await fetch('/api/admin/launches', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editLaunch),
+      });
+      showMsg('✅ ローンチを保存しました');
+      setEditLaunch(null);
+      if (editTool) fetchLaunches(editTool.id);
+    } catch (e) {
+      showMsg('❌ 保存失敗: ' + String(e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const openEdit = async (tool: Tool) => {
     setEditTool({ ...tool });
     const res = await fetch(`/api/admin/pricing?tool_id=${tool.id}`);
     const data = await res.json();
     setPlans(data.plans ?? []);
     setEditTab('tools');
+    fetchLaunches(tool.id);
+    setEditLaunch(null);
   };
 
   const saveTool = async () => {
@@ -401,12 +455,13 @@ export default function AdminDashboard() {
                     <thead style={{ position: 'sticky', top: 0, zIndex: 2, background: '#111318' }}>
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         {[
+                          { col: 'check',     label: '✓' },
                           { col: 'published', label: '公開' },
                           { col: 'company',   label: '会社名' },
                           { col: 'name',      label: 'ツール名' },
                           { col: 'launch',    label: 'ローンチ' },
-          { col: 'ios',       label: 'iOS' },
-          { col: 'android',   label: 'Android' },
+                          { col: 'ios',       label: 'iOS' },
+                          { col: 'android',   label: 'Android' },
                           { col: 'note',      label: 'NOTE' },
                         ].map(({ col, label }) => (
                           <th key={col} onClick={() => handleSort(col)}
@@ -442,6 +497,15 @@ export default function AdminDashboard() {
                             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,140,237,0.04)')}
                             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
 
+                            {/* チェック */}
+                            <td style={{ padding: '8px 6px', textAlign: 'center' }}>
+                              <button onClick={() => setCheckModal({ tool, memo: tool.admin_memo ?? '' })}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}
+                                title={tool.admin_memo ?? 'チェックなし'}>
+                                {tool.admin_checked ? '✅' : '⬜'}
+                              </button>
+                            </td>
+
                             {/* 公開 */}
                             <td style={{ padding: '8px 10px' }}>
                               <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: tool.is_published ? 'rgba(52,211,153,0.15)' : 'rgba(156,163,175,0.1)', color: tool.is_published ? '#34D399' : '#6B7280' }}>
@@ -468,6 +532,19 @@ export default function AdminDashboard() {
                               <span style={{ fontSize: '0.78rem', fontWeight: 700, color: launchCount > 0 ? '#F0EBE1' : '#4A5568' }}>
                                 {launchCount > 0 ? launchCount : '—'}
                               </span>
+                            </td>
+
+                            {/* iOS */}
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                              {tool.ios_url
+                                ? <span style={{ color: '#34D399', fontWeight: 700 }}>○</span>
+                                : <span style={{ color: '#F87171', fontWeight: 700 }}>×</span>}
+                            </td>
+                            {/* Android */}
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                              {tool.android_url
+                                ? <span style={{ color: '#34D399', fontWeight: 700 }}>○</span>
+                                : <span style={{ color: '#F87171', fontWeight: 700 }}>×</span>}
                             </td>
 
                             {/* Note */}
@@ -505,18 +582,6 @@ export default function AdminDashboard() {
                               ) : <span style={{ color: '#4A5568', fontSize: '0.65rem' }}>—</span>}
                             </td>
 
-                            {/* iOS */}
-                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
-                              {tool.ios_url
-                                ? <span style={{ color: '#34D399', fontWeight: 700 }}>○</span>
-                                : <span style={{ color: '#F87171', fontWeight: 700 }}>×</span>}
-                            </td>
-                            {/* Android */}
-                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
-                              {tool.android_url
-                                ? <span style={{ color: '#34D399', fontWeight: 700 }}>○</span>
-                                : <span style={{ color: '#F87171', fontWeight: 700 }}>×</span>}
-                            </td>
                             {/* 操作 */}
                             <td style={{ padding: '8px 10px' }}>
                               <div style={{ display: 'flex', gap: '6px' }}>
@@ -706,7 +771,15 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* PRICING_DISABLED */}
+            {/* タブ切り替え */}
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0' }}>
+              {(['tools', 'launches'] as const).map(tab => (
+                <button key={tab} onClick={() => setEditTab(tab)}
+                  style={{ padding: '6px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, color: editTab === tab ? '#008CED' : '#4A5568', borderBottom: editTab === tab ? '2px solid #008CED' : '2px solid transparent', marginBottom: '-1px' }}>
+                  {tab === 'tools' ? '概要' : 'ローンチ'}
+                </button>
+              ))}
+            </div>
 
             {editTab === 'tools' && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -719,6 +792,8 @@ export default function AdminDashboard() {
                   { key: 'logo_url',     label: 'ロゴURL' },
                   { key: 'company_name', label: '会社名' },
                   { key: 'ph_name',      label: 'PH正式名（例: Claude by Anthropic）' },
+                  { key: 'ios_url',      label: 'App Store URL' },
+                  { key: 'android_url',  label: 'Google Play URL' },
                 ].map(({ key, label }) => {
                   const val = (editTool as any)[key] ?? '';
                   const isEmpty = !val;
@@ -779,6 +854,91 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
+
+            {editTab === 'launches' && (
+              <div>
+                {launches.length === 0 ? (
+                  <p style={{ color: '#4A5568', fontSize: '0.82rem' }}>ローンチがありません</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {launches.map(launch => (
+                      <div key={launch.id} style={{ background: '#111318', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '4px', padding: '12px 16px' }}>
+                        {editLaunch?.id === launch.id ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                              <div>
+                                <label style={LABEL}>ローンチ名</label>
+                                <input value={editLaunch.launch_name} onChange={e => setEditLaunch({ ...editLaunch, launch_name: e.target.value })} style={INPUT()} />
+                              </div>
+                              <div>
+                                <label style={LABEL}>タグライン（日本語）</label>
+                                <input value={editLaunch.tagline_ja ?? ''} onChange={e => setEditLaunch({ ...editLaunch, tagline_ja: e.target.value })} style={INPUT()} />
+                              </div>
+                              <div>
+                                <label style={LABEL}>URL</label>
+                                <input value={editLaunch.url ?? ''} onChange={e => setEditLaunch({ ...editLaunch, url: e.target.value })} style={INPUT()} />
+                              </div>
+                              <div>
+                                <label style={LABEL}>サムネイルURL</label>
+                                <input value={editLaunch.thumbnail_url ?? ''} onChange={e => setEditLaunch({ ...editLaunch, thumbnail_url: e.target.value })} style={INPUT()} />
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button onClick={saveLaunch} disabled={saving} style={BTN()}>{saving ? '保存中...' : '保存'}</button>
+                              <button onClick={() => setEditLaunch(null)} style={BTN('#374151', '#9CA3AF')}>キャンセル</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              {launch.thumbnail_url && (
+                                <img src={launch.thumbnail_url} alt="" style={{ width: '40px', height: '27px', objectFit: 'cover', borderRadius: '2px' }} />
+                              )}
+                              <div>
+                                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#F0EBE1' }}>{launch.launch_name}</div>
+                                <div style={{ fontSize: '0.7rem', color: '#4A5568' }}>{launch.tagline_ja ?? launch.tagline ?? '—'}</div>
+                                <div style={{ fontSize: '0.65rem', color: '#374151', marginTop: '2px' }}>{launch.launch_date ?? '日付不明'}</div>
+                              </div>
+                            </div>
+                            <button onClick={() => setEditLaunch(launch)} style={BTN('#1A56DB', '#fff')}>編集</button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* チェックモーダル */}
+      {checkModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={e => e.target === e.currentTarget && setCheckModal(null)}>
+          <div style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.2)', borderTop: '3px solid #008CED', borderRadius: '4px', padding: '2rem', width: '480px' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#F0EBE1', margin: '0 0 1rem' }}>
+              {checkModal.tool.name_ja} — チェック
+            </h2>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '1rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#9CA3AF', cursor: 'pointer' }}>
+                <input type="checkbox" checked={!!checkModal.tool.admin_checked}
+                  onChange={e => setCheckModal({ ...checkModal, tool: { ...checkModal.tool, admin_checked: e.target.checked ? 1 : 0 } })}
+                  style={{ accentColor: '#008CED', width: '18px', height: '18px' }} />
+                確認済み
+              </label>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ fontSize: '0.75rem', color: '#4A5568', display: 'block', marginBottom: '4px' }}>メモ</label>
+              <textarea value={checkModal.memo} onChange={e => setCheckModal({ ...checkModal, memo: e.target.value })}
+                rows={4} placeholder="確認内容・修正事項などを記入..."
+                style={{ width: '100%', background: '#111318', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '3px', color: '#F0EBE1', padding: '8px', fontSize: '0.82rem', resize: 'vertical', boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => { saveCheck(checkModal.tool, checkModal.tool.admin_checked, checkModal.memo); setCheckModal(null); }} style={BTN()}>保存</button>
+              <button onClick={() => setCheckModal(null)} style={BTN('#374151', '#9CA3AF')}>閉じる</button>
+            </div>
           </div>
         </div>
       )}

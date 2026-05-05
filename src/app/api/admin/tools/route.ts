@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
              t.manually_verified, t.category_id, t.product_hunt_url, t.ph_slug,
              t.ph_name, t.search_keywords,
              t.ios_url, t.android_url,
+             t.admin_checked, t.admin_memo,
              t.created_at, t.updated_at,
              c.name_ja as category_name_ja, c.slug as category_slug,
              EXISTS (SELECT 1 FROM pricing_plans WHERE tool_id = t.id AND manually_verified = 1) AS has_verified_pricing,
@@ -74,6 +75,7 @@ export async function PUT(req: NextRequest) {
     'company_name', 'status', 'is_published', 'has_free_plan', 'has_api',
     'category_id', 'manually_verified',
     'ph_name', 'search_keywords',
+    'admin_checked', 'admin_memo',
   ];
 
   const setClauses: string[] = [];
