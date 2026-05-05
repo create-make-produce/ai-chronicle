@@ -332,17 +332,17 @@ export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntP
   for (let page = 0; page < pages; page++) {
     console.log(`  PH API取得中... ${page + 1}/${pages}ページ`);
 
-    const data = await graphqlQuery<ResponseType>(query, {
+    const result = await graphqlQuery<ResponseType>(query, {
       first: perPage,
       after: cursor ?? undefined,
     });
 
     const posts = await Promise.all(
-      data.posts.edges.map(e => processPostNode(e.node))
+      result.posts.edges.map(e => processPostNode(e.node))
     );
     allPosts.push(...posts);
 
-    const pageInfo = data.posts.pageInfo;
+    const pageInfo = result.posts.pageInfo;
     if (!pageInfo.hasNextPage || !pageInfo.endCursor) break;
     cursor = pageInfo.endCursor;
 
