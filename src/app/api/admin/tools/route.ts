@@ -97,3 +97,28 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  if (!checkAuth(req)) return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+  if (!id) return NextResponse.json({ error: 'idが必要です' }, { status: 400 });
+
+  try {
+    // 関連テーブルを先に削除（FK制約対応）
+    for (const sql of [
+      `DELETE FROM tool_tags WHERE tool_id = '${id}'`,
+      `DELETE FROM tool_note_articles WHERE tool_id = '${id}'`,
+      `DELETE FROM tool_launches WHERE tool_id = '${id}'`,
+      `DELETE FROM news WHERE tool_id = '${id}'`,
+      `DELETE FROM pricing_plans WHERE tool_id = '${id}'`,
+      `DELETE FROM tools WHERE id = '${id}'`,
+    ]) {
+      await d1(sql);
+    }
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
+  }
+}

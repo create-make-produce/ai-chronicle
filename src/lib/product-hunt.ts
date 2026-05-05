@@ -315,7 +315,7 @@ type TopAIResponse = {
 };
 
 export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntPost[]> {
-  const perPage = 50;
+  const perPage = 20;
   const pages = Math.ceil(count / perPage);
   const allPosts: ProductHuntPost[] = [];
   let cursor: string | null = null;

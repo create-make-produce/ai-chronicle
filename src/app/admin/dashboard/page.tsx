@@ -196,6 +196,18 @@ export default function AdminDashboard() {
     showMsg('✅ 削除しました');
   };
 
+  const deleteTool = async (tool: Tool) => {
+    if (!confirm(`「${tool.name_ja}」を削除しますか？\n関連するローンチ・ニュース・Note記事もすべて削除されます。`)) return;
+    const res = await fetch(`/api/admin/tools?id=${tool.id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.ok) {
+      showMsg(`✅ 「${tool.name_ja}」を削除しました`);
+      fetchTools(search);
+    } else {
+      showMsg('❌ 削除失敗: ' + data.error);
+    }
+  };
+
   const openEdit = async (tool: Tool) => {
     setEditTool({ ...tool });
     const res = await fetch(`/api/admin/pricing?tool_id=${tool.id}`);
@@ -490,9 +502,12 @@ export default function AdminDashboard() {
                               ) : <span style={{ color: '#4A5568', fontSize: '0.65rem' }}>—</span>}
                             </td>
 
-                            {/* 編集 */}
+                            {/* 操作 */}
                             <td style={{ padding: '8px 10px' }}>
-                              <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>
+                              <div style={{ display: 'flex', gap: '6px' }}>
+                                <button onClick={() => openEdit(tool)} style={BTN('#1A56DB', '#fff')}>編集</button>
+                                <button onClick={() => deleteTool(tool)} style={BTN('#7F1D1D', '#FCA5A5')}>削除</button>
+                              </div>
                             </td>
                           </tr>
                         );
