@@ -61,3 +61,7 @@ scripts/collect-note-hot.ts
 # シードスクリプト（ローカルのみ・GitHubに上げない）
 scripts/seed-ph-top100.ts
 scripts/seed-ph-test3.ts
+
+# URL補完・その他ユーティリティ（ローカルのみ）
+scripts/fix-missing-urls.ts
+scripts/check-ph-names.ts
