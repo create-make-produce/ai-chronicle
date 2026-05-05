@@ -12,6 +12,7 @@ interface Tool {
   ph_name: string;          // PH正式名（例: "Claude by Anthropic"）
   search_keywords: string;  // Noteマッチング用キーワード（例: "Claude,クロード,Claude AI"）
   launch_count: number;
+  ios_url: string | null; android_url: string | null;
   created_at: string; updated_at: string;
 }
 
@@ -107,6 +108,8 @@ export default function AdminDashboard() {
       else if (sortCol === 'company')   { aVal = a.company_name ?? ''; bVal = b.company_name ?? ''; }
       else if (sortCol === 'name')      { aVal = a.name_ja ?? ''; bVal = b.name_ja ?? ''; }
       else if (sortCol === 'launch')    { aVal = a.launch_count ?? 0; bVal = b.launch_count ?? 0; }
+      else if (sortCol === 'ios')        { aVal = a.ios_url ? 1 : 0; bVal = b.ios_url ? 1 : 0; }
+      else if (sortCol === 'android')    { aVal = a.android_url ? 1 : 0; bVal = b.android_url ? 1 : 0; }
       else if (sortCol === 'note')      { aVal = (noteCountMap[a.id] ?? 0) > 0 ? 1 : 0; bVal = (noteCountMap[b.id] ?? 0) > 0 ? 1 : 0; }
       else if (sortCol === 'desc')      { aVal = a.description_ja ? 1 : 0; bVal = b.description_ja ? 1 : 0; }
       else if (sortCol === 'url')       { aVal = a.official_url ? 1 : 0; bVal = b.official_url ? 1 : 0; }
@@ -402,6 +405,8 @@ export default function AdminDashboard() {
                           { col: 'company',   label: '会社名' },
                           { col: 'name',      label: 'ツール名' },
                           { col: 'launch',    label: 'ローンチ' },
+          { col: 'ios',       label: 'iOS' },
+          { col: 'android',   label: 'Android' },
                           { col: 'note',      label: 'NOTE' },
                         ].map(({ col, label }) => (
                           <th key={col} onClick={() => handleSort(col)}
@@ -500,6 +505,18 @@ export default function AdminDashboard() {
                               ) : <span style={{ color: '#4A5568', fontSize: '0.65rem' }}>—</span>}
                             </td>
 
+                            {/* iOS */}
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                              {tool.ios_url
+                                ? <span style={{ color: '#34D399', fontWeight: 700 }}>○</span>
+                                : <span style={{ color: '#F87171', fontWeight: 700 }}>×</span>}
+                            </td>
+                            {/* Android */}
+                            <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                              {tool.android_url
+                                ? <span style={{ color: '#34D399', fontWeight: 700 }}>○</span>
+                                : <span style={{ color: '#F87171', fontWeight: 700 }}>×</span>}
+                            </td>
                             {/* 操作 */}
                             <td style={{ padding: '8px 10px' }}>
                               <div style={{ display: 'flex', gap: '6px' }}>

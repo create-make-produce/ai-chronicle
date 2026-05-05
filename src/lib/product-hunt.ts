@@ -105,6 +105,7 @@ async function graphqlQuery<T>(
   return json.data;
 }
 
+
 async function resolveRedirectUrl(redirectUrl: string): Promise<string | null> {
   if (!redirectUrl || !redirectUrl.includes('producthunt.com')) {
     return redirectUrl;
@@ -140,38 +141,74 @@ function stripTrackingParams(url: string): string {
   }
 }
 
-async function extractWebsiteFromPHPage(phPageUrl: string): Promise<string | null> {
+async function extractFromPHPage(phPageUrl: string): Promise<{
+  website: string | null;
+  ios_url: string | null;
+  android_url: string | null;
+}> {
+  const empty = { website: null, ios_url: null, android_url: null };
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
-
     const response = await fetch(phPageUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AI-Chronicle-Bot/1.0)' },
       signal: controller.signal,
     });
     clearTimeout(timeout);
-
-    if (!response.ok) return null;
-
+    if (!response.ok) return empty;
     const html = await response.text();
 
+    // === website ===
+    let website: string | null = null;
     const jsonMatch = html.match(/"websiteUrl":"(https?:\/\/[^"]+)"/);
-    if (jsonMatch) return stripTrackingParams(jsonMatch[1]);
+    if (jsonMatch) website = stripTrackingParams(jsonMatch[1]);
+    if (!website) {
+      const btnMatch = html.match(/data-test="visit-website-button"[^>]*href="([^"]+)"/);
+      if (btnMatch) website = stripTrackingParams(btnMatch[1]);
+    }
+    if (!website) {
+      const primaryMatch = html.match(/"primaryLink":\{"__typename":"ProductLink","id":"[^"]+","url":"(https?:\/\/[^"]+)"\}/);
+      if (primaryMatch) website = stripTrackingParams(primaryMatch[1]);
+    }
+    if (!website) {
+      const refHrefMatch = html.match(/href="(https?:\/\/(?!(?:www\.)?producthunt\.com)[^"]+ref=producthunt[^"]*)"/);
+      if (refHrefMatch) website = stripTrackingParams(refHrefMatch[1]);
+    }
 
-    const btnMatch = html.match(/data-test="visit-website-button"[^>]*href="([^"]+)"/);
-    if (btnMatch) return stripTrackingParams(btnMatch[1]);
+    // === ios_url ===
+    // PHページHTML内の "App Store" 直前のhrefを探す（PHリダイレクトURLのまま保存）
+    let ios_url: string | null = null;
+    const iosHrefMatch = html.match(/href="(https?:\/\/www\.producthunt\.com\/r\/[^"?]+[^"]*)"[^>]*>(?:[^<]*<[^>]+>)*[^<]*App Store/s);
+    if (iosHrefMatch) {
+      ios_url = iosHrefMatch[1];
+    } else {
+      // fallback: apps.apple.com直リンク
+      const iosDirect = html.match(/href="(https?:\/\/apps\.apple\.com[^"]+)"/);
+      if (iosDirect) ios_url = stripTrackingParams(iosDirect[1]);
+    }
 
-    const primaryMatch = html.match(/"primaryLink":\{"__typename":"ProductLink","id":"[^"]+","url":"(https?:\/\/[^"]+)"\}/);
-    if (primaryMatch) return stripTrackingParams(primaryMatch[1]);
+    // === android_url ===
+    // PHページHTML内の "Play Store" 直前のhrefを探す（PHリダイレクトURLのまま保存）
+    let android_url: string | null = null;
+    const androidHrefMatch = html.match(/href="(https?:\/\/www\.producthunt\.com\/r\/[^"?]+[^"]*)"[^>]*>(?:[^<]*<[^>]+>)*[^<]*Play Store/s);
+    if (androidHrefMatch) {
+      android_url = androidHrefMatch[1];
+    } else {
+      // fallback: play.google.com直リンク
+      const androidDirect = html.match(/href="(https?:\/\/play\.google\.com[^"]+)"/);
+      if (androidDirect) android_url = stripTrackingParams(androidDirect[1]);
+    }
 
-    // 方法4: href に ref=producthunt が付いた外部リンク（Plurai等で確認）
-    const refHrefMatch = html.match(/href="(https?:\/\/(?!(?:www\.)?producthunt\.com)[^"]+ref=producthunt[^"]*)"/);
-    if (refHrefMatch) return stripTrackingParams(refHrefMatch[1]);
-
-    return null;
+    return { website, ios_url, android_url };
   } catch {
-    return null;
+    return empty;
   }
+}
+
+// 後方互換ラッパー
+async function extractWebsiteFromPHPage(phPageUrl: string): Promise<string | null> {
+  const result = await extractFromPHPage(phPageUrl);
+  return result.website;
 }
 
 /**
@@ -215,6 +252,33 @@ async function processPostNode(node: RawPostNode): Promise<ProductHuntPost> {
     website = stripTrackingParams(website);
   }
 
+  let ios_url = productLinks.find(l =>
+    l.type === 'ios_app' || l.url.includes('apps.apple.com')
+  )?.url ?? null;
+  let android_url = productLinks.find(l =>
+    l.type === 'android_app' || l.url.includes('play.google.com')
+  )?.url ?? null;
+
+  // productLinksで取れなかった場合はPHページHTMLから補完
+  if (!ios_url || !android_url || !website) {
+    // まず投稿ページ（/posts/xxx）を試みる
+    const fromPage = await extractFromPHPage(node.url);
+    if (!ios_url) ios_url = fromPage.ios_url;
+    if (!android_url) android_url = fromPage.android_url;
+    if (!website) website = fromPage.website;
+
+    // まだ取れない場合、製品ページ（/products/xxx）も試みる
+    if (!ios_url || !android_url) {
+      const productUrl = node.url.replace('www.producthunt.com/posts/', 'www.producthunt.com/products/');
+      if (productUrl !== node.url) {
+        const fromProduct = await extractFromPHPage(productUrl);
+        if (!ios_url) ios_url = fromProduct.ios_url;
+        if (!android_url) android_url = fromProduct.android_url;
+        if (!website) website = fromProduct.website;
+      }
+    }
+  }
+
   return {
     id: node.id,
     name: node.name,
@@ -227,12 +291,8 @@ async function processPostNode(node: RawPostNode): Promise<ProductHuntPost> {
     createdAt: node.createdAt,
     thumbnail: node.thumbnail,
     topics: node.topics.edges.map((t) => t.node),
-    ios_url: productLinks.find(l =>
-      l.type === 'ios_app' || l.url.includes('apps.apple.com')
-    )?.url ?? null,
-    android_url: productLinks.find(l =>
-      l.type === 'android_app' || l.url.includes('play.google.com')
-    )?.url ?? null,
+    ios_url,
+    android_url,
     // ph_slugはAPI経由では取得不可（管理画面から手動設定）
     product_id: null,
     product_slug: null,
