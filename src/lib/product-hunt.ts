@@ -307,6 +307,13 @@ export async function fetchLatestAIPosts(): Promise<ProductHuntPost[]> {
 /**
  * AI topic の人気上位ツールを取得（seed-ph-top100で使用）
  */
+type TopAIResponse = {
+  posts: {
+    edges: Array<{ node: RawPostNode }>;
+    pageInfo: { hasNextPage: boolean; endCursor: string | null };
+  };
+};
+
 export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntPost[]> {
   const perPage = 50;
   const pages = Math.ceil(count / perPage);
@@ -321,13 +328,6 @@ export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntP
       }
     }
   `;
-
-  type TopAIResponse = {
-    posts: {
-      edges: Array<{ node: RawPostNode }>;
-      pageInfo: { hasNextPage: boolean; endCursor: string | null };
-    };
-  };
 
   for (let page = 0; page < pages; page++) {
     console.log(`  PH API取得中... ${page + 1}/${pages}ページ`);

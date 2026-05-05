@@ -341,6 +341,9 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     /* PRICING_DISABLED */
 
+    // 新規ツールの最初のローンチとしてPH投稿を保存
+    await saveToolLaunch(db, toolId, post);
+
     console.log(`  ✅ 登録完了: ${slug}（${isPublished ? '公開' : '非公開'}）ph_slug: ${post.product_slug ?? 'なし'}`);
 
     if (isPublished) {

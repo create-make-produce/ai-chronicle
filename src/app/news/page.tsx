@@ -26,7 +26,7 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
 
 async function getLatestNews() {
   return queryD1(
-    `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en, t.slug as tool_slug
+    `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en, t.slug as tool_slug, t.logo_url as tool_logo_url
      FROM news n LEFT JOIN tools t ON n.tool_id = t.id
      WHERE n.is_published = 1
      ORDER BY n.published_at DESC

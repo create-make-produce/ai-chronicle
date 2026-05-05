@@ -19,6 +19,7 @@ interface NewsRowProps {
     published_at: string;
     tool_name_ja?: string;
     tool_name_en?: string;
+    tool_logo_url?: string;
   };
   href: string;
   lang: 'ja' | 'en';
@@ -33,6 +34,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
   const toolName = lang === 'en' ? item.tool_name_en : item.tool_name_ja;
   const badgeLabel = lang === 'en' ? badge.en : badge.ja;
   const date = item.published_at?.substring(0, 10) ?? '';
+  const logoUrl = item.tool_logo_url ?? null;
 
   return (
     <Link
@@ -68,8 +70,13 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       <span style={{ fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: '#B0BAC5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {title}
         {toolName && (
-          <span style={{ color: '#4A5568', marginLeft: '0.5rem', fontSize: '0.78rem' }}>
-            — {toolName}
+          <span style={{ color: '#4A5568', marginLeft: '0.5rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            —
+            {logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt={toolName} style={{ width: '14px', height: '14px', borderRadius: '2px', objectFit: 'contain', flexShrink: 0 }} />
+            )}
+            {toolName}
           </span>
         )}
       </span>
