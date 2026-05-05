@@ -28,7 +28,7 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
 
 async function getToolNews(toolId: string) {
   return queryD1(
-    `SELECT * FROM news WHERE tool_id = ? AND is_published = 1 ORDER BY published_at DESC LIMIT 5`,
+    `SELECT * FROM news WHERE tool_id = ? AND is_published = 1 ORDER BY published_at DESC`,
     [toolId]
   );
 }

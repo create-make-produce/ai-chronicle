@@ -5,6 +5,7 @@ import { t, localizedPath } from '@/lib/i18n';
 import ToolCard from './ToolCard';
 import AdSlot from './AdSlot';
 import ToolMediaTabs from './ToolMediaTabs';
+import ToolNewsSection from './ToolNewsSection';
 
 interface ToolDetailContentProps {
   tool: ToolWithPlans;
@@ -14,13 +15,6 @@ interface ToolDetailContentProps {
   toolLaunches?: ToolLaunch[];
   noteArticles?: NoteArticle[];
 }
-
-const NEWS_TYPE_LABELS = {
-  price_change: { ja: '価格改定', en: 'Price Change', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.3)' },
-  new_tool:     { ja: '新リリース', en: 'New Release', color: '#008CED', bg: 'rgba(0,140,237,0.12)', border: 'rgba(0,140,237,0.3)' },
-  new_feature:  { ja: '新機能', en: 'New Feature', color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
-  other:        { ja: 'その他', en: 'Other', color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
-} as const;
 
 function isProductHuntUrl(url: string): boolean {
   return url.includes('producthunt.com');
@@ -192,25 +186,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
               )}
 
               {toolNews.length > 0 && (
-                <div>
-                  <h2 className="section-label mb-3">このツールのニュース</h2>
-                  <div style={{ overflow: 'hidden', borderRadius: '4px', border: '1px solid rgba(0,140,237,0.08)' }}>
-                    {toolNews.slice(0, 3).map((item, i) => {
-                      const typeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
-                      const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
-                      return (
-                        <Link key={item.id} href={localizedPath(locale, `/news/${item.slug}`)}
-                          className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-bg)]"
-                          style={{ borderBottom: i < Math.min(toolNews.length, 3) - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none' }}>
-                          <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', whiteSpace: 'nowrap' }}>{item.published_at?.substring(0, 10)}</time>
-                          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.border}` }}>{badge.ja}</span>
-                          <span className="flex-1 text-sm truncate group-hover:text-[var(--color-accent)]" style={{ color: 'var(--color-text)' }}>{item.title_ja}</span>
-                          <span style={{ color: 'var(--color-accent)', fontSize: '0.85rem' }}>→</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
+                <ToolNewsSection news={toolNews} locale={locale} />
               )}
             </section>
           )}
@@ -244,19 +220,6 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
 
           <AdSlot slot="footer" />
         </div>
-
-        {relatedTools.length > 0 && (
-          <section className="bg-[var(--color-bg-sub)] border-t border-[var(--color-border)]">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-              <h2 className="font-display text-2xl tracking-tight mb-6">{tt.secRelatedTools}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {relatedTools.slice(0, 6).map((related, i) => (
-                  <ToolCard key={related.id} tool={related} locale={locale} index={i} />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
       </main>
 
       <script type="application/ld+json"
