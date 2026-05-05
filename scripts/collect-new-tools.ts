@@ -248,8 +248,8 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     }
 
     await db.execute(
-      `INSERT INTO tools (id, slug, name_ja, name_en, tagline_ja, tagline_en, description_ja, description_en, official_url, logo_url, company_name, category_id, status, is_published, has_api, has_free_plan, product_hunt_id, product_hunt_url, ai_confidence_score, needs_manual_review, data_source, source_url, language_support, last_scraped_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, 'product_hunt_api', ?, ?, datetime('now'), datetime('now'), datetime('now'))`,
+      `INSERT INTO tools (id, slug, name_ja, name_en, tagline_ja, tagline_en, description_ja, description_en, official_url, logo_url, company_name, category_id, status, is_published, has_api, has_free_plan, product_hunt_id, product_hunt_url, ai_confidence_score, needs_manual_review, data_source, source_url, language_support, ios_url, android_url, last_scraped_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, 'product_hunt_api', ?, ?, ?, ?, datetime('now'), datetime('now'), datetime('now'))`,
       [
         toolId, slug,
         extracted.tool_name ?? post.name, extracted.tool_name ?? post.name,
@@ -260,6 +260,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         extracted.has_free_plan === true ? 1 : 0,
         post.id, post.url, confidence, needsReview, post.url,
         extracted.supported_languages ? JSON.stringify(extracted.supported_languages) : null,
+        post.ios_url ?? null, post.android_url ?? null,
       ]
     );
 

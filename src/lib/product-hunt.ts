@@ -22,6 +22,8 @@ export interface ProductHuntPost {
   createdAt: string;              // ISO8601
   thumbnail: { url: string } | null;
   topics: Array<{ name: string; slug: string }>;
+  ios_url: string | null;
+  android_url: string | null;
 }
 
 /**
@@ -300,6 +302,8 @@ export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
         createdAt: edge.node.createdAt,
         thumbnail: edge.node.thumbnail,
         topics: edge.node.topics.edges.map((t) => t.node),
+        ios_url: productLinks.find(l => l.type === 'ios_app' || l.url.includes('apps.apple.com'))?.url ?? null,
+        android_url: productLinks.find(l => l.type === 'android_app' || l.url.includes('play.google.com'))?.url ?? null,
       };
     })
   );
