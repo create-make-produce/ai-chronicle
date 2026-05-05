@@ -104,7 +104,7 @@ export default function AdminDashboard() {
       let aVal: string | number = '';
       let bVal: string | number = '';
       if      (sortCol === 'published') { aVal = a.is_published; bVal = b.is_published; }
-      else if (sortCol === 'fixed')     { aVal = a.manually_verified; bVal = b.manually_verified; }
+      else if (sortCol === 'company')   { aVal = a.company_name ?? ''; bVal = b.company_name ?? ''; }
       else if (sortCol === 'name')      { aVal = a.name_ja ?? ''; bVal = b.name_ja ?? ''; }
       else if (sortCol === 'launch')    { aVal = a.launch_count ?? 0; bVal = b.launch_count ?? 0; }
       else if (sortCol === 'note')      { aVal = (noteCountMap[a.id] ?? 0) > 0 ? 1 : 0; bVal = (noteCountMap[b.id] ?? 0) > 0 ? 1 : 0; }
@@ -399,7 +399,7 @@ export default function AdminDashboard() {
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         {[
                           { col: 'published', label: '公開' },
-                          { col: 'fixed',     label: '固定' },
+                          { col: 'company',   label: '会社名' },
                           { col: 'name',      label: 'ツール名' },
                           { col: 'launch',    label: 'ローンチ' },
                           { col: 'note',      label: 'NOTE' },
@@ -444,11 +444,9 @@ export default function AdminDashboard() {
                               </span>
                             </td>
 
-                            {/* 固定 */}
-                            <td style={{ padding: '8px 10px' }}>
-                              {tool.manually_verified ? (
-                                <span style={{ padding: '2px 8px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 700, background: 'rgba(96,165,250,0.15)', color: '#60A5FA', whiteSpace: 'nowrap' }}>固定</span>
-                              ) : null}
+                            {/* 会社名 */}
+                            <td style={{ padding: '8px 10px', color: '#9CA3AF', fontSize: '0.75rem', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {tool.company_name ?? ''}
                             </td>
 
                             {/* ツール名 */}
