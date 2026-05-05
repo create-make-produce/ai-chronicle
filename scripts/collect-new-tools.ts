@@ -13,7 +13,7 @@ import { CONFIG } from '../src/config';
 import { D1Client } from '../src/lib/d1-rest';
 import { callAI, parseJsonResponse } from '../src/lib/ai';
 import { fetchLatestAIPosts, fetchLatestPosts, type ProductHuntPost } from '../src/lib/product-hunt';
-import { fetchHtml, htmlToText, extractMeta, guessFaviconUrl, truncateForAI } from '../src/lib/scraper';
+import { fetchHtml, htmlToText, extractFaviconUrl, truncateForAI } from '../src/lib/scraper';
 import { generateId } from '../src/lib/uuid';
 import { slugify, slugifyFromUrl } from '../src/lib/slug';
 import { createNews } from '../src/lib/news-generator';
@@ -267,7 +267,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         const html = await fetchHtml(post.website);
         pageText = htmlToText(html);
         // ロゴはGoogleファビコンサービス優先（og:imageはバナー画像のことが多い）
-        logoUrl = guessFaviconUrl(post.website);
+        logoUrl = extractFaviconUrl(html, post.website);
       } catch {
         logoUrl = null;
       }
@@ -384,79 +384,81 @@ async function main() {
   let failedIds = await loadFailedProductHuntIds(db);
 
   try {
+    // STEP 1: PH投稿取得（Gemini不使用）
     console.log('\n--- Product Hunt投稿取得 ---');
     const allPosts = await fetchLatestAIPosts();
     console.log(`  → ${allPosts.length}件取得`);
 
+    // STEP 2: 既存ツールの新ローンチ確認（Gemini軽量使用）
     console.log('\n--- 既存ツールの新ローンチ確認 ---');
     launchesAdded = await saveExistingToolLaunches(db, allPosts);
 
-    if (failedIds.length > 0) {
-      console.log(`\n--- 前回失敗分再処理（${failedIds.length}件）---`);
-      const retryPosts = (await fetchLatestPosts()).filter(p => failedIds.includes(p.id));
-      for (const post of retryPosts) {
-        const isNew = await isNewTool(db, post);
-        if (!isNew) { failedIds = failedIds.filter(id => id !== post.id); continue; }
-        const result = await processSingleTool(db, post);
-        if (result.skipped || result.success) {
-          failedIds = failedIds.filter(id => id !== post.id);
-          result.skipped ? skipped++ : added++;
-          if (result.success) consecutiveGeminiFailures = 0;
-        } else {
-          consecutiveGeminiFailures++;
-          errors.push(`${post.name}: ${result.error}`);
-          if (consecutiveGeminiFailures >= GEMINI_DOWN_THRESHOLD) {
-            await saveFailedProductHuntIds(db, failedIds);
-            await db.execute(`UPDATE scrape_logs SET status='partial', tools_added=?, errors=?, finished_at=datetime('now') WHERE id=?`, [added, JSON.stringify(errors), logId]);
-            printResult(added, skipped, launchesAdded, errors.length, 'partial（Geminiダウン）');
-            return;
-          }
-        }
-      }
-      await saveFailedProductHuntIds(db, failedIds);
-    }
-
-    console.log('\n--- 新着ツール登録 ---');
+    // STEP 3: 処理対象リストを先に全件構築（取り逃し防止）
+    console.log('\n--- 処理対象リスト構築 ---');
     const newPosts: ProductHuntPost[] = [];
     for (const post of allPosts) {
       if (await isNewTool(db, post)) newPosts.push(post);
     }
-    console.log(`  → 未登録: ${newPosts.length}件`);
-    const targets = newPosts.slice(0, CONFIG.MAX_NEW_TOOLS_PER_RUN);
 
+    // 前回失敗IDも対象に追加（重複除外）
+    const failedPosts = (await fetchLatestPosts())
+      .filter(p => failedIds.includes(p.id) && !newPosts.find(n => n.id === p.id));
+
+    // 全処理対象 = 失敗分（優先）+ 新着
+    const targets = [...failedPosts, ...newPosts].slice(0, CONFIG.MAX_NEW_TOOLS_PER_RUN);
+    console.log(`  → 新着: ${newPosts.length}件 / 前回失敗: ${failedPosts.length}件 / 処理対象: ${targets.length}件`);
+
+    // 処理前に全対象IDを失敗リストに入れておく（中断時も逃さない）
     for (const post of targets) {
+      if (!failedIds.includes(post.id)) failedIds.push(post.id);
+    }
+
+    // STEP 4: 処理実行
+    console.log('\n--- ツール登録処理 ---');
+    for (const post of targets) {
+      const alreadyRegistered = !(await isNewTool(db, post));
+      if (alreadyRegistered) {
+        failedIds = failedIds.filter(id => id !== post.id);
+        continue;
+      }
+
       const result = await processSingleTool(db, post);
-      if (result.skipped) { skipped++; }
-      else if (result.success) { added++; consecutiveGeminiFailures = 0; }
-      else {
+
+      if (result.skipped) {
+        skipped++;
+        failedIds = failedIds.filter(id => id !== post.id);
+      } else if (result.success) {
+        added++;
+        consecutiveGeminiFailures = 0;
+        failedIds = failedIds.filter(id => id !== post.id);
+      } else {
         consecutiveGeminiFailures++;
         errors.push(`${post.name}: ${result.error}`);
-        if (!failedIds.includes(post.id)) failedIds.push(post.id);
+        // failedIdsには既に入っているのでそのまま残す
         if (consecutiveGeminiFailures >= GEMINI_DOWN_THRESHOLD) {
-          for (const r of targets.slice(targets.indexOf(post) + 1)) {
-            if (!failedIds.includes(r.id)) failedIds.push(r.id);
-          }
-          await saveFailedProductHuntIds(db, failedIds);
-          await db.execute(`UPDATE scrape_logs SET status='partial', tools_added=?, errors=?, finished_at=datetime('now') WHERE id=?`, [added, JSON.stringify(errors), logId]);
-          printResult(added, skipped, launchesAdded, errors.length, 'partial（Geminiダウン）');
-          return;
+          console.error(`\n⛔ Gemini連続失敗 → 中断（残りは次回再処理）`);
+          break;
         }
       }
     }
 
-    await saveFailedProductHuntIds(db, failedIds);
     const status = errors.length === 0 ? 'success' : added > 0 ? 'partial' : 'error';
-    await db.execute(`UPDATE scrape_logs SET status=?, tools_added=?, errors=?, finished_at=datetime('now') WHERE id=?`, [status, added, errors.length > 0 ? JSON.stringify(errors) : null, logId]);
+    await db.execute(`UPDATE scrape_logs SET status=?, tools_added=?, errors=?, finished_at=datetime('now') WHERE id=?`,
+      [status, added, errors.length > 0 ? JSON.stringify(errors) : null, logId]);
     printResult(added, skipped, launchesAdded, errors.length, status);
 
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error('🔥 致命的エラー:', msg);
+    await db.execute(`UPDATE scrape_logs SET status='error', errors=?, finished_at=datetime('now') WHERE id=?`,
+      [JSON.stringify([msg]), logId]);
+  } finally {
+    // どんな終わり方でも必ず失敗IDを保存
     await saveFailedProductHuntIds(db, failedIds);
-    await db.execute(`UPDATE scrape_logs SET status='error', errors=?, finished_at=datetime('now') WHERE id=?`, [JSON.stringify([msg]), logId]);
-    process.exit(1);
+    console.log(`💾 失敗IDリスト保存: ${failedIds.length}件`);
   }
 }
+
 
 function printResult(added: number, skipped: number, launches: number, errorCount: number, status: string) {
   console.log(`\n========== 結果 ==========`);

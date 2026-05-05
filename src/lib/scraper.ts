@@ -147,7 +147,7 @@ export function extractMeta(html: string): {
 }
 
 /**
- * faviconのURLを推定
+ * faviconのURLを推定（Googleキャッシュ・フォールバック用）
  */
 export function guessFaviconUrl(siteUrl: string): string {
   try {
@@ -155,6 +155,41 @@ export function guessFaviconUrl(siteUrl: string): string {
     return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=128`;
   } catch {
     return '';
+  }
+}
+
+/**
+ * HTMLからファビコンURLを抽出（公式サイトのHTMLから直接取得）
+ * <link rel="icon"> → <link rel="shortcut icon"> → /favicon.ico の順で探す
+ */
+export function extractFaviconUrl(html: string, baseUrl: string): string | null {
+  // <link rel="icon" href="..."> パターン（優先度順）
+  const patterns = [
+    /<link[^>]+rel=["'](?:icon|shortcut icon)["'][^>]+href=["']([^"']+)["']/i,
+    /<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:icon|shortcut icon)["']/i,
+    /<link[^>]+rel=["']apple-touch-icon["'][^>]+href=["']([^"']+)["']/i,
+    /<link[^>]+href=["']([^"']+)["'][^>]+rel=["']apple-touch-icon["']/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match) {
+      const href = match[1];
+      try {
+        // 絶対URLに変換
+        return new URL(href, baseUrl).toString();
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  // フォールバック: /favicon.ico を直接試す
+  try {
+    const u = new URL(baseUrl);
+    return `${u.protocol}//${u.host}/favicon.ico`;
+  } catch {
+    return null;
   }
 }
 
