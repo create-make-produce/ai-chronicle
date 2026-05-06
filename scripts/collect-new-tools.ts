@@ -127,10 +127,12 @@ async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]):
     const tool = await findExistingTool(db, post);
     if (!tool) continue;
 
-    const existing = await db.first<{ id: string }>(
-      `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`, [tool.id, post.name]
+    // PH post IDで重複チェック（V12）
+    const existingNews = await db.first<{ id: string }>(
+      `SELECT id FROM news WHERE source_ph_post_id = ? LIMIT 1`,
+      [post.id]
     );
-    if (existing) continue;
+    if (existingNews) continue;
 
     console.log(`  🔄 既存ツール新ローンチ: ${tool.name_en} → ${post.name}`);
 
@@ -146,6 +148,7 @@ async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]):
         tagline: post.tagline ?? null,
         tagline_ja: taglineJa,
         launch_date: launchDate,
+        ph_post_id: post.id,
       },
     });
 

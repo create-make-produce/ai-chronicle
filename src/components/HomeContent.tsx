@@ -166,7 +166,7 @@ function SectionHeadWithTime({ label, isoTime, locale }: { label: string; isoTim
 
 const NEWS_TYPE_STYLE: Record<string, { color: string; bg: string; border: string }> = {
   price_change: { color: '#FCD34D', bg: 'rgba(252,211,77,0.12)',  border: 'rgba(252,211,77,0.3)' },
-  new_tool:     { color: '#008CED', bg: 'rgba(0,140,237,0.12)',   border: 'rgba(0,140,237,0.3)' },
+  new_tool:     { color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
   new_feature:  { color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
   other:        { color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
 };

@@ -31,6 +31,7 @@ export type NewsEvent =
         tagline: string | null;
         tagline_ja: string | null;
         launch_date: string | null;
+        ph_post_id?: string | null;
       };
     }
   | {
@@ -192,10 +193,12 @@ export async function createNews(db: D1Client, event: NewsEvent): Promise<void> 
       slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
     }
 
+    const phPostId = event.type === 'new_feature' ? (event.launch.ph_post_id ?? null) : null;
+
     await db.execute(
-      `INSERT INTO news (id, slug, title_ja, title_en, body_ja, body_en, news_type, tool_id, is_published, published_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'))`,
-      [id, slug, newsContent.title_ja, newsContent.title_en, newsContent.body_ja, newsContent.body_en, newsType, toolId]
+      `INSERT INTO news (id, slug, title_ja, title_en, body_ja, body_en, news_type, tool_id, is_published, published_at, source_ph_post_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), ?)`,
+      [id, slug, newsContent.title_ja, newsContent.title_en, newsContent.body_ja, newsContent.body_en, newsType, toolId, phPostId]
     );
 
     console.log(`📰 ニュース生成: ${newsContent.title_ja}`);

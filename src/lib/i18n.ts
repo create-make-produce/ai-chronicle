@@ -95,7 +95,7 @@ export const t = {
 
     // ニュースタイプ
     newsTypePriceChange: '価格改定',
-    newsTypeNewTool: '新リリース',
+    newsTypeNewTool: '新機能',
     newsTypeNewFeature: '新機能',
     newsTypeOther: 'その他',
 
@@ -217,7 +217,7 @@ export const t = {
     ctaBack: 'Back',
 
     newsTypePriceChange: 'Price update',
-    newsTypeNewTool: 'New release',
+    newsTypeNewTool: 'New feature',
     newsTypeNewFeature: 'New feature',
     newsTypeOther: 'Other',
 

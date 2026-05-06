@@ -5,7 +5,7 @@ import type { News, Locale } from '@/types';
 
 const NEWS_TYPE_LABELS = {
   price_change: { ja: '価格改定', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.3)' },
-  new_tool:     { ja: '新リリース', color: '#008CED', bg: 'rgba(0,140,237,0.12)', border: 'rgba(0,140,237,0.3)' },
+  new_tool:     { ja: '新機能',    color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
   new_feature:  { ja: '新機能',    color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
   other:        { ja: 'その他',    color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
 } as const;
