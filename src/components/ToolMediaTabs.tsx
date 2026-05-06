@@ -43,7 +43,7 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
       {/* タブヘッダー */}
       <div style={{ display: 'flex', borderBottom: '1px solid rgba(0,140,237,0.1)', padding: '0 1.5rem', gap: '0.25rem' }}>
         {tabs.map(tab => (
-          <button key={tab.id} onClick={() => { setActiveTab(tab.id); setLaunchPage(0); setNotePage(0); }}
+          <button key={tab.id} onClick={() => { setActiveTab(tab.id); setNotePage(0); }}
             style={{
               padding: '0.875rem 1.25rem', fontSize: '0.82rem', fontFamily: 'Fira Sans, sans-serif',
               fontWeight: activeTab === tab.id ? 700 : 400,
