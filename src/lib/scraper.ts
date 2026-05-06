@@ -159,11 +159,25 @@ export function guessFaviconUrl(siteUrl: string): string {
 }
 
 /**
- * HTMLからファビコンURLを抽出（公式サイトのHTMLから直接取得）
+ * HTMLからファビコンURLを抽出（後方互換・直接HTML参照が必要な場合）
  * <link rel="icon"> → <link rel="shortcut icon"> → /favicon.ico の順で探す
  */
 export function extractFaviconUrl(html: string, baseUrl: string): string | null {
-  // <link rel="icon" href="..."> パターン（優先度順）
+  try {
+    const u = new URL(baseUrl);
+
+    // 1. Googleファビコンサービス（最優先）
+    return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=128`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * HTMLからファビコンURLを直接抽出（2番目の選択肢）
+ * <link rel="icon"> → <link rel="shortcut icon"> → /favicon.ico の順で探す
+ */
+export function extractHtmlFaviconUrl(html: string, baseUrl: string): string | null {
   const patterns = [
     /<link[^>]+rel=["'](?:icon|shortcut icon)["'][^>]+href=["']([^"']+)["']/i,
     /<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:icon|shortcut icon)["']/i,
@@ -174,19 +188,39 @@ export function extractFaviconUrl(html: string, baseUrl: string): string | null 
   for (const pattern of patterns) {
     const match = html.match(pattern);
     if (match) {
-      const href = match[1];
       try {
-        // 絶対URLに変換
-        return new URL(href, baseUrl).toString();
-      } catch {
-        continue;
-      }
+        return new URL(match[1], baseUrl).toString();
+      } catch { continue; }
     }
   }
 
-  // フォールバック: /favicon.ico を直接試す
+  // 3. /favicon.ico 直接参照
   try {
     const u = new URL(baseUrl);
+    return `${u.protocol}//${u.host}/favicon.ico`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * ロゴURLを取得（3段階フォールバック）
+ * 1. Googleファビコンサービス → 2. HTMLから抽出 → 3. /favicon.ico
+ */
+export function getLogoUrl(html: string | null, siteUrl: string): string | null {
+  // 1. Google favicon（常に生成可能なら最優先）
+  const googleUrl = extractFaviconUrl(html ?? '', siteUrl);
+  if (googleUrl) return googleUrl;
+
+  // 2. HTMLから抽出
+  if (html) {
+    const htmlUrl = extractHtmlFaviconUrl(html, siteUrl);
+    if (htmlUrl) return htmlUrl;
+  }
+
+  // 3. /favicon.ico
+  try {
+    const u = new URL(siteUrl);
     return `${u.protocol}//${u.host}/favicon.ico`;
   } catch {
     return null;

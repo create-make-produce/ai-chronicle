@@ -14,6 +14,7 @@ interface ToolDetailContentProps {
   toolNews?: News[];
   toolLaunches?: ToolLaunch[];
   noteArticles?: NoteArticle[];
+  relatedToolsFromRelations?: Array<{ id: string; slug: string; name_ja: string; name_en: string; tagline_ja: string | null; logo_url: string | null }>;
 }
 
 function isProductHuntUrl(url: string): boolean {
@@ -61,7 +62,7 @@ function LinkBadge({ href, icon, topLabel, bottomLabel }: {
   );
 }
 
-export default function ToolDetailContent({ tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [] }: ToolDetailContentProps) {
+export default function ToolDetailContent({ tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [], relatedToolsFromRelations = [] }: ToolDetailContentProps) {
   const tt = t[locale];
   const name = locale === 'ja' ? tool.name_ja : tool.name_en;
   const tagline = locale === 'ja' ? tool.tagline_ja : tool.tagline_en;
@@ -196,7 +197,10 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             noteArticles={noteArticles}
             locale={locale}
             launches={toolLaunches}
-          toolName={name}
+            toolName={name}
+            toolLogoUrl={tool.logo_url ?? null}
+            relatedTools={relatedToolsFromRelations}
+            currentToolId={tool.id}
           />
 
           <AdSlot slot="in-content" />

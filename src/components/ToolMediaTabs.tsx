@@ -6,27 +6,37 @@ import type { Locale, ToolLaunch, NoteArticle } from '@/types';
 const LAUNCHES_PER_PAGE = 10;
 const NOTES_PER_PAGE = 12;
 
+interface RelatedTool {
+  id: string;
+  slug: string;
+  name_ja: string;
+  name_en: string;
+  tagline_ja: string | null;
+  logo_url: string | null;
+}
+
 interface ToolMediaTabsProps {
   noteArticles: NoteArticle[];
   launches: ToolLaunch[];
   locale: Locale;
   toolName: string;
+  toolLogoUrl?: string | null;
+  relatedTools?: RelatedTool[];
+  currentToolId?: string;
 }
 
-export default function ToolMediaTabs({ noteArticles, launches, locale, toolName }: ToolMediaTabsProps) {
-  const [activeTab, setActiveTab] = useState<'note' | 'launches'>('note');
-  const [launchPage, setLaunchPage] = useState(0);
+export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedTools = [], currentToolId }: ToolMediaTabsProps) {
+  const [activeTab, setActiveTab] = useState<'note' | 'related'>('note');
   const [notePage, setNotePage] = useState(0);
 
-  const launchTotalPages = Math.ceil(launches.length / LAUNCHES_PER_PAGE);
   const noteTotalPages = Math.ceil(noteArticles.length / NOTES_PER_PAGE);
-  const pagedLaunches = launches.slice(launchPage * LAUNCHES_PER_PAGE, (launchPage + 1) * LAUNCHES_PER_PAGE);
   const pagedNotes = noteArticles.slice(notePage * NOTES_PER_PAGE, (notePage + 1) * NOTES_PER_PAGE);
+  const filteredRelated = relatedTools.filter(t => t.id !== currentToolId);
 
   const tabs = [
     { id: 'note' as const, label: 'Note紹介' },
-    ...(launches.length > 0 ? [{ id: 'launches' as const, label: 'リリース' }] : []),
-  ] as { id: 'note' | 'launches'; label: string }[];
+    ...(filteredRelated.length > 0 ? [{ id: 'related' as const, label: '関連AIツール' }] : []),
+  ] as { id: 'note' | 'related'; label: string }[];
 
   return (
     <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', overflow: 'hidden' }}>
@@ -133,65 +143,30 @@ export default function ToolMediaTabs({ noteArticles, launches, locale, toolName
             )}
           </div>
         )}
-
-        {/* 機能・アップデートタブ */}
-        {activeTab === 'launches' && (
-          <div>
-            {pagedLaunches.length === 0 ? (
-              <p style={{ color: '#6B7280', fontSize: '0.88rem', textAlign: 'center', padding: '2rem 0' }}>リリース履歴はありません</p>
-            ) : (
-              <>
-                {pagedLaunches.map((launch, i) => {
-                  const displayTagline = launch.tagline_ja ?? launch.tagline;
-                  const isLast = i === pagedLaunches.length - 1;
-                  return (
-                    <div key={launch.id} style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem 0', borderBottom: isLast ? 'none' : '1px solid rgba(0,140,237,0.08)', alignItems: 'center' }}>
-                      {launch.thumbnail_url && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={launch.thumbnail_url} alt={launch.launch_name}
-                          style={{ width: '80px', height: '54px', borderRadius: '3px', objectFit: 'cover', flexShrink: 0, border: '1px solid rgba(0,140,237,0.1)' }} />
-                      )}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ marginBottom: '2px' }}>
-                          <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 700, fontSize: '0.88rem', color: '#F0EBE1' }}>
-                            {launch.url && !launch.url.includes('producthunt.com') ? (
-                              <a href={launch.url} target="_blank" rel="noopener noreferrer"
-                                style={{ color: '#F0EBE1', textDecoration: 'none' }} className="link-underline">
-                                {launch.launch_name}
-                              </a>
-                            ) : launch.launch_name}
-                          </span>
-                        </div>
-                        {displayTagline && (
-                          <p style={{ fontSize: '0.78rem', color: '#9CA3AF', margin: 0, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {displayTagline}
-                          </p>
-                        )}
-                      </div>
-                      {launch.launch_date && (
-                        <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          {launch.launch_date}
-                        </time>
-                      )}
-                    </div>
-                  );
-                })}
-
-                {launchTotalPages > 1 && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid rgba(0,140,237,0.08)' }}>
-                    <button onClick={() => setLaunchPage(p => Math.max(0, p - 1))} disabled={launchPage === 0}
-                      style={{ padding: '4px 14px', fontSize: '0.78rem', background: launchPage === 0 ? 'rgba(0,140,237,0.04)' : 'rgba(0,140,237,0.1)', color: launchPage === 0 ? '#4A5568' : '#008CED', border: '1px solid rgba(0,140,237,0.2)', borderRadius: '3px', cursor: launchPage === 0 ? 'default' : 'pointer', fontFamily: 'Fira Sans, sans-serif' }}>
-                      ← 前へ
-                    </button>
-                    <span style={{ fontSize: '0.78rem', color: '#6B7280', fontFamily: 'Fira Sans, monospace' }}>{launchPage + 1} / {launchTotalPages}</span>
-                    <button onClick={() => setLaunchPage(p => Math.min(launchTotalPages - 1, p + 1))} disabled={launchPage === launchTotalPages - 1}
-                      style={{ padding: '4px 14px', fontSize: '0.78rem', background: launchPage === launchTotalPages - 1 ? 'rgba(0,140,237,0.04)' : 'rgba(0,140,237,0.1)', color: launchPage === launchTotalPages - 1 ? '#4A5568' : '#008CED', border: '1px solid rgba(0,140,237,0.2)', borderRadius: '3px', cursor: launchPage === launchTotalPages - 1 ? 'default' : 'pointer', fontFamily: 'Fira Sans, sans-serif' }}>
-                      次へ →
-                    </button>
+        {/* 関連AIツールタブ */}
+        {activeTab === 'related' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            {filteredRelated.map(tool => (
+              <a key={tool.id} href={`/tool/${tool.slug}`}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '10px', background: '#111318', border: '1px solid rgba(0,140,237,0.08)', borderRadius: '6px', padding: '10px 12px', transition: 'border-color 0.15s' }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(0,140,237,0.3)'}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(0,140,237,0.08)'}>
+                {tool.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={tool.logo_url} alt={tool.name_ja} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,140,237,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#008CED' }}>{tool.name_ja.slice(0, 2).toUpperCase()}</span>
                   </div>
                 )}
-              </>
-            )}
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 700, fontSize: '0.82rem', color: '#F0EBE1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tool.name_ja}</div>
+                  {tool.tagline_ja && (
+                    <div style={{ fontSize: '0.7rem', color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tool.tagline_ja}</div>
+                  )}
+                </div>
+              </a>
+            ))}
           </div>
         )}
       </div>

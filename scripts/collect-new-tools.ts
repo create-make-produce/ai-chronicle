@@ -74,29 +74,6 @@ async function translateLaunchTagline(tagline: string): Promise<string | null> {
   } catch { return null; }
 }
 
-async function saveToolLaunch(db: D1Client, toolId: string, post: ProductHuntPost): Promise<void> {
-  try {
-    const existing = await db.first<{ id: string }>(
-      `SELECT id FROM tool_launches WHERE tool_id = ? AND launch_name = ? LIMIT 1`, [toolId, post.name]
-    );
-    if (existing) return;
-
-    let taglineJa: string | null = null;
-    if (post.tagline) taglineJa = await translateLaunchTagline(post.tagline);
-
-    // ローンチ固有の公式URL（そのローンチの機能ページ等）
-    const url = post.website ?? null;
-    const launchDate = (post as any).featuredAt ? String((post as any).featuredAt).substring(0, 10) : null;
-
-    await db.execute(
-      `INSERT INTO tool_launches (id, tool_id, launch_name, tagline, tagline_ja, launch_date, launch_number, thumbnail_url, url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-      [generateId('launch'), toolId, post.name, post.tagline ?? null, taglineJa, launchDate, null, post.thumbnail?.url ?? null, url]
-    );
-    console.log(`  ✅ ローンチ保存: ${post.name}${taglineJa ? ` →「${taglineJa}」` : ''}`);
-  } catch (error) {
-    console.warn(`  ⚠️ ローンチ保存失敗: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
 
 /**
  * 既存ツールの照合（ph_slug優先 → product_hunt_id フォールバック）
@@ -156,7 +133,6 @@ async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]):
     if (existing) continue;
 
     console.log(`  🔄 既存ツール新ローンチ: ${tool.name_en} → ${post.name}`);
-    await saveToolLaunch(db, tool.id, post);
 
     const taglineJa = post.tagline ? await translateLaunchTagline(post.tagline).catch(() => null) : null;
     const launchDate = (post as any).featuredAt
@@ -269,8 +245,16 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         // ロゴはGoogleファビコンサービス優先（og:imageはバナー画像のことが多い）
         logoUrl = extractFaviconUrl(html, post.website);
       } catch {
-        logoUrl = null;
+        logoUrl = null; // fetchは失敗でも後でGoogleファビコンをセット
       }
+    }
+
+    // fetchが失敗してもGoogleファビコンは生成可能
+    if (!logoUrl && post.website) {
+      try {
+        const u = new URL(post.website);
+        logoUrl = `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=128`;
+      } catch { /* ignore */ }
     }
 
     const extracted = await extractToolData(post, pageText);
@@ -342,7 +326,6 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     /* PRICING_DISABLED */
 
     // 新規ツールの最初のローンチとしてPH投稿を保存
-    await saveToolLaunch(db, toolId, post);
 
     console.log(`  ✅ 登録完了: ${slug}（${isPublished ? '公開' : '非公開'}）ph_slug: ${post.product_slug ?? 'なし'}`);
 

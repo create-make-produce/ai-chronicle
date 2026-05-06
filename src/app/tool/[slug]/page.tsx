@@ -47,6 +47,16 @@ async function getNoteArticles(toolId: string) {
   );
 }
 
+async function getRelatedToolsFromRelations(toolId: string) {
+  return queryD1(
+    `SELECT t.id, t.slug, t.name_ja, t.name_en, t.tagline_ja, t.logo_url
+     FROM tool_relations tr
+     JOIN tools t ON tr.tool_id_b = t.id
+     WHERE tr.tool_id_a = ?`,
+    [toolId]
+  );
+}
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const tool = await getToolDetailBySlug(slug);
@@ -67,11 +77,12 @@ export default async function ToolDetailPage({ params }: Params) {
   const tool = await getToolDetailBySlug(slug);
   if (!tool) notFound();
 
-  const [related, toolNews, toolLaunches, noteArticles] = await Promise.all([
+  const [related, toolNews, toolLaunches, noteArticles, relatedFromRelations] = await Promise.all([
     getRelatedTools(tool.category_id, tool.id, 6),
     getToolNews(tool.id),
     getToolLaunches(tool.id),
     getNoteArticles(tool.id),
+    getRelatedToolsFromRelations(tool.id),
   ]);
 
   return (
@@ -82,6 +93,7 @@ export default async function ToolDetailPage({ params }: Params) {
       toolNews={toolNews}
       toolLaunches={toolLaunches}
       noteArticles={noteArticles}
+      relatedToolsFromRelations={relatedFromRelations}
     />
   );
 }
