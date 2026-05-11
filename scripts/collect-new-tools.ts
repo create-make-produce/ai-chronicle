@@ -301,7 +301,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
         ?, ?, ?, ?,
-        'active', ?, ?, ?,
+        ?, ?, ?, ?,
         ?, ?,
         ?, ?,
         'product_hunt_api', ?, ?,
