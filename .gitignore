@@ -57,11 +57,12 @@ Thumbs.db
 # Note収集スクリプト（ローカルのみ・GitHubに上げない）
 scripts/collect-note-articles.ts
 scripts/collect-note-hot.ts
+scripts/collect-note-tools.ts
 
 # シードスクリプト（ローカルのみ・GitHubに上げない）
 scripts/seed-ph-top100.ts
-scripts/seed-ph-test3.ts
 scripts/seed-ph-product.ts
+scripts/seed-ph-product-temp.ts
 
 # 管理画面（ローカル専用・GitHubに上げない）
 src/app/admin/

@@ -64,7 +64,7 @@ async function generateNewToolNews(event: Extract<NewsEvent, { type: 'new_tool' 
 {
   "title_ja": "日本語タイトル（30文字以内・「AIツール」などを含む）",
   "title_en": "English title (under 60 characters)",
-  "body_ja": "日本語本文（10〜15行・何ができるツールか・特徴・想定ユーザーを含む。最低200文字）",
+  "body_ja": "日本語本文（10〜15行・何ができるツールか・特徴・想定ユーザーを含む。最低200文字。日本のAI初心者にもわかりやすい言葉で書くこと）",
   "body_en": "English body (10-15 lines, what it does, features, target users)"
 }`;
 
@@ -92,7 +92,7 @@ async function generateNewFeatureNews(event: Extract<NewsEvent, { type: 'new_fea
 {
   "title_ja": "日本語タイトル（30文字以内・例：「${tool.name_ja}が${launch.launch_name}を追加」）",
   "title_en": "English title (under 60 characters)",
-  "body_ja": "日本語本文（10〜15行・どんな機能か・誰に役立つか・使い方を含む。最低200文字）",
+  "body_ja": "日本語本文（10〜15行・どんな機能か・誰に役立つか・使い方を含む。最低200文字。日本のAI初心者にもわかりやすい言葉で書くこと）",
   "body_en": "English body (10-15 lines)"
 }`;
 

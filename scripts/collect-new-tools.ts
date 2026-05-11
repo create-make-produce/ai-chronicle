@@ -87,18 +87,18 @@ async function findExistingTool(
   db: D1Client,
   post: ProductHuntPost
 ): Promise<{ id: string; name_ja: string; name_en: string; slug: string } | null> {
-  // ph_slug による照合（推奨・製品単位）
+  // ph_slug による照合（推奨・製品単位）・is_published=1のみ対象
   if (post.product_slug) {
     const bySlug = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
-      `SELECT id, name_ja, name_en, slug FROM tools WHERE ph_slug = ? LIMIT 1`,
+      `SELECT id, name_ja, name_en, slug FROM tools WHERE ph_slug = ? AND is_published = 1 LIMIT 1`,
       [post.product_slug]
     );
     if (bySlug) return bySlug;
   }
 
-  // product_hunt_id による照合（後方互換・旧データ用）
+  // product_hunt_id による照合（後方互換・旧データ用）・is_published=1のみ対象
   const byId = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
-    `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? LIMIT 1`,
+    `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? AND is_published = 1 LIMIT 1`,
     [post.id]
   );
   return byId ?? null;
@@ -127,12 +127,19 @@ async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]):
     const tool = await findExistingTool(db, post);
     if (!tool) continue;
 
-    // PH post IDで重複チェック（V12）
-    const existingNews = await db.first<{ id: string }>(
+    // PH post IDで重複チェック（source_ph_post_idがある場合）
+    const existingByPostId = await db.first<{ id: string }>(
       `SELECT id FROM news WHERE source_ph_post_id = ? LIMIT 1`,
       [post.id]
     );
-    if (existingNews) continue;
+    if (existingByPostId) continue;
+    // フォールバック: tool_id + 同日チェック
+    const today = new Date().toISOString().slice(0, 10);
+    const existingByDate = await db.first<{ id: string }>(
+      `SELECT id FROM news WHERE tool_id = ? AND date(published_at) = ? LIMIT 1`,
+      [tool.id, today]
+    );
+    if (existingByDate) continue;
 
     console.log(`  🔄 既存ツール新ローンチ: ${tool.name_en} → ${post.name}`);
 
@@ -276,7 +283,13 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const officialUrl = post.website ?? null;
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
-    const isPublished = hasOfficialUrl && confidenceOk ? 1 : 0;
+    const isGithubOnly = officialUrl ? officialUrl.includes('github.com') : false;
+    const hasCompany = !!(extracted.company_name ?? null);
+    const hasLogo = !!logoUrl;
+    const isPublished = hasOfficialUrl && confidenceOk && !isGithubOnly && hasCompany && hasLogo ? 1 : 0;
+    if (isGithubOnly) console.log(`  ⚠ GitHub URLのため非公開: ${slug}`);
+    if (!hasCompany) console.log(`  ⚠ 会社名なしのため非公開: ${slug}`);
+    if (!hasLogo) console.log(`  ⚠ ロゴなしのため非公開: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;
 
     if (!hasOfficialUrl) {
