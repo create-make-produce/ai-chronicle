@@ -52,7 +52,7 @@ async function getRelatedToolsFromRelations(toolId: string) {
     `SELECT t.id, t.slug, t.name_ja, t.name_en, t.tagline_ja, t.logo_url
      FROM tool_relations tr
      JOIN tools t ON tr.tool_id_b = t.id
-     WHERE tr.tool_id_a = ?`,
+     WHERE tr.tool_id_a = ? AND t.is_published = 1`,
     [toolId]
   );
 }
