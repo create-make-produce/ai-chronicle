@@ -87,16 +87,6 @@ async function findExistingTool(
   db: D1Client,
   post: ProductHuntPost
 ): Promise<{ id: string; name_ja: string; name_en: string; slug: string } | null> {
-  // ph_slug による照合（推奨・製品単位）・is_published=1のみ対象
-  if (post.product_slug) {
-    const bySlug = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
-      `SELECT id, name_ja, name_en, slug FROM tools WHERE ph_slug = ? AND is_published = 1 LIMIT 1`,
-      [post.product_slug]
-    );
-    if (bySlug) return bySlug;
-  }
-
-  // product_hunt_id による照合（後方互換・旧データ用）・is_published=1のみ対象
   const byId = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
     `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? AND is_published = 1 LIMIT 1`,
     [post.id]
@@ -108,13 +98,6 @@ async function findExistingTool(
  * 新規ツールとして未登録か確認（ph_slug優先）
  */
 async function isNewTool(db: D1Client, post: ProductHuntPost): Promise<boolean> {
-  if (post.product_slug) {
-    const bySlug = await db.first<{ count: number }>(
-      `SELECT COUNT(*) AS count FROM tools WHERE ph_slug = ?`, [post.product_slug]
-    );
-    if (bySlug && bySlug.count > 0) return false;
-  }
-
   const byId = await db.first<{ count: number }>(
     `SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?`, [post.id]
   );
