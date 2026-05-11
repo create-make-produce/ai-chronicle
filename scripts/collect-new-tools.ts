@@ -98,8 +98,9 @@ async function findExistingTool(
  * 新規ツールとして未登録か確認（ph_slug優先）
  */
 async function isNewTool(db: D1Client, post: ProductHuntPost): Promise<boolean> {
+  const checkId = post.product_id ?? post.id;
   const byId = await db.first<{ count: number }>(
-    `SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?`, [post.id]
+    `SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?`, [checkId]
   );
   return !byId || byId.count === 0;
 }
@@ -275,6 +276,12 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     if (!hasLogo) console.log(`  ⚠ ロゴなしのため非公開: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;
 
+    const hasAppUrl = !!(post.ios_url ?? post.android_url);
+    const unpublishCondition = isGithubOnly || !hasCompany || !hasLogo;
+    const toolStatus = (hasAppUrl && !unpublishCondition) ? 'pending' : 'active';
+    const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
+    if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);
+
     if (!hasOfficialUrl) {
       console.log(`  ⚠️ 公式URLなし → 非公開で登録: ${post.name}`);
     }
@@ -304,13 +311,13 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       [
         toolId, slug,
         nameEn, nameEn,
-        post.name,                          // ph_name（PH正式名）
-        post.product_slug ?? null,          // ph_slug（製品照合キー）
-        translated.search_keywords,         // Noteマッチング用キーワード
+        post.name,
+        post.product_slug ?? null,
+        translated.search_keywords,
         translated.tagline_ja, extracted.tagline ?? post.tagline,
         translated.description_ja, extracted.description ?? post.description,
         officialUrl, logoUrl, extracted.company_name, categoryId,
-        isPublished,
+        toolStatus, finalPublished,
         extracted.has_api === true ? 1 : 0,
         extracted.has_free_plan === true ? 1 : 0,
         post.product_id ?? post.id,
@@ -326,9 +333,28 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     // 新規ツールの最初のローンチとしてPH投稿を保存
 
-    console.log(`  ✅ 登録完了: ${slug}（${isPublished ? '公開' : '非公開'}）ph_slug: ${post.product_slug ?? 'なし'}`);
+    console.log(`  ✅ 登録完了: ${slug}（${finalPublished ? '公開' : hasAppUrl ? '保留' : '非公開'}）`);
 
-    if (isPublished) {
+    // 同じ会社名の既存ツールと関連AIツール登録
+    if (extracted.company_name) {
+      const sameCompany = await db.query<{ id: string; name_en: string }>(
+        `SELECT id, name_en FROM tools WHERE company_name = ? AND id != ? LIMIT 20`,
+        [extracted.company_name, toolId]
+      );
+      for (const related of sameCompany) {
+        await db.execute(
+          `INSERT OR IGNORE INTO tool_relations (id, tool_id_a, tool_id_b, created_at) VALUES (?, ?, ?, datetime('now'))`,
+          [generateId('rel'), toolId, related.id]
+        );
+        await db.execute(
+          `INSERT OR IGNORE INTO tool_relations (id, tool_id_a, tool_id_b, created_at) VALUES (?, ?, ?, datetime('now'))`,
+          [generateId('rel'), related.id, toolId]
+        );
+        console.log(`  🔗 関連AI登録: ${related.name_en}（同会社）`);
+      }
+    }
+
+    if (finalPublished) {
       const category = categoryId ? await db.first<{ name_ja: string }>('SELECT name_ja FROM categories WHERE id = ?', [categoryId]) : null;
       await createNews(db, {
         type: 'new_tool',
