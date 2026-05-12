@@ -174,11 +174,14 @@ export async function callAI(prompt: string): Promise<string> {
       return result;
     } catch (error) {
       lastError = error;
-      console.warn(
-        `AI API呼び出し失敗 (試行 ${attempt + 1}/${CONFIG.AI_MAX_RETRIES}): ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
+      const msg = error instanceof Error ? error.message : String(error);
+
+      // 429はRPD上限のため即中断（リトライ不要）
+      if (msg.includes('429')) {
+        throw error;
+      }
+
+      console.warn(`AI API呼び出し失敗 (試行 ${attempt + 1}/${CONFIG.AI_MAX_RETRIES}): ${msg}`);
       if (attempt < CONFIG.AI_MAX_RETRIES - 1) {
         await sleep(CONFIG.AI_RETRY_DELAY_MS);
       }

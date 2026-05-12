@@ -58,6 +58,7 @@ Thumbs.db
 scripts/collect-note-articles.ts
 scripts/collect-note-hot.ts
 scripts/collect-note-tools.ts
+scripts/collect-news-bulk.ts
 
 # シードスクリプト（ローカルのみ・GitHubに上げない）
 scripts/seed-ph-top100.ts

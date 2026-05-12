@@ -319,7 +319,7 @@ const POST_FIELDS = `
 /**
  * 最新投稿を取得（collect-new-toolsで使用）
  */
-export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
+export async function fetchLatestPosts(count: number = CONFIG.PRODUCT_HUNT_POSTS_PER_REQUEST): Promise<ProductHuntPost[]> {
   const query = `
     query RecentPosts($first: Int!) {
       posts(first: $first, order: NEWEST) {
@@ -333,7 +333,7 @@ export async function fetchLatestPosts(): Promise<ProductHuntPost[]> {
   };
 
   const data = await graphqlQuery<ResponseType>(query, {
-    first: CONFIG.PRODUCT_HUNT_POSTS_PER_REQUEST,
+    first: count,
   });
 
   return Promise.all(data.posts.edges.map(e => processPostNode(e.node)));
@@ -362,8 +362,8 @@ export function isAITool(post: ProductHuntPost): boolean {
 /**
  * AIツールの最新投稿のみに絞り込む（collect-new-toolsで使用）
  */
-export async function fetchLatestAIPosts(): Promise<ProductHuntPost[]> {
-  const posts = await fetchLatestPosts();
+export async function fetchLatestAIPosts(count: number = CONFIG.PRODUCT_HUNT_POSTS_PER_REQUEST): Promise<ProductHuntPost[]> {
+  const posts = await fetchLatestPosts(count);
   return posts
     .filter((p) => p.votesCount >= CONFIG.PRODUCT_HUNT_MIN_VOTES)
     .filter(isAITool);
