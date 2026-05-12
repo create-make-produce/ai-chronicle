@@ -33,17 +33,9 @@ export default function HomeContent(p: HomeContentProps) {
       <HeroSection locale={locale} />
       <AdSlot slot="header" />
 
-      {/* カテゴリ */}
-      {categories.length > 0 && (
-        <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)" paddingBottom={48}>
-          <SectionHead label={locale==='ja'?'AIカテゴリ':'AI Categories'} />
-          <CategoryGrid categories={categories} locale={locale} />
-        </Sec>
-      )}
-
       {/* 最新ニュース */}
       {latestNews.length > 0 && (
-        <Sec bg="linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)">
+        <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)" paddingBottom={48}>
           <SectionHeadWithTime label={locale==='ja'?'最新ニュース':'Latest News'} isoTime={latestNews[0]?.published_at} locale={locale} />
           <div style={{ border:'1px solid var(--color-border)' }}>
             {latestNews.map((n) => (
@@ -71,6 +63,14 @@ export default function HomeContent(p: HomeContentProps) {
               {tt.secViewAllNews} →
             </Link>
           </div>
+        </Sec>
+      )}
+
+      {/* カテゴリ */}
+      {categories.length > 0 && (
+        <Sec bg="linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)">
+          <SectionHead label={locale==='ja'?'AIカテゴリ':'AI Categories'} />
+          <CategoryGrid categories={categories} locale={locale} />
         </Sec>
       )}
 
