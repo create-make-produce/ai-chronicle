@@ -40,15 +40,15 @@ export default function HomeContent(p: HomeContentProps) {
           <div style={{ border:'1px solid var(--color-border)' }}>
             {latestNews.map((n) => (
               <Link key={n.id} href={localizedPath(locale, `/news/${n.slug}`)}
-                className="group flex items-center gap-4 px-4 py-3 transition-colors"
+                className="group flex items-center gap-3 px-4 py-3 transition-colors"
                 style={{ borderBottom:'1px solid var(--color-border)' }}
                 onMouseEnter={e=>(e.currentTarget.style.background='var(--color-bg-sub)')}
                 onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
-                <time className="shrink-0 w-20 text-xs font-mono" style={{ color:'#AABBCC' }}>
+                <time className="shrink-0 w-20 text-xs font-mono hidden sm:block" style={{ color:'#AABBCC' }}>
                   {formatDateShort(n.published_at)}
                 </time>
                 <NewsBadge type={n.news_type} tt={tt} />
-                <span className="flex-1 text-sm font-medium truncate" style={{ color:'var(--color-text)' }}>
+                <span className="flex-1 text-sm font-medium" style={{ color:'var(--color-text)', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as const }}>
                   {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
                 </span>
                 <span className="shrink-0 text-xs font-bold transition-colors"
