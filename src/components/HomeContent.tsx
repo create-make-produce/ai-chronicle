@@ -40,27 +40,24 @@ export default function HomeContent(p: HomeContentProps) {
           <div style={{ border:'1px solid var(--color-border)' }}>
             {latestNews.map((n) => (
               <Link key={n.id} href={localizedPath(locale, `/news/${n.slug}`)}
-                className="group flex items-center gap-3 transition-colors"
-                style={{ padding: '0.85rem 1.25rem', borderBottom:'1px solid rgba(255,255,255,0.04)', textDecoration: 'none' }}
+                className="group block transition-colors"
+                style={{ padding:'0.85rem 1.25rem', borderBottom:'1px solid rgba(255,255,255,0.04)', textDecoration:'none' }}
                 onMouseEnter={e=>(e.currentTarget.style.background='var(--color-bg-sub)')}
                 onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
-                {/* PC: 日付 */}
-                <time className="news-date-pc" style={{ fontFamily:'Fira Sans, monospace', fontSize:'0.78rem', color:'#4A5568', flexShrink:0, width:'90px' }}>
-                  {formatDateShort(n.published_at)}
-                </time>
-                {/* バッジ */}
-                <span style={{ flexShrink: 0 }}>
+                {/* バッジ＋日付 */}
+                <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.35rem' }}>
                   <NewsBadge type={n.news_type} tt={tt} />
-                  {/* スマホ: 日付 */}
-                  <span className="news-date-mobile" style={{ fontFamily:'Fira Sans, monospace', fontSize:'0.72rem', color:'#4A5568', marginLeft:'0.4rem' }}>
+                  <time style={{ fontFamily:'Fira Sans, monospace', fontSize:'0.75rem', color:'#4A5568' }}>
                     {formatDateShort(n.published_at)}
-                  </span>
-                </span>
+                  </time>
+                </div>
                 {/* タイトル */}
-                <span className="news-title" style={{ fontFamily:'Noto Sans JP, sans-serif', fontSize:'0.88rem', color:'var(--color-text)', flex:1, minWidth:0 }}>
-                  {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
-                </span>
-                <span style={{ color:'var(--color-text-muted)', flexShrink:0 }}>→</span>
+                <div style={{ display:'flex', alignItems:'flex-start', gap:'0.5rem' }}>
+                  <span className="news-title" style={{ fontFamily:'Noto Sans JP, sans-serif', fontSize:'0.88rem', color:'var(--color-text)', flex:1, lineHeight:1.6 }}>
+                    {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
+                  </span>
+                  <span style={{ color:'var(--color-text-muted)', flexShrink:0, marginTop:'2px' }}>→</span>
+                </div>
               </Link>
             ))}
           </div>

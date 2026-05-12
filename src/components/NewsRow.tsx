@@ -42,9 +42,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1rem',
+        display: 'block',
         padding: '0.85rem 1.25rem',
         borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.04)',
         textDecoration: 'none',
@@ -52,14 +50,8 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         transition: 'background 0.12s',
       }}
     >
-      {/* PC: 日付（スマホ非表示） */}
-      <span className="news-date-pc" style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', letterSpacing: '0.02em', flexShrink: 0, width: '90px' }}>
-        {date}
-      </span>
-
-      {/* スマホ: バッジ＋日付＋タイトル縦並び、PC: バッジのみ */}
-      <span className="news-badge-wrap" style={{ flexShrink: 0 }}>
-        {/* バッジ（PC/スマホ共通） */}
+      {/* バッジ＋日付（横並び） */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
         <span style={{
           fontFamily: 'Fira Sans, sans-serif',
           fontSize: '0.7rem', fontWeight: 700,
@@ -67,21 +59,23 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
           padding: '2px 8px', borderRadius: '3px',
           whiteSpace: 'nowrap' as const,
           border: `1px solid ${badge.border}`,
-          display: 'inline-block',
         }}>
           {badgeLabel}
         </span>
-        {/* スマホのみ: 日付 */}
-        <span className="news-date-mobile" style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.72rem', color: '#4A5568', marginLeft: '0.4rem' }}>
+        <span style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.75rem', color: '#4A5568' }}>
           {date}
         </span>
-      </span>
-
-      {/* タイトル */}
-      <span className="news-title" style={{ fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: '#B0BAC5', flex: 1, minWidth: 0 }}>
-        {title}
-      </span>
-      <span style={{ color: '#008CED', fontSize: '0.85rem', flexShrink: 0 }}>→</span>
+      </div>
+      {/* タイトル（全幅・3行まで） */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+        <span className="news-title" style={{
+          fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif',
+          fontSize: '0.88rem', color: '#B0BAC5', flex: 1, lineHeight: 1.6,
+        }}>
+          {title}
+        </span>
+        <span style={{ color: '#008CED', fontSize: '0.85rem', flexShrink: 0, marginTop: '2px' }}>→</span>
+      </div>
     </Link>
   );
 }
