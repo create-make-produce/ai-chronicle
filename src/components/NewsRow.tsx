@@ -41,8 +41,12 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       href={href}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="news-row"
       style={{
-        display: 'block',
+        display: 'grid',
+        gridTemplateColumns: '110px auto 1fr auto',
+        alignItems: 'center',
+        gap: '1rem',
         padding: '0.85rem 1.25rem',
         borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.04)',
         textDecoration: 'none',
@@ -50,32 +54,34 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         transition: 'background 0.12s',
       }}
     >
-      {/* バッジ＋日付（横並び） */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-        <span style={{
-          fontFamily: 'Fira Sans, sans-serif',
-          fontSize: '0.7rem', fontWeight: 700,
-          color: badge.color, background: badge.bg,
-          padding: '2px 8px', borderRadius: '3px',
-          whiteSpace: 'nowrap' as const,
-          border: `1px solid ${badge.border}`,
-        }}>
-          {badgeLabel}
-        </span>
-        <span style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.75rem', color: '#4A5568' }}>
-          {date}
-        </span>
-      </div>
-      {/* タイトル（全幅・3行まで） */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-        <span className="news-title" style={{
-          fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif',
-          fontSize: '0.88rem', color: '#B0BAC5', flex: 1, lineHeight: 1.6,
-        }}>
-          {title}
-        </span>
-        <span style={{ color: '#008CED', fontSize: '0.85rem', flexShrink: 0, marginTop: '2px' }}>→</span>
-      </div>
+      <span className="news-date" style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', letterSpacing: '0.02em' }}>
+        {date}
+      </span>
+      <span style={{
+        fontFamily: 'Fira Sans, sans-serif',
+        fontSize: '0.7rem', fontWeight: 700,
+        color: badge.color,
+        background: badge.bg,
+        padding: '2px 8px', borderRadius: '3px',
+        whiteSpace: 'nowrap',
+        border: `1px solid ${badge.border}`,
+      }}>
+        {badgeLabel}
+      </span>
+      <span className="news-title" style={{ fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: '#B0BAC5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {title}
+        {toolName && (
+          <span style={{ color: '#4A5568', marginLeft: '0.5rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            —
+            {logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt={toolName} style={{ width: '14px', height: '14px', borderRadius: '2px', objectFit: 'contain', flexShrink: 0 }} />
+            )}
+            {toolName}
+          </span>
+        )}
+      </span>
+      <span style={{ color: '#008CED', fontSize: '0.85rem' }}>→</span>
     </Link>
   );
 }

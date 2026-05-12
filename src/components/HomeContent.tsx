@@ -40,24 +40,18 @@ export default function HomeContent(p: HomeContentProps) {
           <div style={{ border:'1px solid var(--color-border)' }}>
             {latestNews.map((n) => (
               <Link key={n.id} href={localizedPath(locale, `/news/${n.slug}`)}
-                className="group block transition-colors"
-                style={{ padding:'0.85rem 1.25rem', borderBottom:'1px solid rgba(255,255,255,0.04)', textDecoration:'none' }}
+                className="group flex items-center gap-4 px-4 py-3 transition-colors news-row"
+                style={{ borderBottom:'1px solid var(--color-border)', textDecoration:'none' }}
                 onMouseEnter={e=>(e.currentTarget.style.background='var(--color-bg-sub)')}
                 onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
-                {/* バッジ＋日付 */}
-                <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.35rem' }}>
-                  <NewsBadge type={n.news_type} tt={tt} />
-                  <time style={{ fontFamily:'Fira Sans, monospace', fontSize:'0.75rem', color:'#4A5568' }}>
-                    {formatDateShort(n.published_at)}
-                  </time>
-                </div>
-                {/* タイトル */}
-                <div style={{ display:'flex', alignItems:'flex-start', gap:'0.5rem' }}>
-                  <span className="news-title" style={{ fontFamily:'Noto Sans JP, sans-serif', fontSize:'0.88rem', color:'var(--color-text)', flex:1, lineHeight:1.6 }}>
-                    {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
-                  </span>
-                  <span style={{ color:'var(--color-text-muted)', flexShrink:0, marginTop:'2px' }}>→</span>
-                </div>
+                <time className="shrink-0 w-20 text-xs font-mono news-date" style={{ color:'#AABBCC' }}>
+                  {formatDateShort(n.published_at)}
+                </time>
+                <NewsBadge type={n.news_type} tt={tt} />
+                <span className="flex-1 text-sm font-medium news-title" style={{ color:'var(--color-text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
+                </span>
+                <span className="shrink-0 text-xs font-bold" style={{ color:'var(--color-text-muted)' }}>→</span>
               </Link>
             ))}
           </div>

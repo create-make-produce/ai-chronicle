@@ -251,20 +251,20 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
 :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 :target { scroll-margin-top: 72px; }
 
-/* ニュースタイトル：PC1行・スマホ3行 */
-.news-title {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.news-date-mobile { display: none; }
-.news-date-pc { display: inline; }
-
+/* ニュースタイトル：スマホのみ3行 */
 @media (max-width: 767px) {
-  .news-title { -webkit-line-clamp: 3; }
-  .news-date-mobile { display: inline; }
-  .news-date-pc { display: none !important; }
+  .news-row {
+    display: block !important;
+  }
+  .news-row .news-date { display: none; }
+  .news-title {
+    white-space: normal !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    text-overflow: unset !important;
+  }
 }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--color-bg); }
