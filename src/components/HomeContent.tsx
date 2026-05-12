@@ -78,22 +78,7 @@ export default function HomeContent(p: HomeContentProps) {
       {newTools.length > 0 && (
         <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)">
           <SectionHead label={locale==='ja'?'月刊AIアップデート':'Monthly AI Updates'} />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {newTools.slice(0,6).map((tool,i) => (
-              <ToolCard key={tool.id} tool={tool} locale={locale} index={i}
-                categoryName={
-                  tool.category_id
-                    ? (categories.find(cat => cat.id === tool.category_id)
-                        ? (locale === 'ja'
-                            ? categories.find(cat => cat.id === tool.category_id)!.name_ja
-                            : categories.find(cat => cat.id === tool.category_id)!.name_en)
-                        : undefined)
-                    : undefined
-                }
-                categorySlug={categories.find(cat => cat.id === tool.category_id)?.slug}
-              />
-            ))}
-          </div>
+          <ToolSlider tools={newTools.slice(0,12)} locale={locale} categories={categories} tt={tt} />
           <div className="mt-5 text-right">
             <Link href={localizedPath(locale,'/monthly')}
               className="text-xs font-bold tracking-widest uppercase link-underline"
@@ -190,4 +175,71 @@ function newsLabel(type: string, tt: TDict): string {
     case 'new_feature':  return tt.newsTypeNewFeature;
     default:             return tt.newsTypeOther;
   }
+}
+
+import { useRef, useState, useCallback } from 'react';
+
+function ToolSlider({ tools, locale, categories, tt }: {
+  tools: Tool[];
+  locale: Locale;
+  categories: CategoryWithCount[];
+  tt: TDict;
+}) {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const cardW = 300 + 16; // width + gap
+
+  const onScroll = useCallback(() => {
+    if (!sliderRef.current) return;
+    const idx = Math.round(sliderRef.current.scrollLeft / cardW);
+    setActiveIdx(Math.min(idx, tools.length - 1));
+  }, [tools.length, cardW]);
+
+  const scrollTo = (idx: number) => {
+    if (!sliderRef.current) return;
+    sliderRef.current.scrollTo({ left: idx * cardW, behavior: 'smooth' });
+    setActiveIdx(idx);
+  };
+
+  return (
+    <div>
+      <div ref={sliderRef} onScroll={onScroll} style={{
+        display: 'flex', gap: '1rem', overflowX: 'auto', scrollSnapType: 'x mandatory',
+        scrollBehavior: 'smooth', paddingBottom: '0.5rem',
+        msOverflowStyle: 'none', scrollbarWidth: 'none',
+      }}>
+        {tools.map((tool, i) => (
+          <div key={tool.id} style={{ scrollSnapAlign: 'start', flexShrink: 0, width: '300px' }}>
+            <ToolCard tool={tool} locale={locale} index={i}
+              categoryName={
+                tool.category_id
+                  ? (categories.find(cat => cat.id === tool.category_id)
+                      ? (locale === 'ja'
+                          ? categories.find(cat => cat.id === tool.category_id)!.name_ja
+                          : categories.find(cat => cat.id === tool.category_id)!.name_en)
+                      : undefined)
+                  : undefined
+              }
+              categorySlug={categories.find(cat => cat.id === tool.category_id)?.slug}
+            />
+          </div>
+        ))}
+      </div>
+      {/* ドットインジケーター */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '1rem' }}>
+        {tools.map((_, i) => (
+          <button key={i} onClick={() => scrollTo(i)} style={{
+            width: i === activeIdx ? '20px' : '8px',
+            height: '8px',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            background: i === activeIdx ? '#008CED' : 'rgba(255,255,255,0.2)',
+            transition: 'all 0.25s',
+            padding: 0,
+          }} />
+        ))}
+      </div>
+    </div>
+  );
 }
