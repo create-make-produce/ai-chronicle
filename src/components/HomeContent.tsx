@@ -51,7 +51,7 @@ export default function HomeContent(p: HomeContentProps) {
                 <span className="flex-1 text-sm font-medium news-title" style={{ color:'var(--color-text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                   {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
                 </span>
-                <span className="shrink-0 text-xs font-bold" style={{ color:'var(--color-text-muted)' }}>→</span>
+                <span className="shrink-0 text-xs font-bold" style={{ color:'var(--color-text-muted)' }}></span>
               </Link>
             ))}
           </div>
@@ -59,7 +59,7 @@ export default function HomeContent(p: HomeContentProps) {
             <Link href={localizedPath(locale,'/news')}
               className="text-xs font-bold tracking-widest uppercase link-underline"
               style={{ color:'var(--color-accent)' }}>
-              {tt.secViewAllNews} →
+              {tt.secViewAllNews}
             </Link>
           </div>
         </Sec>
@@ -82,7 +82,7 @@ export default function HomeContent(p: HomeContentProps) {
             <Link href={localizedPath(locale,'/monthly')}
               className="text-xs font-bold tracking-widest uppercase link-underline"
               style={{ color:'var(--color-accent)' }}>
-              {tt.secSeeAll} →
+              {tt.secSeeAll}
             </Link>
           </div>
         </Sec>

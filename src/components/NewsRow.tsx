@@ -81,7 +81,6 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
           </span>
         )}
       </span>
-      <span style={{ color: '#008CED', fontSize: '0.85rem' }}>→</span>
     </Link>
   );
 }
