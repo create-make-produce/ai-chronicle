@@ -35,7 +35,7 @@ export default function HomeContent(p: HomeContentProps) {
 
       {/* 最新ニュース */}
       {latestNews.length > 0 && (
-        <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)" paddingBottom={48}>
+        <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)" paddingBottom={24}>
           <SectionHeadWithTime label={locale==='ja'?'最新ニュース':'Latest News'} isoTime={latestNews[0]?.published_at} locale={locale} />
           <div style={{ border:'1px solid var(--color-border)' }}>
             {latestNews.map((n) => (
@@ -79,7 +79,7 @@ export default function HomeContent(p: HomeContentProps) {
         <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)">
           <SectionHead label={locale==='ja'?'月刊AIアップデート':'Monthly AI Updates'} />
           <ToolSlider tools={newTools.slice(0,12)} locale={locale} categories={categories} tt={tt} />
-          <div className="mt-5 text-right">
+          <div className="mt-3 text-right">
             <Link href={localizedPath(locale,'/monthly')}
               className="text-xs font-bold tracking-widest uppercase link-underline"
               style={{ color:'var(--color-accent)' }}>
@@ -98,7 +98,7 @@ function Sec({ children, dark, bg, paddingBottom }: { children: React.ReactNode;
   return (
     <section style={{ background }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        style={{ paddingTop: '24px', paddingBottom: paddingBottom ?? 8 }}>
+        style={{ paddingTop: '24px', paddingBottom: paddingBottom ?? 24 }}>
         {children}
       </div>
     </section>
@@ -189,9 +189,14 @@ function ToolSlider({ tools, locale, categories, tt }: {
   const [activeIdx, setActiveIdx] = useState(0);
   const cardW = 300 + 16; // width + gap
 
+  const [scrollRatio, setScrollRatio] = useState(0);
+
   const onScroll = useCallback(() => {
     if (!sliderRef.current) return;
-    const idx = Math.round(sliderRef.current.scrollLeft / cardW);
+    const el = sliderRef.current;
+    const ratio = el.scrollLeft / (el.scrollWidth - el.clientWidth);
+    setScrollRatio(isNaN(ratio) ? 0 : ratio);
+    const idx = Math.round(el.scrollLeft / cardW);
     setActiveIdx(Math.min(idx, tools.length - 1));
   }, [tools.length, cardW]);
 
@@ -203,13 +208,23 @@ function ToolSlider({ tools, locale, categories, tt }: {
 
   return (
     <div>
-      <div ref={sliderRef} onScroll={onScroll} style={{
-        display: 'flex', gap: '1rem', overflowX: 'auto', scrollSnapType: 'x mandatory',
-        scrollBehavior: 'smooth', paddingBottom: '0.5rem',
-        msOverflowStyle: 'none', scrollbarWidth: 'none',
+      <style>{`
+        #tool-slider::-webkit-scrollbar { height: 8px; cursor: pointer; }
+        #tool-slider::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        #tool-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; max-width: 60px; }
+        #tool-slider::-webkit-scrollbar-thumb:hover { background: #33AAFF; }
+      `}</style>
+      <div id="tool-slider" ref={sliderRef} onScroll={onScroll} style={{
+        display: 'flex',
+        gap: '1rem',
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        paddingBottom: '16px',
+        marginBottom: '8px',
+        WebkitOverflowScrolling: 'touch' as any,
       }}>
         {tools.map((tool, i) => (
-          <div key={tool.id} style={{ scrollSnapAlign: 'start', flexShrink: 0, width: '300px' }}>
+          <div key={tool.id} style={{ flexShrink: 0, width: '320px' }}>
             <ToolCard tool={tool} locale={locale} index={i}
               categoryName={
                 tool.category_id
@@ -223,21 +238,6 @@ function ToolSlider({ tools, locale, categories, tt }: {
               categorySlug={categories.find(cat => cat.id === tool.category_id)?.slug}
             />
           </div>
-        ))}
-      </div>
-      {/* ドットインジケーター */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '1rem' }}>
-        {tools.map((_, i) => (
-          <button key={i} onClick={() => scrollTo(i)} style={{
-            width: i === activeIdx ? '20px' : '8px',
-            height: '8px',
-            borderRadius: '4px',
-            border: 'none',
-            cursor: 'pointer',
-            background: i === activeIdx ? '#008CED' : 'rgba(255,255,255,0.2)',
-            transition: 'all 0.25s',
-            padding: 0,
-          }} />
         ))}
       </div>
     </div>

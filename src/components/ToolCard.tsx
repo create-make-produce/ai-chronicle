@@ -94,36 +94,32 @@ export default function ToolCard({ tool, locale, index = 0, categoryName }: Tool
           <FoldedCorner />
 
           <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-            {/* ロゴバッジ＋カテゴリバッジ行 */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '10px', flexShrink: 0 }}>
-              {/* ロゴバッジ（傾き） */}
+            {/* バッジ行：カテゴリ左・ロゴ右 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexShrink: 0 }}>
+              {categoryName ? (
+                <span style={{
+                  background: '#0F3D8C', color: '#FFFFFF',
+                  fontSize: '0.6875rem', fontWeight: 700,
+                  letterSpacing: '0.06em', textTransform: 'uppercase' as const,
+                  padding: '2px 8px', borderRadius: '2px',
+                  border: '1px solid #1A56DB',
+                }}>{categoryName}</span>
+              ) : <span />}
+              {/* ロゴバッジ（右上・傾き） */}
               <div style={{
                 width: '48px', height: '48px', flexShrink: 0,
                 background: '#ffffff', border: '2px solid var(--color-accent)',
                 borderRadius: '6px', overflow: 'hidden',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transform: 'rotate(-4deg)',
+                transform: 'rotate(4deg)',
                 boxShadow: '2px 3px 8px rgba(0,0,0,0.25)',
               }}>
                 {tool.logo_url ? (
-                  <img src={tool.logo_url} alt={name} width={38} height={38} style={{ objectFit: 'contain', padding: '3px', transform: 'rotate(4deg)' }} />
+                  <img src={tool.logo_url} alt={name} width={38} height={38} style={{ objectFit: 'contain', padding: '3px', transform: 'rotate(-4deg)' }} />
                 ) : (
-                  <span style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-accent)', transform: 'rotate(4deg)', display: 'block' }}>
+                  <span style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-accent)', transform: 'rotate(-4deg)', display: 'block' }}>
                     {initials}
                   </span>
-                )}
-              </div>
-              {/* カテゴリバッジ */}
-              <div style={{ paddingTop: '4px' }}>
-                {categoryName && (
-                  <span style={{
-                    background: '#0F3D8C', color: '#FFFFFF',
-                    fontSize: '0.6875rem', fontWeight: 700,
-                    letterSpacing: '0.06em', textTransform: 'uppercase' as const,
-                    padding: '2px 8px', borderRadius: '2px',
-                    border: '1px solid #1A56DB',
-                    display: 'inline-block',
-                  }}>{categoryName}</span>
                 )}
               </div>
             </div>
