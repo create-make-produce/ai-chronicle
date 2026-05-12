@@ -20,7 +20,7 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
         <h1 className="hero-title text-4xl sm:text-5xl mt-3 mb-3">{tt.secLatestNews}</h1>
         <p className="text-base text-[var(--color-text-sub)]">
           {locale === 'ja'
-            ? 'AIツールの新着リリース・価格改定・機能アップデート情報。'
+            ? '新機能・アップデート・価格改定に関する最新情報。'
             : 'New releases, price updates, and feature announcements for AI tools.'}
         </p>
       </div>

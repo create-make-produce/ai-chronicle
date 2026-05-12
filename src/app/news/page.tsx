@@ -6,7 +6,7 @@ import NewsRow from '@/components/NewsRow';
 
 export const metadata: Metadata = {
   title: 'AIツール最新ニュース | AI Chronicle',
-  description: 'AIツールの新着リリース・価格改定・機能アップデート情報。',
+  description: '新機能・アップデート・価格改定に関する最新情報。',
 };
 
 async function queryD1(sql: string, params: (string | number | null)[] = []) {
@@ -31,6 +31,7 @@ async function getLatestNews() {
     `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en, t.slug as tool_slug, t.logo_url as tool_logo_url
      FROM news n LEFT JOIN tools t ON n.tool_id = t.id
      WHERE n.is_published = 1
+       AND (n.tool_id IS NULL OR t.is_published = 1)
      ORDER BY n.published_at DESC
      LIMIT 50`,
     []
@@ -56,7 +57,7 @@ export default async function NewsPage() {
             最新ニュース
           </h1>
           <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.9rem', color: '#7A8A99', margin: 0 }}>
-            AIツールの新着リリース・価格改定・機能アップデート情報
+            新機能・アップデート・価格改定に関する最新情報
           </p>
         </div>
       </section>
