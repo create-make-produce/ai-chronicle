@@ -50,12 +50,26 @@
 /* =========================================
    ベース
    ========================================= */
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-inter), var(--font-noto), system-ui, sans-serif;
   line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* スマホ（768px未満）でHeaderのナビを非表示 */
+@media (max-width: 767px) {
+  .header-desktop-nav {
+    display: none !important;
+  }
+  .bottom-nav-mobile {
+    display: flex !important;
+  }
+  .bottom-nav-spacer {
+    display: block !important;
+  }
 }
 p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word; }
 

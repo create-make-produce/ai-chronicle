@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${notoSansJP.variable} ${anton.variable} ${orbitron.variable} ${firaSans.variable} ${merriweather.variable} ${shipporiMincho.variable}`}
     >
       <head />
-      <body className="min-h-screen flex flex-col antialiased" style={{ background: '#111318' }}>
+      <body className="min-h-screen flex flex-col antialiased" style={{ background: '#111318', overflowX: 'hidden' }}>
         <Header />
         {children}
         <FooterWrapper />

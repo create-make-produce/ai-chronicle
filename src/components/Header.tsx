@@ -54,8 +54,8 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* デスクトップナビ */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }} className="hidden md:flex">
+        {/* デスクトップナビ（スマホ非表示） */}
+        <nav className="hidden md:flex header-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
             return (

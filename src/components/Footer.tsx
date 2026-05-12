@@ -79,11 +79,12 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
       </div>
 
       {/* スマホ用ボトムナビ（スマホのみ表示） */}
-      <nav className="flex md:hidden" style={{
+      <nav className="bottom-nav-mobile" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
         background: '#0A0D12', borderTop: '1px solid rgba(0,140,237,0.2)',
         justifyContent: 'space-around', alignItems: 'center',
         height: '60px', paddingBottom: 'env(safe-area-inset-bottom)',
+        display: 'none',
       }}>
         {BOTTOM_NAV.map(item => {
           const active = isActive(item.href);
@@ -104,7 +105,7 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
       </nav>
 
       {/* スマホ用ボトムナビの余白 */}
-      <div className="block md:hidden" style={{ height: '60px' }} />
+      <div className="bottom-nav-spacer" style={{ height: '60px', display: 'none' }} />
     </footer>
   );
 }
