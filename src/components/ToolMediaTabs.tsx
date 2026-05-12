@@ -65,16 +65,21 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
           <div>
             {pagedNotes.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-                <p style={{ color: '#6B7280', fontSize: '0.88rem', marginBottom: '0.75rem' }}>
-                  {toolName} に関するNote記事はまだありません
+                <style>{`.note-empty-br { display: none; } @media (max-width: 767px) { .note-empty-br { display: inline; } }`}</style>
+                <p style={{ color: '#6B7280', fontSize: '0.88rem', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+                  {toolName} に関する<br className="note-empty-br" />Note記事はまだありません
                 </p>
-                <a href="https://note.com/hashtag/AI" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: '0.8rem', color: '#008CED' }} className="link-underline">
-                  NoteでAI記事を探す →
+                <a
+                  href={`https://note.com/search?q=${encodeURIComponent(toolName + ' AI')}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '0.8rem', color: '#008CED', display: 'inline-block', marginBottom: '1rem' }}
+                  className="link-underline"
+                >
+                  NoteでAI記事を探す
                 </a>
-                <p style={{ color: '#4A5568', fontSize: '0.75rem', marginTop: '1rem' }}>
+                <p style={{ color: '#4A5568', fontSize: '0.75rem', margin: 0 }}>
                   掲載希望の方は
-                  <a href="/contact" style={{ color: '#008CED', marginLeft: '4px' }} className="link-underline">
+                  <a href="/contact" style={{ color: '#008CED', margin: '0 4px' }} className="link-underline">
                     お問い合わせ
                   </a>
                   からご連絡ください

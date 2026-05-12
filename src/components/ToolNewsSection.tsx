@@ -42,18 +42,29 @@ export default function ToolNewsSection({ news, locale }: ToolNewsSectionProps) 
           const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
           return (
             <Link key={item.id} href={`/news/${item.slug}`}
-              className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-bg)]"
-              style={{ borderBottom: i < paged.length - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none' }}>
-              <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', whiteSpace: 'nowrap' }}>
-                {item.published_at?.substring(0, 10)}
-              </time>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.border}` }}>
-                {badge.ja}
-              </span>
-              <span className="flex-1 text-sm truncate group-hover:text-[var(--color-accent)]" style={{ color: 'var(--color-text)' }}>
-                {item.title_ja}
-              </span>
-              <span style={{ color: 'var(--color-accent)', fontSize: '0.85rem' }}>→</span>
+              className="news-row-tool group"
+              style={{
+                display: 'block',
+                padding: '0.75rem 1rem',
+                borderBottom: i < paged.length - 1 ? '1px solid var(--color-border)' : 'none',
+                textDecoration: 'none',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,140,237,0.04)'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+            >
+              {/* PC：横並び / スマホ：縦積み */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  {item.published_at?.substring(0, 10)}
+                </time>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.border}`, flexShrink: 0 }}>
+                  {badge.ja}
+                </span>
+                <span className="news-title-tool" style={{ fontSize: '0.85rem', color: 'var(--color-text)', fontFamily: 'Noto Sans JP, sans-serif', lineHeight: 1.5, flex: '1 1 200px' }}>
+                  {item.title_ja}
+                </span>
+              </div>
             </Link>
           );
         })}
