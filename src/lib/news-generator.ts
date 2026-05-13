@@ -55,6 +55,20 @@ export type NewsEvent =
       };
     };
 
+function parseJsonOrThrow(text: string): {
+  title_ja: string; title_en: string; body_ja: string; body_en: string;
+} {
+  let cleaned = text.trim();
+  cleaned = cleaned.replace(/^```json\s*/i, '').replace(/^```\s*/i, '');
+  cleaned = cleaned.replace(/\s*```$/, '');
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+  }
+  return JSON.parse(cleaned);
+}
+
 async function generateNewToolNews(event: Extract<NewsEvent, { type: 'new_tool' }>): Promise<{
   title_ja: string; title_en: string; body_ja: string; body_en: string;
 }> {
@@ -168,20 +182,6 @@ async function generatePriceChangeLaunchNews(event: Extract<NewsEvent, { type: '
 
   const raw = await callAI(prompt);
   return parseJsonOrThrow(raw);
-}
-
-(text: string): {
-  title_ja: string; title_en: string; body_ja: string; body_en: string;
-} {
-  let cleaned = text.trim();
-  cleaned = cleaned.replace(/^```json\s*/i, '').replace(/^```\s*/i, '');
-  cleaned = cleaned.replace(/\s*```$/, '');
-  const firstBrace = cleaned.indexOf('{');
-  const lastBrace = cleaned.lastIndexOf('}');
-  if (firstBrace >= 0 && lastBrace > firstBrace) {
-    cleaned = cleaned.slice(firstBrace, lastBrace + 1);
-  }
-  return JSON.parse(cleaned);
 }
 
 function generateNewsSlug(event: NewsEvent): string {
