@@ -149,15 +149,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
             ✕
           </button>
         )}
-        {/* 並べ替え：右端に配置 */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
-          <span style={{ color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{locale === 'ja' ? '並べ替え：' : 'Sort:'}</span>
-          <select value={sort} onChange={e => { setSort(e.target.value as SortKey); resetPage(); }}
-            style={{ background: 'var(--color-bg-sub)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-text)', borderRadius: '2px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
-            <option value="newest">{tt.filterSortNewest}</option>
-            <option value="name">A-Z</option>
-          </select>
-        </div>
+
       </form>
 
       {/* 検索中の表示 */}
