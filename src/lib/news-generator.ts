@@ -42,6 +42,17 @@ export type NewsEvent =
         previous_price_usd: number | null;
         new_price_usd: number | null;
       };
+    }
+  | {
+      type: 'price_change_launch';
+      tool: { id: string; slug: string; name_ja: string; name_en: string };
+      launch: {
+        launch_name: string;
+        tagline: string | null;
+        tagline_ja: string | null;
+        launch_date: string | null;
+        ph_post_id?: string | null;
+      };
     };
 
 async function generateNewToolNews(event: Extract<NewsEvent, { type: 'new_tool' }>): Promise<{
@@ -64,7 +75,7 @@ async function generateNewToolNews(event: Extract<NewsEvent, { type: 'new_tool' 
 {
   "title_ja": "日本語タイトル（30文字以内・「AIツール」などを含む）",
   "title_en": "English title (under 60 characters)",
-  "body_ja": "日本語本文（10〜15行・何ができるツールか・特徴・想定ユーザーを含む。最低200文字。日本のAI初心者にもわかりやすい言葉で書くこと）",
+  "body_ja": "日本語本文（10〜15行・何ができるツールか・特徴・想定ユーザーを含む。最低200文字。日本のAI初心者にもわかりやすい言葉で書くこと。本文中にURLを記載しないこと）",
   "body_en": "English body (10-15 lines, what it does, features, target users)"
 }`;
 
@@ -92,7 +103,7 @@ async function generateNewFeatureNews(event: Extract<NewsEvent, { type: 'new_fea
 {
   "title_ja": "日本語タイトル（30文字以内・例：「${tool.name_ja}が${launch.launch_name}を追加」）",
   "title_en": "English title (under 60 characters)",
-  "body_ja": "日本語本文（10〜15行・どんな機能か・誰に役立つか・使い方を含む。最低200文字。日本のAI初心者にもわかりやすい言葉で書くこと）",
+  "body_ja": "日本語本文（10〜15行・どんな機能か・誰に役立つか・使い方を含む。最低200文字。日本のAI初心者にもわかりやすい言葉で書くこと。本文中にURLを記載しないこと）",
   "body_en": "English body (10-15 lines)"
 }`;
 
@@ -123,7 +134,7 @@ async function generatePriceChangeNews(event: Extract<NewsEvent, { type: 'price_
 {
   "title_ja": "日本語タイトル（例：${tool.name_ja}の${change.plan_name}プランが${direction}）",
   "title_en": "English title",
-  "body_ja": "日本語本文（10〜15行・何がいつから変わるか・影響するユーザーを含む。最低200文字）",
+  "body_ja": "日本語本文（10〜15行・何がいつから変わるか・影響するユーザーを含む。最低200文字。本文中にURLを記載しないこと）",
   "body_en": "English body (10-15 lines)"
 }`;
 
@@ -131,7 +142,35 @@ async function generatePriceChangeNews(event: Extract<NewsEvent, { type: 'price_
   return parseJsonOrThrow(raw);
 }
 
-function parseJsonOrThrow(text: string): {
+async function generatePriceChangeLaunchNews(event: Extract<NewsEvent, { type: 'price_change_launch' }>): Promise<{
+  title_ja: string; title_en: string; body_ja: string; body_en: string;
+}> {
+  const { tool, launch } = event;
+  const tagline = launch.tagline_ja ?? launch.tagline ?? '';
+
+  const prompt = `以下のAIツールの価格改定についてニュース記事を日本語と英語で生成してください。
+
+ツール情報：
+- ツール名（日）: ${tool.name_ja}
+- ツール名（英）: ${tool.name_en}
+- 改定内容: ${launch.launch_name}
+- 詳細: ${tagline}
+- 日付: ${launch.launch_date ?? '不明'}
+
+以下の形式でJSONのみを出力してください。マークダウンは使わないでください。
+
+{
+  "title_ja": "日本語タイトル（30文字以内・例：「${tool.name_ja}が料金プランを改定」）",
+  "title_en": "English title (under 60 characters)",
+  "body_ja": "日本語本文（10〜15行・何がどう変わるか・影響するユーザーを含む。最低200文字。日本のAI初心者にもわかりやすい言葉で書くこと。本文中にURLを記載しないこと）",
+  "body_en": "English body (10-15 lines)"
+}`;
+
+  const raw = await callAI(prompt);
+  return parseJsonOrThrow(raw);
+}
+
+(text: string): {
   title_ja: string; title_en: string; body_ja: string; body_en: string;
 } {
   let cleaned = text.trim();
@@ -151,6 +190,8 @@ function generateNewsSlug(event: NewsEvent): string {
     return `${slugify(event.tool.name_en) || event.tool.slug}-new-${dateStr}`;
   } else if (event.type === 'new_feature') {
     return `${slugify(event.tool.name_en) || event.tool.slug}-${slugify(event.launch.launch_name)}-${dateStr}`;
+  } else if (event.type === 'price_change_launch') {
+    return `${slugify(event.tool.name_en) || event.tool.slug}-price-${dateStr}`;
   } else {
     return `${slugify(event.tool.name_en) || event.tool.slug}-price-${dateStr}`;
   }
@@ -170,6 +211,10 @@ export async function createNews(db: D1Client, event: NewsEvent): Promise<void> 
     } else if (event.type === 'new_feature') {
       newsContent = await generateNewFeatureNews(event);
       newsType = 'new_feature';
+      toolId = event.tool.id;
+    } else if (event.type === 'price_change_launch') {
+      newsContent = await generatePriceChangeLaunchNews(event);
+      newsType = 'price_change';
       toolId = event.tool.id;
     } else {
       if (!CONFIG.NEWS_GENERATE_ON_PRICE_CHANGE) return;
@@ -193,7 +238,7 @@ export async function createNews(db: D1Client, event: NewsEvent): Promise<void> 
       slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
     }
 
-    const phPostId = event.type === 'new_feature' ? (event.launch.ph_post_id ?? null) : null;
+    const phPostId = (event.type === 'new_feature' || event.type === 'price_change_launch') ? (event.launch.ph_post_id ?? null) : null;
 
     await db.execute(
       `INSERT INTO news (id, slug, title_ja, title_en, body_ja, body_en, news_type, tool_id, is_published, published_at, source_ph_post_id)

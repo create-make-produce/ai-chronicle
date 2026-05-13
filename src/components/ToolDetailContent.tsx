@@ -159,7 +159,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
               {description && (
                 <div className="mb-5">
                   <h2 className="font-display text-2xl tracking-tight mb-4">概要</h2>
-                  <div className="prose prose-sm max-w-none text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">{description.replace(/<br\s*\/?>/gi, '\n').replace(/。\n/g, '\n').replace(/。/g, '')}</div>
+                  <div className="prose prose-sm max-w-none text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">{description.replace(/<br\s*\/?>/gi, '\n')}</div>
                 </div>
               )}
 

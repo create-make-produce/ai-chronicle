@@ -105,6 +105,26 @@ async function isNewTool(db: D1Client, post: ProductHuntPost): Promise<boolean> 
   return !byId || byId.count === 0;
 }
 
+async function detectNewsType(launchName: string, tagline: string | null): Promise<'new_feature' | 'price_change'> {
+  const prompt = `以下のAIツールの新ローンチ情報を見て、「価格改定」か「新機能・アップデート」かを判定してください。
+
+ローンチ名: ${launchName}
+説明: ${tagline ?? '（なし）'}
+
+価格改定の例：プランの値上げ・値下げ・新プラン追加・無料プラン廃止など
+新機能の例：新しい機能追加・UIリニューアル・新モデル対応など
+
+JSONのみ出力：{"type":"price_change"} または {"type":"new_feature"}`;
+
+  try {
+    const raw = await callAI(prompt);
+    const result = parseJsonResponse<{ type: string }>(raw);
+    return result.type === 'price_change' ? 'price_change' : 'new_feature';
+  } catch {
+    return 'new_feature';
+  }
+}
+
 async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]): Promise<number> {
   let saved = 0;
   for (const post of posts) {
@@ -131,8 +151,10 @@ async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]):
     const launchDate = (post as any).featuredAt
       ? String((post as any).featuredAt).substring(0, 10)
       : null;
+    const newsType = await detectNewsType(post.name, post.tagline ?? null);
+    console.log(`  📰 ニュースタイプ判定: ${newsType}`);
     await createNews(db, {
-      type: 'new_feature',
+      type: newsType === 'price_change' ? 'price_change_launch' : 'new_feature',
       tool: { id: tool.id, slug: tool.slug, name_ja: tool.name_ja, name_en: tool.name_en },
       launch: {
         launch_name: post.name,
@@ -181,10 +203,10 @@ async function translateToJapanese(phName: string, tagline: string | null, descr
 - description: ${description ?? '（なし）'}
 
 tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、最大2文、会社名・製品名禁止
-description_jaルール：最大4文、合計200文字以内、会社名・製品名・バージョン禁止、日本のAI初心者にもわかりやすい言葉で書く、何ができるか・特徴・想定ユーザーを含む
+description_jaルール：最大4文、合計200文字以内、会社名・製品名・バージョン禁止、日本のAI初心者にもわかりやすい言葉で書く、何ができるか・特徴・想定ユーザーを含む、各文末に「。」をつける
 search_keywordsルール：製品名のみ（機能説明・会社名・バージョン番号は絶対に入れない）英語の製品名とカタカナ読みのみ 例: "Fathom,ファザム" / "Claude,クロード" / "ChatGPT,チャットGPT"
 
-{"tagline_ja":"翻訳結果またはnull","description_ja":"翻訳結果またはnull","search_keywords":"keyword1,keyword2"}`;
+{"tagline_ja":"翻訳結果またはnull","description_ja":"各文末に「。」をつけた日本語概要またはnull","search_keywords":"keyword1,keyword2"}`;
   const raw = await callAI(prompt);
   const sanitized = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
   const result = parseJsonResponse<{ tagline_ja: string | null; description_ja: string | null; search_keywords: string | null }>(sanitized);
@@ -301,7 +323,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
         ?, ?, ?, ?,
-        'active', ?, ?, ?,
+        ?, ?, ?, ?,
         ?, ?,
         ?, ?,
         'product_hunt_api', ?, ?,
