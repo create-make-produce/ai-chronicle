@@ -40,7 +40,7 @@ export const CONFIG = {
   // AI プロバイダー設定
   // =============================================
   AI_PROVIDER: 'gemini' as 'gemini' | 'openai' | 'claude',
-  AI_MODEL: 'gemini-3.1-flash-lite-preview',
+  AI_MODEL: 'gemini-3.1-flash-lite',
   AI_REQUEST_INTERVAL_MS: 5000,
   AI_MAX_RETRIES: 3,
   AI_RETRY_DELAY_MS: 10000,
@@ -49,7 +49,7 @@ export const CONFIG = {
   // =============================================
   // Gemini（後方互換用）
   // =============================================
-  GEMINI_MODEL: 'gemini-3.1-flash-lite-preview',
+  GEMINI_MODEL: 'gemini-3.1-flash-lite',
   GEMINI_MAX_RETRIES: 3,
 
   // =============================================
