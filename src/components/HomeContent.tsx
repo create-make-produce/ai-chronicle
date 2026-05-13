@@ -9,6 +9,7 @@ import HeroSection from './HeroSection';
 import CategoryGrid from './CategoryGrid';
 import ToolCard from './ToolCard';
 import AdSlot from './AdSlot';
+import NewsRow from './NewsRow';
 import { formatPriceChange } from '@/lib/price';
 
 interface HomeContentProps {
@@ -37,22 +38,15 @@ export default function HomeContent(p: HomeContentProps) {
       {latestNews.length > 0 && (
         <Sec bg="linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)" paddingBottom={24}>
           <SectionHeadWithTime label={locale==='ja'?'最新ニュース':'Latest News'} isoTime={latestNews[0]?.published_at} locale={locale} />
-          <div style={{ border:'1px solid var(--color-border)' }}>
-            {latestNews.map((n) => (
-              <Link key={n.id} href={localizedPath(locale, `/news/${n.slug}`)}
-                className="group flex items-center gap-4 px-4 py-3 transition-colors news-row"
-                style={{ borderBottom:'1px solid var(--color-border)', textDecoration:'none' }}
-                onMouseEnter={e=>(e.currentTarget.style.background='var(--color-bg-sub)')}
-                onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
-                <time className="shrink-0 w-20 text-xs font-mono news-date" style={{ color:'#AABBCC' }}>
-                  {formatDateShort(n.published_at)}
-                </time>
-                <NewsBadge type={n.news_type} tt={tt} />
-                <span className="flex-1 text-sm font-medium news-title" style={{ color:'var(--color-text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  {locale==='ja' ? n.title_ja : n.title_en||n.title_ja}
-                </span>
-                <span className="shrink-0 text-xs font-bold" style={{ color:'var(--color-text-muted)' }}></span>
-              </Link>
+          <div style={{ border:'1px solid var(--color-border)', borderRadius:'4px', overflow:'hidden' }}>
+            {latestNews.map((n, i) => (
+              <NewsRow
+                key={n.id}
+                item={n as any}
+                href={localizedPath(locale, `/news/${n.slug}`)}
+                lang={locale}
+                isLast={i === latestNews.length - 1}
+              />
             ))}
           </div>
           <div className="mt-4 text-right">

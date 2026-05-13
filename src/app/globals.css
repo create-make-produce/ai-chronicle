@@ -256,7 +256,7 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
   .news-row {
     display: block !important;
   }
-  .news-row .news-date { display: none; }
+  .news-row .news-date { display: inline; }
   .news-title {
     white-space: normal !important;
     overflow: hidden !important;
@@ -277,4 +277,10 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
 @media (max-width: 767px) {
   .tools-cat-mobile { display: block; }
   .tools-cat-pc     { display: none; }
+}
+
+/* 月刊AIスライダー：スマホのみ右端グラデーション表示 */
+.tool-slider-fade { display: none; }
+@media (max-width: 767px) {
+  .tool-slider-fade { display: block; }
 }

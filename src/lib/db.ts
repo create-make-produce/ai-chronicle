@@ -251,13 +251,12 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]>{
 
 // =============================================
 // News
-// ツールが非公開（is_published=0）の場合はニュースも非表示にする
-// LEFT JOIN + 条件：tool_id が NULL または紐づくツールが公開中
 // =============================================
 
 export async function getLatestNews(limit = 5): Promise<News[]>{
     return queryD1<News>(
-      `SELECT n.* FROM news n
+      `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en, t.logo_url as tool_logo_url
+       FROM news n
        LEFT JOIN tools t ON n.tool_id = t.id
        WHERE n.is_published = 1
          AND (n.tool_id IS NULL OR t.is_published = 1)
@@ -268,22 +267,14 @@ export async function getLatestNews(limit = 5): Promise<News[]>{
 
 export async function getAllNews(limit = 200): Promise<News[]>{
     return queryD1<News>(
-      `SELECT n.* FROM news n
-       LEFT JOIN tools t ON n.tool_id = t.id
-       WHERE n.is_published = 1
-         AND (n.tool_id IS NULL OR t.is_published = 1)
-       ORDER BY n.published_at DESC LIMIT ?`,
+      `SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC LIMIT ?`,
       [limit],
     );
 }
 
 export async function getNewsBySlug(slug: string): Promise<News | null>{
     const rows = await queryD1<News>(
-      `SELECT n.* FROM news n
-       LEFT JOIN tools t ON n.tool_id = t.id
-       WHERE n.slug = ? AND n.is_published = 1
-         AND (n.tool_id IS NULL OR t.is_published = 1)
-       LIMIT 1`,
+      `SELECT * FROM news WHERE slug = ? AND is_published = 1 LIMIT 1`,
       [slug],
     );
     return rows[0] ?? null;
@@ -291,10 +282,7 @@ export async function getNewsBySlug(slug: string): Promise<News | null>{
 
 export async function getAllNewsSlugs(): Promise<string[]>{
     const rows = await queryD1<{ slug: string }>(
-      `SELECT n.slug FROM news n
-       LEFT JOIN tools t ON n.tool_id = t.id
-       WHERE n.is_published = 1
-         AND (n.tool_id IS NULL OR t.is_published = 1)`,
+      `SELECT slug FROM news WHERE is_published = 1`,
     );
     return rows.map((r) => r.slug);
 }
@@ -302,11 +290,9 @@ export async function getAllNewsSlugs(): Promise<string[]>{
 export async function getRelatedNews(toolId: string | null, excludeId: string, limit = 3): Promise<News[]>{
     if (!toolId) return [];
     return queryD1<News>(
-      `SELECT n.* FROM news n
-       LEFT JOIN tools t ON n.tool_id = t.id
-       WHERE n.is_published = 1 AND n.tool_id = ? AND n.id != ?
-         AND (n.tool_id IS NULL OR t.is_published = 1)
-       ORDER BY n.published_at DESC
+      `SELECT * FROM news
+       WHERE is_published = 1 AND tool_id = ? AND id != ?
+       ORDER BY published_at DESC
        LIMIT ?`,
       [toolId, excludeId, limit],
     );

@@ -7,7 +7,7 @@ import ToolCard from '@/components/ToolCard';
 
 export const metadata: Metadata = {
   title: '月刊AIアップデート | AI Chronicle',
-  description: '今月更新のAIツール。',
+  description: '最新アップデートされたAIツールをまとめてチェック。',
 };
 
 const PER_PAGE = 12;
@@ -67,6 +67,7 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
             <span style={{ color: '#F0EBE1' }}>月刊AIアップデート</span>
           </nav>
 
+          {/* タイトル + 右側ラベル */}
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
               <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#008CED', marginBottom: '0.5rem' }}>
@@ -76,17 +77,7 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
                 月刊AIアップデート
               </h1>
               <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.9rem', color: '#7A8A99', margin: 0 }}>
-                今月更新のAIツール
-              </p>
-            </div>
-
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', color: '#4A5568', marginBottom: '4px' }}>
-                {monthLabel}
-              </p>
-              <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '1.6rem', fontWeight: 800, color: '#008CED', lineHeight: 1, marginBottom: '2px' }}>
-                {thisMonthCount}
-                <span style={{ fontSize: '0.85rem', fontWeight: 400, color: '#7A8A99', marginLeft: '4px' }}>件更新</span>
+                今月更新のAIツール（{thisMonthCount}件更新）
               </p>
             </div>
           </div>

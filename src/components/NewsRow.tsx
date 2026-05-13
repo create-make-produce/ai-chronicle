@@ -33,7 +33,15 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
   const title = lang === 'en' ? (item.title_en || item.title_ja) : item.title_ja;
   const toolName = lang === 'en' ? item.tool_name_en : item.tool_name_ja;
   const badgeLabel = lang === 'en' ? badge.en : badge.ja;
-  const date = item.published_at?.substring(0, 10) ?? '';
+  const date = (() => {
+    try {
+      const raw = item.published_at?.includes('Z') ? item.published_at : item.published_at?.replace(' ', 'T') + 'Z';
+      const d = new Date(raw);
+      const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return `${jst.getUTCFullYear()}/${pad(jst.getUTCMonth()+1)}/${pad(jst.getUTCDate())} ${pad(jst.getUTCHours())}:${pad(jst.getUTCMinutes())}`;
+    } catch { return item.published_at?.substring(0, 10) ?? ''; }
+  })();
   const logoUrl = item.tool_logo_url ?? null;
 
   return (
@@ -44,7 +52,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       className="news-row"
       style={{
         display: 'grid',
-        gridTemplateColumns: '110px auto 1fr auto',
+        gridTemplateColumns: '145px auto 1fr auto',
         alignItems: 'center',
         gap: '1rem',
         padding: '0.85rem 1.25rem',
