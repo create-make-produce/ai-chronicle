@@ -270,3 +270,11 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
 ::-webkit-scrollbar-track { background: var(--color-bg); }
 ::-webkit-scrollbar-thumb { background: var(--color-border-mid); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+
+/* ツール一覧：カテゴリドロップダウン PC/スマホ切り替え */
+.tools-cat-mobile { display: none; }
+.tools-cat-pc     { display: block; }
+@media (max-width: 767px) {
+  .tools-cat-mobile { display: block; }
+  .tools-cat-pc     { display: none; }
+}

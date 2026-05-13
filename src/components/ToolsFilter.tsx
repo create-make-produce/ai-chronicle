@@ -29,7 +29,6 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
   const [query,       setQuery]       = useState(initialQ);
   const [inputValue,  setInputValue]  = useState(initialQ);
   const [selectedCat, setSelectedCat] = useState(initialCat || categorySlug || '');
-  const [freeOnly,    setFreeOnly]    = useState(false);
   const [sort,        setSort]        = useState<SortKey>('newest');
   const [currentPage, setCurrentPage] = useState(1);
   const tt = t[locale];
@@ -56,7 +55,6 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
       });
     }
     if (selectedCat) r = r.filter(tool => (tool as any).category_slug === selectedCat);
-    if (freeOnly) r = r.filter(tool => tool.has_free_plan === 1);
     if (sort === 'newest') r.sort((a, b) => b.created_at > a.created_at ? 1 : -1);
     if (sort === 'name')   r.sort((a, b) => {
       const an = locale === 'ja' ? a.name_ja : a.name_en;
@@ -64,7 +62,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
       return an.localeCompare(bn);
     });
     return r;
-  }, [tools, query, selectedCat, freeOnly, sort, locale]);
+  }, [tools, query, selectedCat, sort, locale]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
@@ -84,30 +82,61 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
     return pages;
   };
 
-  const btnStyle = (active: boolean) => ({
+  const selectStyle: React.CSSProperties = {
     fontFamily: 'Noto Sans JP, sans-serif',
-    fontSize: '0.75rem',
-    fontWeight: 700,
-    padding: '5px 12px',
-    borderRadius: '2px',
-    border: `1px solid ${active ? '#008CED' : 'rgba(255,255,255,0.15)'}`,
-    background: active ? '#008CED' : 'transparent',
-    color: active ? '#000' : 'var(--color-text-sub)',
+    fontSize: '0.85rem',
+    padding: '10px 12px',
+    background: 'var(--color-bg-sub)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    color: 'var(--color-text)',
     cursor: 'pointer',
-    transition: 'all 0.12s',
-    whiteSpace: 'nowrap' as const,
-  });
+    outline: 'none',
+  };
 
   return (
     <div>
-      {/* 検索ボックス */}
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 0, marginBottom: '1rem' }}>
+      {/* スマホ：カテゴリドロップダウンを上に表示 */}
+      {categories.length > 0 && (
+        <div className="tools-cat-mobile" style={{ marginBottom: '0.75rem' }}>
+          <select
+            value={selectedCat}
+            onChange={e => { setSelectedCat(e.target.value); resetPage(); }}
+            style={{ ...selectStyle, width: '100%', borderRadius: '2px' }}
+          >
+            <option value="">{locale === 'ja' ? 'すべてのカテゴリ' : 'All Categories'}</option>
+            {categories.map(cat => (
+              <option key={cat.slug} value={cat.slug}>
+                {locale === 'ja' ? cat.name_ja : cat.name_en}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* 検索ボックス（PC：左にカテゴリドロップダウン） */}
+      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
+        {categories.length > 0 && (
+          <div className="tools-cat-pc">
+            <select
+              value={selectedCat}
+              onChange={e => { setSelectedCat(e.target.value); resetPage(); }}
+              style={{ ...selectStyle, height: '100%', borderRadius: '2px', minWidth: '160px' }}
+            >
+              <option value="">{locale === 'ja' ? 'すべてのカテゴリ' : 'All Categories'}</option>
+              {categories.map(cat => (
+                <option key={cat.slug} value={cat.slug}>
+                  {locale === 'ja' ? cat.name_ja : cat.name_en}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <input
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           placeholder={locale === 'ja' ? 'ツール名・機能・用途で検索...' : 'Search by name, feature, or use case...'}
-          style={{ flex: 1, fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.88rem', padding: '10px 14px', background: 'var(--color-bg-sub)', border: '1px solid rgba(255,255,255,0.15)', borderRight: 'none', borderRadius: '2px 0 0 2px', color: 'var(--color-text)', outline: 'none' }}
+          style={{ flex: 1, maxWidth: '420px', fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.88rem', padding: '10px 14px', background: 'var(--color-bg-sub)', border: '1px solid rgba(255,255,255,0.15)', borderRight: 'none', borderRadius: '2px 0 0 2px', color: 'var(--color-text)', outline: 'none' }}
           onFocus={e => e.currentTarget.style.borderColor = '#008CED'}
           onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}
         />
@@ -116,37 +145,20 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
         </button>
         {query && (
           <button type="button" onClick={() => { setQuery(''); setInputValue(''); resetPage(); }}
-            style={{ marginLeft: '8px', padding: '10px 12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '2px', color: 'var(--color-text-muted)', fontSize: '0.78rem', cursor: 'pointer' }}>
+            style={{ padding: '10px 12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '2px', color: 'var(--color-text-muted)', fontSize: '0.78rem', cursor: 'pointer' }}>
             ✕
           </button>
         )}
-      </form>
-
-      {/* カテゴリ選択 */}
-      {categories.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '0.75rem' }}>
-          <button type="button" onClick={() => { setSelectedCat(''); resetPage(); }} style={btnStyle(selectedCat === '')}>
-            {locale === 'ja' ? 'すべて' : 'All'}
-          </button>
-          {categories.map(cat => (
-            <button type="button" key={cat.slug} onClick={() => { setSelectedCat(cat.slug); resetPage(); }} style={btnStyle(selectedCat === cat.slug)}>
-              {locale === 'ja' ? cat.name_ja : cat.name_en}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* フィルターバー */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
+        {/* 並べ替え：右端に配置 */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
-          <span style={{ color: 'var(--color-text-muted)' }}>{locale === 'ja' ? '並べ替え：' : 'Sort:'}</span>
+          <span style={{ color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{locale === 'ja' ? '並べ替え：' : 'Sort:'}</span>
           <select value={sort} onChange={e => { setSort(e.target.value as SortKey); resetPage(); }}
             style={{ background: 'var(--color-bg-sub)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-text)', borderRadius: '2px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
             <option value="newest">{tt.filterSortNewest}</option>
             <option value="name">A-Z</option>
           </select>
         </div>
-      </div>
+      </form>
 
       {/* 検索中の表示 */}
       {query && (
