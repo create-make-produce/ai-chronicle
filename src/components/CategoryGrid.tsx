@@ -100,8 +100,8 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
                   <FallbackIcon slug={cat.slug} />
                 )}
               </div>
-              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '72%', padding: '0 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: '4px', gap: 2 }}>
-                <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: dispName.length > 7 ? '1rem' : '1.15rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.6)' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '80%', padding: '0 10px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2 }}>
+                <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: '1rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2, textShadow: '1px 1px 4px rgba(0,0,0,0.6)', wordBreak: 'keep-all' }}>
                   {dispName}
                 </p>
                 {locale === 'ja' && (
