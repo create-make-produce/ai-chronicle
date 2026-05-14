@@ -59,6 +59,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
       <div style={{
         position: 'relative', overflow: 'hidden', background: '#040912',
         borderBottom: '1px solid rgba(0,140,237,0.15)',
+        paddingTop: '16px', paddingBottom: '24px',
       }}>
         {/* 背景：青い斜め帯 + ドット + 縦線 */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
@@ -67,10 +68,10 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
         </div>
 
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12" style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 1 }}>
 
           {/* パンくず */}
-          <nav className="flex items-center gap-2 text-xs mb-7" style={{ color: 'var(--color-text-muted)' }}>
+          <nav style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.78rem", color: "#4A5568", marginBottom: "1.25rem" }}>
             <Link href={localizedPath(locale, '/')}
               style={{ transition: 'color 0.12s' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--color-accent)')}
@@ -87,9 +88,12 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
             <span>/</span>
             <span style={{ color: 'var(--color-text)' }} className="truncate">{title}</span>
           </nav>
+          <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#008CED', marginBottom: '0.5rem' }}>
+            AI News
+          </p>
 
           {/* バッジ ＋ 日時（TOPページ #AABBCC に統一） */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '0.75rem' }}>
             <span style={{
               fontFamily: 'Fira Sans, sans-serif',
               fontSize: '0.72rem',
@@ -116,7 +120,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
           {/* タイトル */}
           <h1 style={{
             fontFamily: locale === 'ja' ? 'Noto Sans JP, sans-serif' : 'Fira Sans, sans-serif',
-            fontSize: 'clamp(1.5rem, 4vw, 2.25rem)',
+            fontSize: 'clamp(1.5rem, 3vw, 2.25rem)',
             fontWeight: 900,
             lineHeight: 1.35,
             color: '#F0EBE1',

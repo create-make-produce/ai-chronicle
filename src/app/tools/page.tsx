@@ -52,7 +52,7 @@ export default async function AllToolsPage({
     <ToolsListContent
       tools={tools as any}
       locale="ja"
-      title="すべてのAI"
+      title="AIツール一覧"
       categories={categories as any}
       initialCat={sp.cat ?? ''}
       initialQ={sp.q ?? ''}
