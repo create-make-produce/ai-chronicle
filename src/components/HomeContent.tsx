@@ -207,7 +207,7 @@ function ToolSlider({ tools, locale, categories, tt }: {
         #tool-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; max-width: 60px; }
         #tool-slider::-webkit-scrollbar-thumb:hover { background: #33AAFF; }
         @media (max-width: 767px) {
-          .tool-slider-card { width: calc(82vw) !important; }
+          .tool-slider-card { width: calc(72vw) !important; }
         }
       `}</style>
       <div style={{ position: 'relative' }}>
@@ -240,8 +240,8 @@ function ToolSlider({ tools, locale, categories, tt }: {
         {/* スマホのみ右端グラデーション */}
         <div className="tool-slider-fade" style={{
           position: 'absolute', top: 0, right: 0, bottom: '24px',
-          width: '60px', pointerEvents: 'none',
-          background: 'linear-gradient(to right, transparent, rgba(4,9,18,0.6))',
+          width: '30px', pointerEvents: 'none',
+          background: 'linear-gradient(to right, transparent, #040912)',
         }} />
       </div>
     </div>
