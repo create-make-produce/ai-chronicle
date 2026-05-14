@@ -88,11 +88,17 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
 
   return (
     <>
-      <main className="flex-1">
+      <main className="flex-1" style={{ background: 'linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)' }}>
 
         {/* ヘッダー */}
-        <section style={{ background: 'linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem' }}>
-          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        <section style={{ position: 'relative', overflow: 'hidden', background: '#040912', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem' }}>
+        {/* 背景：青い斜め帯 + ドット + 縦線 */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: '-20%', left: '-5%', width: '55%', height: '140%', background: 'linear-gradient(135deg, rgba(0,80,180,0.18) 0%, rgba(0,140,237,0.08) 100%)', transform: 'skewX(-8deg)' }} />
+          <div style={{ position: 'absolute', top: '-20%', right: '15%', width: '2px', height: '140%', background: 'rgba(0,140,237,0.2)', transform: 'skewX(-8deg)' }} />
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
+        </div>
+          <div style={{ maxWidth: '1280px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
             <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.5rem' }}>
               <Link href={localizedPath(locale, '/')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navHome}</Link>
               <span>/</span>
@@ -159,7 +165,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
               {description && (
                 <div className="mb-5">
                   <h2 className="font-display text-2xl tracking-tight mb-4">概要</h2>
-                  <div className="prose prose-sm max-w-none text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">{description.replace(/<br\s*\/?>/gi, '\n')}</div>
+                  <div className="prose prose-sm max-w-none text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">{description.replace(/<br\s*\/?>/gi, '\n').replace(/。\n/g, '\n').replace(/。/g, '')}</div>
                 </div>
               )}
 

@@ -21,7 +21,7 @@ export const t = {
 
     // ナビゲーション
     navHome: 'ホーム',
-    navTools: 'すべてのツール',
+    navTools: 'AIツール一覧',
     navCategories: 'カテゴリ',
     navNews: 'ニュース',
     navNew: '新着',
@@ -150,7 +150,7 @@ export const t = {
     searchPlaceholder: 'Search tools, categories, keywords...',
 
     navHome: 'Home',
-    navTools: 'All Tools',
+    navTools: 'AI Tools',
     navCategories: 'Categories',
     navNews: 'News',
     navNew: 'New',

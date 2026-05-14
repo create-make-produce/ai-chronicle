@@ -7,7 +7,7 @@ const NAV_ITEMS = [
   { href: '/',        label: 'TOP' },
   { href: '/news',    label: 'ニュース' },
   { href: '/monthly', label: '月刊AIアップデート' },
-  { href: '/tools',   label: 'すべてのAI' },
+  { href: '/tools',   label: 'AIツール一覧' },
 ];
 
 export default function Header() {

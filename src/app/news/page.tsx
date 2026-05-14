@@ -42,9 +42,15 @@ export default async function NewsPage() {
   const newsItems = await getLatestNews();
 
   return (
-    <main style={{ minHeight: '100vh', background: '#111318' }}>
-      <section style={{ background: 'linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%)', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2rem' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+    <main style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)' }}>
+      <section style={{ position: 'relative', overflow: 'hidden', background: '#040912', borderBottom: '1px solid rgba(0,140,237,0.15)', padding: '2rem 1.5rem 2rem' }}>
+        {/* 背景：青い斜め帯 + ドット + 縦線 */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: '-20%', left: '-5%', width: '55%', height: '140%', background: 'linear-gradient(135deg, rgba(0,80,180,0.18) 0%, rgba(0,140,237,0.08) 100%)', transform: 'skewX(-8deg)' }} />
+          <div style={{ position: 'absolute', top: '-20%', right: '15%', width: '2px', height: '140%', background: 'rgba(0,140,237,0.2)', transform: 'skewX(-8deg)' }} />
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
+        </div>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
             <Link href="/" style={{ color: '#4A5568', textDecoration: 'none' }}>ホーム</Link>
             <span>/</span>
@@ -68,7 +74,7 @@ export default async function NewsPage() {
             ニュースはまだありません。
           </div>
         ) : (
-          <div style={{ background: '#1A1D24', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', overflow: 'hidden' }}>
+          <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
             {newsItems.map((item: Record<string, unknown>, i: number) => (
               <NewsRow
                 key={item.id as string}
