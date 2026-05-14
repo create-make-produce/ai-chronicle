@@ -71,7 +71,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 1 }}>
 
           {/* パンくず */}
-          <nav style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.78rem", color: "#4A5568", marginBottom: "1.25rem" }}>
+          <nav style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem", fontSize: "0.78rem", color: "#4A5568", marginBottom: "1.25rem" }}>
             <Link href={localizedPath(locale, '/')}
               style={{ transition: 'color 0.12s' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--color-accent)')}
