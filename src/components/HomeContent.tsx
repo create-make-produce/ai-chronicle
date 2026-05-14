@@ -206,18 +206,22 @@ function ToolSlider({ tools, locale, categories, tt }: {
         #tool-slider::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
         #tool-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; max-width: 60px; }
         #tool-slider::-webkit-scrollbar-thumb:hover { background: #33AAFF; }
+        @media (max-width: 767px) {
+          .tool-slider-card { width: calc(82vw) !important; }
+        }
       `}</style>
-      <div id="tool-slider" ref={sliderRef} onScroll={onScroll} style={{
-        display: 'flex',
-        gap: '1rem',
-        overflowX: 'auto',
-        overflowY: 'hidden',
-        paddingBottom: '16px',
-        marginBottom: '8px',
-        WebkitOverflowScrolling: 'touch' as any,
-      }}>
-        {tools.map((tool, i) => (
-          <div key={tool.id} style={{ flexShrink: 0, width: '320px' }}>
+      <div style={{ position: 'relative' }}>
+        <div id="tool-slider" ref={sliderRef} onScroll={onScroll} style={{
+          display: 'flex',
+          gap: '1rem',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          paddingBottom: '16px',
+          marginBottom: '8px',
+          WebkitOverflowScrolling: 'touch' as any,
+        }}>
+          {tools.map((tool, i) => (
+            <div key={tool.id} className="tool-slider-card" style={{ flexShrink: 0, width: '320px' }}>
             <ToolCard tool={tool} locale={locale} index={i}
               categoryName={
                 tool.category_id
@@ -230,8 +234,15 @@ function ToolSlider({ tools, locale, categories, tt }: {
               }
               categorySlug={categories.find(cat => cat.id === tool.category_id)?.slug}
             />
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
+        {/* スマホのみ右端グラデーション */}
+        <div className="tool-slider-fade" style={{
+          position: 'absolute', top: 0, right: 0, bottom: '24px',
+          width: '60px', pointerEvents: 'none',
+          background: 'linear-gradient(to right, transparent, #040912)',
+        }} />
       </div>
     </div>
   );
