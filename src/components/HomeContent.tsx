@@ -241,7 +241,7 @@ function ToolSlider({ tools, locale, categories, tt }: {
         <div className="tool-slider-fade" style={{
           position: 'absolute', top: 0, right: 0, bottom: '24px',
           width: '60px', pointerEvents: 'none',
-          background: 'linear-gradient(to right, transparent, #040912)',
+          background: 'linear-gradient(to right, transparent, rgba(4,9,18,0.6))',
         }} />
       </div>
     </div>

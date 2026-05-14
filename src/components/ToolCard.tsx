@@ -76,7 +76,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName }: Tool
       style={{ position: 'relative' }}
     >
       {/* カード本体 */}
-      <div style={{ filter: 'drop-shadow(5px 5px 0px #008CED)' }}>
+      <div style={{ filter: 'drop-shadow(5px 8px 12px rgba(0,140,237,0.35))' }}>
         <Link
           href={localizedPath(locale, `/tool/${tool.slug}`)}
           className="group relative block transition-transform duration-150 hover:-translate-y-1"

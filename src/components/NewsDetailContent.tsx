@@ -158,44 +158,38 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
             borderLeft: `3px solid ${badge.color}`,
             borderRadius: '4px',
           }}>
-            <span style={{
-              display: 'block',
-              fontSize: '0.62rem',
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-muted)',
-              marginBottom: '0.85rem',
-            }}>
-              {locale === 'ja' ? '関連ツール' : 'Related Tool'}
-            </span>
-            <Link href={localizedPath(locale, `/tool/${relatedTool.slug}`)} className="group flex items-center gap-3" style={{ textDecoration: 'none' }}>
-              <div style={{
-                flexShrink: 0, width: 48, height: 48, borderRadius: 4,
-                background: '#fff', border: '1px solid var(--color-border)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-              }}>
-                {relatedTool.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={relatedTool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <span className="font-display text-sm">
-                    {(locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en).slice(0, 2).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p className="link-underline" style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', margin: 0 }}>
-                  {locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en}
-                </p>
-                {(locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en) && (
-                  <p style={{ fontSize: '0.82rem', color: 'var(--color-text-sub)', margin: '3px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en}
+            <Link href={localizedPath(locale, `/tool/${relatedTool.slug}`)} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{
+                  flexShrink: 0, width: 48, height: 48, borderRadius: 4,
+                  background: '#fff', border: '1px solid var(--color-border)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+                }}>
+                  {relatedTool.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={relatedTool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 800, fontSize: '0.9rem', color: '#F0EBE1', textTransform: 'uppercase' }}>
+                      {(locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en).slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', margin: 0 }}>
+                    {locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en}
                   </p>
-                )}
+                  {(locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en) && (
+                    <p style={{ fontSize: '0.82rem', color: 'var(--color-text-sub)', margin: '3px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en}
+                    </p>
+                  )}
+                </div>
               </div>
-              <span className="group-hover:text-[var(--color-accent)]"
-                style={{ flexShrink: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem', transition: 'color 0.12s' }}>→</span>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'Fira Sans, sans-serif', letterSpacing: '0.05em' }}>
+                  ツール情報確認
+                </span>
+              </div>
             </Link>
           </div>
         )}
@@ -254,7 +248,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
           <Link href={localizedPath(locale, '/news')}
             className="link-underline text-sm font-bold"
             style={{ color: 'var(--color-accent)' }}>
-            ← {tt.navNews}
+            ニュース一覧に戻る
           </Link>
         </div>
       </article>
