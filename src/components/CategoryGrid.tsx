@@ -93,7 +93,7 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
               <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: '0.55rem', fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '0.08em' }}>
                 ////
               </div>
-              <div style={{ position: 'absolute', right: '6%', top: '60%', transform: 'translateY(-50%)', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }}>
+              <div className="cat-icon" style={{ position: 'absolute', right: '6%', top: '60%', transform: 'translateY(-50%)', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }}>
                 {iconFile ? (
                   <img src={`/icons/${iconFile}`} alt={name_en} width={38} height={38} style={{ objectFit: 'contain' }} />
                 ) : (

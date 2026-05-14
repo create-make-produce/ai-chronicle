@@ -284,3 +284,10 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
 @media (max-width: 767px) {
   .tool-slider-fade { display: block; }
 }
+
+/* カテゴリアイコン：PC時に大きく */
+@media (min-width: 768px) {
+  .cat-icon { width: 64px !important; height: 64px !important; right: 18% !important; top: 47% !important; }
+  .cat-icon img { width: 56px !important; height: 56px !important; }
+  .cat-icon svg { width: 56px !important; height: 56px !important; }
+}
