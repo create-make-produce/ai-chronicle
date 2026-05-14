@@ -59,8 +59,6 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
       <div style={{
         position: 'relative', overflow: 'hidden', background: '#040912',
         borderBottom: '1px solid rgba(0,140,237,0.15)',
-        position: 'relative',
-        overflow: 'hidden',
       }}>
         {/* 背景：青い斜め帯 + ドット + 縦線 */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>

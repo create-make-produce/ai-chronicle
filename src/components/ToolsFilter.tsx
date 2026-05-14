@@ -87,7 +87,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
     fontSize: '0.85rem',
     padding: '10px 12px',
     background: 'var(--color-bg-sub)',
-    border: '1px solid rgba(255,255,255,0.15)',
+    border: '1px solid rgba(0,140,237,0.3)',
     color: 'var(--color-text)',
     cursor: 'pointer',
     outline: 'none',
@@ -136,9 +136,9 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           placeholder={locale === 'ja' ? 'ツール名・機能・用途で検索...' : 'Search by name, feature, or use case...'}
-          style={{ flex: 1, maxWidth: '420px', fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.88rem', padding: '10px 14px', background: 'var(--color-bg-sub)', border: '1px solid rgba(255,255,255,0.15)', borderRight: 'none', borderRadius: '2px 0 0 2px', color: 'var(--color-text)', outline: 'none' }}
-          onFocus={e => e.currentTarget.style.borderColor = '#008CED'}
-          onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}
+          style={{ flex: 1, maxWidth: '420px', fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.88rem', padding: '10px 14px', background: 'var(--color-bg-sub)', border: '1px solid rgba(0,140,237,0.3)', borderRight: 'none', borderRadius: '2px 0 0 2px', color: 'var(--color-text)', outline: 'none' }}
+          onFocus={e => { e.currentTarget.style.borderColor = 'rgba(0,140,237,0.8)'; if(e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.borderColor = 'rgba(0,140,237,0.8)'; }}
+          onBlur={e => { e.currentTarget.style.borderColor = 'rgba(0,140,237,0.3)'; if(e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).style.borderColor = '#008CED'; }}
         />
         <button type="submit" style={{ padding: '10px 20px', background: '#008CED', border: '1px solid #008CED', borderRadius: '0 2px 2px 0', color: '#000', fontFamily: 'var(--font-fira), system-ui', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
           {locale === 'ja' ? '検索' : 'Search'}
