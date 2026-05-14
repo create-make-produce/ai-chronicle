@@ -237,12 +237,7 @@ function ToolSlider({ tools, locale, categories, tt }: {
             </div>
           ))}
         </div>
-        {/* スマホのみ右端グラデーション */}
-        <div className="tool-slider-fade" style={{
-          position: 'absolute', top: 0, right: 0, bottom: '24px',
-          width: '15px', pointerEvents: 'none',
-          background: 'linear-gradient(to right, transparent, #040912)',
-        }} />
+
       </div>
     </div>
   );
