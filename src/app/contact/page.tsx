@@ -82,7 +82,7 @@ export default function ContactPage() {
                 件名 <span style={{ color: '#F97316' }}>*</span>
               </label>
               <input type="text" value={subject} onChange={e => setSubject(e.target.value)} required
-                placeholder="例：ChatGPTの料金情報の修正依頼"
+                placeholder="例：ChatGPTの掲載情報の修正依頼"
                 style={INPUT}
                 onFocus={e => e.currentTarget.style.borderColor = 'var(--color-accent)'}
                 onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border-mid)'} />
