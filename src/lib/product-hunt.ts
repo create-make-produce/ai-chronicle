@@ -416,3 +416,54 @@ export async function fetchTopAIPosts(count: number = 100): Promise<ProductHuntP
 
   return allPosts.slice(0, count);
 }
+
+/**
+ * AIツールの最新投稿を複数ページ取得（collect-news-bulkで使用）
+ */
+type LatestAIResponse = {
+  posts: {
+    edges: Array<{ node: RawPostNode }>;
+    pageInfo: { hasNextPage: boolean; endCursor: string | null };
+  };
+};
+
+export async function fetchLatestAIPostsPaginated(count: number = 100): Promise<ProductHuntPost[]> {
+  const perPage = 20;
+  const pages = Math.ceil(count / perPage);
+  const allPosts: ProductHuntPost[] = [];
+  let cursor: string | null = null;
+
+  const query = `
+    query LatestAIPosts($first: Int!, $after: String) {
+      posts(first: $first, after: $after, topic: "artificial-intelligence", order: NEWEST) {
+        edges { node { ${POST_FIELDS} } }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  `;
+
+  for (let page = 0; page < pages; page++) {
+    console.log(`  PH API取得中... ${page + 1}/${pages}ページ`);
+
+    const result = await graphqlQuery<LatestAIResponse>(query, {
+      first: perPage,
+      after: cursor ?? undefined,
+    });
+
+    const posts = await Promise.all(
+      result.posts.edges.map(e => processPostNode(e.node))
+    );
+    allPosts.push(...posts);
+
+    const pageInfo = result.posts.pageInfo;
+    if (!pageInfo.hasNextPage || !pageInfo.endCursor) break;
+    cursor = pageInfo.endCursor;
+
+    if (page < pages - 1) await new Promise(r => setTimeout(r, 1500));
+  }
+
+  return allPosts
+    .filter(p => p.votesCount >= CONFIG.PRODUCT_HUNT_MIN_VOTES)
+    .filter(isAITool)
+    .slice(0, count);
+}

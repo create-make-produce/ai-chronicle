@@ -310,3 +310,10 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
   .cat-icon img { width: 30px !important; height: 30px !important; }
   .cat-icon svg { width: 30px !important; height: 30px !important; }
 }
+
+/* ニュースバッジと日付の間隔（スマホ） */
+@media (max-width: 767px) {
+  .news-row span:first-child {
+    margin-right: 0.6rem;
+  }
+}
