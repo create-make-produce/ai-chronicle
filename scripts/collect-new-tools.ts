@@ -91,7 +91,14 @@ async function findExistingTool(
     `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? AND is_published = 1 LIMIT 1`,
     [post.id]
   );
-  return byId ?? null;
+  if (byId) return byId;
+
+  // name_en 大文字小文字無視でフォールバック照合
+  const byName = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
+    `SELECT id, name_ja, name_en, slug FROM tools WHERE LOWER(name_en) = LOWER(?) AND is_published = 1 LIMIT 1`,
+    [post.name]
+  );
+  return byName ?? null;
 }
 
 /**
@@ -102,7 +109,13 @@ async function isNewTool(db: D1Client, post: ProductHuntPost): Promise<boolean> 
   const byId = await db.first<{ count: number }>(
     `SELECT COUNT(*) AS count FROM tools WHERE product_hunt_id = ?`, [checkId]
   );
-  return !byId || byId.count === 0;
+  if (byId && byId.count > 0) return false;
+
+  // name_en 大文字小文字無視で重複チェック
+  const byName = await db.first<{ count: number }>(
+    `SELECT COUNT(*) AS count FROM tools WHERE LOWER(name_en) = LOWER(?)`, [post.name]
+  );
+  return !byName || byName.count === 0;
 }
 
 async function detectNewsType(launchName: string, tagline: string | null): Promise<'new_feature' | 'price_change'> {
