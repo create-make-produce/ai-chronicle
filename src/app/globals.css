@@ -317,3 +317,15 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
     margin-right: 0.6rem;
   }
 }
+
+/* セクションコンテンツ横余白：PC=24px / スマホ=8px */
+.section-px {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+@media (max-width: 767px) {
+  .section-px {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
