@@ -445,7 +445,7 @@ export async function fetchLatestAIPostsPaginated(count: number = 100): Promise<
   for (let page = 0; page < pages; page++) {
     console.log(`  PH API取得中... ${page + 1}/${pages}ページ`);
 
-    const result = await graphqlQuery<LatestAIResponse>(query, {
+    const result: LatestAIResponse = await graphqlQuery<LatestAIResponse>(query, {
       first: perPage,
       after: cursor ?? undefined,
     });
