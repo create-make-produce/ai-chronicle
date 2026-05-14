@@ -16,7 +16,7 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
 
   return (
     <main className="flex-1">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-4">
+      <div className="max-w-4xl mx-auto px-2 sm:px-6 lg:px-8 pt-10 pb-4">
         <h1 className="hero-title text-4xl sm:text-5xl mt-3 mb-3">{tt.secLatestNews}</h1>
         <p className="text-base text-[var(--color-text-sub)]">
           {locale === 'ja'
@@ -25,7 +25,7 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
         </p>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="max-w-4xl mx-auto px-2 sm:px-6 lg:px-8 pb-16">
         <AdSlot slot="header" className="mb-8" />
 
         {news.length === 0 ? (

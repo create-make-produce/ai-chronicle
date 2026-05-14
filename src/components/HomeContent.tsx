@@ -90,7 +90,7 @@ function Sec({ children, dark, bg, paddingBottom }: { children: React.ReactNode;
   const background = bg ?? (dark ? 'var(--color-bg-sub)' : 'var(--color-bg)');
   return (
     <section style={{ background }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8"
         style={{ paddingTop: '24px', paddingBottom: paddingBottom ?? 24 }}>
         {children}
       </div>
