@@ -93,15 +93,15 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
               <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: '0.55rem', fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '0.08em' }}>
                 ////
               </div>
-              <div style={{ position: 'absolute', right: '6%', top: '60%', transform: 'translateY(-50%)', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }}>
+              <div className="cat-icon" style={{ position: 'absolute', right: '6%', top: '60%', transform: 'translateY(-50%)', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }}>
                 {iconFile ? (
                   <img src={`/icons/${iconFile}`} alt={name_en} width={38} height={38} style={{ objectFit: 'contain' }} />
                 ) : (
                   <FallbackIcon slug={cat.slug} />
                 )}
               </div>
-              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '80%', padding: '0 10px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2 }}>
-                <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: '1rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2, textShadow: '1px 1px 4px rgba(0,0,0,0.6)', wordBreak: 'keep-all' }}>
+              <div className="cat-text-area" style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '72%', padding: '0 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: '4px', gap: 2 }}>
+                <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: dispName.length > 7 ? '1rem' : '1.15rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.6)' }}>
                   {dispName}
                 </p>
                 {locale === 'ja' && (

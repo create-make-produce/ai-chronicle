@@ -291,3 +291,22 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
   .cat-icon img { width: 56px !important; height: 56px !important; }
   .cat-icon svg { width: 56px !important; height: 56px !important; }
 }
+
+/* カテゴリカード：スマホのみテキスト左上・アイコン右下 */
+@media (max-width: 767px) {
+  .cat-text-area {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    padding-top: 8px !important;
+  }
+  .cat-icon {
+    top: auto !important;
+    bottom: 4px !important;
+    right: 6px !important;
+    transform: none !important;
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .cat-icon img { width: 30px !important; height: 30px !important; }
+  .cat-icon svg { width: 30px !important; height: 30px !important; }
+}
