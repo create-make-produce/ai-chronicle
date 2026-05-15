@@ -116,7 +116,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             </nav>
 
             <div className="tool-hero-layout">
-              <div style={{ flexShrink: 0, width: '80px', height: '80px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <div style={{ flexShrink: 0, width: '56px', height: '56px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 {tool.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={tool.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -125,17 +125,6 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                 )}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', marginBottom: '0.5rem' }}>
-                  {tool.status !== 'active' && (
-                    <span style={{ background: '#374151', color: '#9CA3AF', fontSize: '0.6875rem', fontWeight: 700, padding: '2px 8px', borderRadius: '2px' }}>{statusLabel()}</span>
-                  )}
-                  {tool.category && (
-                    <Link href={localizedPath(locale, `/tools?cat=${tool.category.slug}`)} className="link-underline"
-                      style={{ background: '#0F3D8C', color: '#FFFFFF', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', padding: '2px 8px', borderRadius: '2px', border: '1px solid #1A56DB', textDecoration: 'none' }}>
-                      {tool.category.name_ja}
-                    </Link>
-                  )}
-                </div>
                 <h1 style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, color: '#F0EBE1', lineHeight: 1.1, letterSpacing: '0.02em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
                   {name}
                 </h1>
