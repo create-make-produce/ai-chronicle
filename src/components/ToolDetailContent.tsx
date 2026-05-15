@@ -115,7 +115,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
               <span style={{ color: '#F0EBE1' }}>{name}</span>
             </nav>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: '1.5rem' }}>
+            <div className="tool-hero-layout">
               <div style={{ flexShrink: 0, width: '80px', height: '80px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 {tool.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element

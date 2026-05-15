@@ -179,7 +179,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
                     {locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en}
                   </p>
                   {(locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en) && (
-                    <p style={{ fontSize: '0.82rem', color: 'var(--color-text-sub)', margin: '3px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--color-text-sub)', margin: '3px 0 0' }}>
                       {locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en}
                     </p>
                   )}

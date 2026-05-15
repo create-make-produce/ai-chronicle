@@ -318,6 +318,21 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
   }
 }
 
+/* ツール詳細ヒーロー：スマホ時に縦並び */
+.tool-hero-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+@media (max-width: 767px) {
+  .tool-hero-layout {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
 /* セクションコンテンツ横余白：PC=24px / スマホ=8px */
 .section-px {
   padding-left: 24px;
