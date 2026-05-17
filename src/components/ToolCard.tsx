@@ -133,7 +133,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName }: Tool
                 fontWeight: 700,
                 color: '#0A1628',
                 letterSpacing: locale === 'ja' ? '0.05em' : '0.03em',
-                textTransform: locale === 'ja' ? 'none' as const : 'uppercase' as const,
+                textTransform: 'none' as const,
                 lineHeight: 1.15,
                 flexShrink: 0,
               }}

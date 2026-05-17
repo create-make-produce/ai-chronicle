@@ -125,7 +125,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                 )}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <h1 style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, color: '#F0EBE1', lineHeight: 1.1, letterSpacing: '0.02em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                <h1 style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, color: '#F0EBE1', lineHeight: 1.1, letterSpacing: '0.02em', marginBottom: '0.4rem' }}>
                   {name}
                 </h1>
                 {tagline && (() => {

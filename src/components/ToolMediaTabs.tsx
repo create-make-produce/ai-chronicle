@@ -119,11 +119,7 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                             <span style={{ fontSize: '0.72rem', color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                               {article.author_name}
                             </span>
-                            {article.likes_count > 0 && (
-                              <span style={{ fontSize: '0.72rem', color: '#6B7280', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                ♡ {article.likes_count}
-                              </span>
-                            )}
+
                           </div>
                         </div>
                       </div>
