@@ -1,6 +1,6 @@
 'use client';
 // src/components/ToolMediaTabs.tsx
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Locale, ToolLaunch, NoteArticle } from '@/types';
 
 const LAUNCHES_PER_PAGE = 10;
@@ -28,8 +28,12 @@ interface ToolMediaTabsProps {
 export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedTools = [], currentToolId }: ToolMediaTabsProps) {
   const [activeTab, setActiveTab] = useState<'note' | 'related'>('note');
   const [notePage, setNotePage] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   const noteTotalPages = Math.ceil(noteArticles.length / NOTES_PER_PAGE);
+  useEffect(() => {
+    if (sliderRef.current) sliderRef.current.scrollLeft = 0;
+  }, [notePage]);
   const pagedNotes = noteArticles.slice(notePage * NOTES_PER_PAGE, (notePage + 1) * NOTES_PER_PAGE);
   const filteredRelated = relatedTools.filter(t => t.id !== currentToolId);
 
@@ -96,7 +100,7 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                       .note-slider-item { flex: 0 0 72vw; max-width: 260px; scroll-snap-align: start; }
                     }
                   `}</style>
-                  <div className="note-slider">
+                  <div className="note-slider" ref={sliderRef}>
                   {pagedNotes.map(article => (
                     <a key={article.id} href={article.note_url} target="_blank" rel="noopener noreferrer"
                       className="note-slider-item"
@@ -105,11 +109,7 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                         onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,140,237,0.3)'}
                         onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,140,237,0.08)'}>
                         <div style={{ width: '100%', aspectRatio: '16/9', background: '#0A0D12', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
-                          {(article as any).is_pinned ? (
-                            <div style={{ position: 'absolute', top: '6px', left: '6px', zIndex: 2, background: '#008CED', color: '#fff', fontSize: '0.6rem', fontWeight: 700, padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.05em' }}>
-                              📌 固定
-                            </div>
-                          ) : null}
+
                           {article.thumbnail_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={article.thumbnail_url} alt={article.title}
@@ -126,9 +126,16 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                             {article.title}
                           </p>
                           {article.published_at && (
-                            <span style={{ fontSize: '0.68rem', color: '#4A5568', marginTop: 'auto' }}>
-                              {article.published_at.slice(0, 10).replace(/-/g, '/')}
-                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: 'auto' }}>
+                              <span style={{ fontSize: '0.68rem', color: '#4A5568' }}>
+                                {article.published_at.slice(0, 10).replace(/-/g, '/')}
+                              </span>
+                              {(article as any).is_pinned ? (
+                                <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#008CED', background: 'rgba(0,140,237,0.12)', padding: '1px 5px', borderRadius: '3px', border: '1px solid rgba(0,140,237,0.3)' }}>
+                                  📌 固定
+                                </span>
+                              ) : null}
+                            </div>
                           )}
                         </div>
                       </div>
