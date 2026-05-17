@@ -29,9 +29,8 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
   const [activeTab, setActiveTab] = useState<'note' | 'related'>('note');
   const [notePage, setNotePage] = useState(0);
 
-  const sortedNotes = [...noteArticles].sort((a, b) => ((b as any).is_pinned ?? 0) - ((a as any).is_pinned ?? 0));
-  const noteTotalPages = Math.ceil(sortedNotes.length / NOTES_PER_PAGE);
-  const pagedNotes = sortedNotes.slice(notePage * NOTES_PER_PAGE, (notePage + 1) * NOTES_PER_PAGE);
+  const noteTotalPages = Math.ceil(noteArticles.length / NOTES_PER_PAGE);
+  const pagedNotes = noteArticles.slice(notePage * NOTES_PER_PAGE, (notePage + 1) * NOTES_PER_PAGE);
   const filteredRelated = relatedTools.filter(t => t.id !== currentToolId);
 
   const tabs = [

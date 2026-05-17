@@ -42,7 +42,7 @@ async function getToolLaunches(toolId: string) {
 
 async function getNoteArticles(toolId: string) {
   return queryD1(
-    `SELECT * FROM tool_note_articles WHERE tool_id = ? ORDER BY likes_count DESC, published_at DESC LIMIT 60`,
+    `SELECT * FROM tool_note_articles WHERE tool_id = ? ORDER BY is_pinned DESC, published_at DESC LIMIT 60`,
     [toolId]
   );
 }
