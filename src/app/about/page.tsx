@@ -33,9 +33,22 @@ export default function AboutPage() {
           {/* 運営者について */}
           <section>
             <h2 className="font-display text-xl mb-3">運営者について</h2>
-            <p className="leading-relaxed text-[var(--color-text-sub)] mb-3">
-              当サイトは、システムエンジニアとして20年以上の実務経験を持つ運営担当が個人で企画・開発・監修しています。インフラ設計・クラウドアーキテクチャを専門領域とし、AIツールの技術的な背景や実用性についての知見をもとに、掲載内容を精査・監修しています。
-            </p>
+            <div style={{ marginBottom: '1rem' }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {[
+                  { label: '運営者', value: '20年以上の実務経験を持つシステムエンジニア' },
+                  { label: '専門領域', value: 'インフラ設計・クラウドアーキテクチャ・AIツールの技術評価' },
+                  { label: '運営形態', value: '個人で企画・開発・監修' },
+                ].map(({ label, value }) => (
+                  <li key={label} style={{ display: 'flex', gap: '0.75rem', alignItems: 'baseline' }}>
+                    <span style={{ color: 'var(--color-accent)', fontWeight: 700, whiteSpace: 'nowrap', minWidth: '6em', fontSize: '0.85rem' }}>
+                      {label}
+                    </span>
+                    <span style={{ color: 'var(--color-text-sub)', lineHeight: 1.7 }}>{value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <p className="leading-relaxed text-[var(--color-text-sub)] mb-3">
               近年のAI技術の急速な進化に伴い、ツールの品質・信頼性に大きな差が生じています。当サイトでは技術的な観点から各ツールを評価し、実際に活用できると判断したものを中心に掲載しています。
             </p>
