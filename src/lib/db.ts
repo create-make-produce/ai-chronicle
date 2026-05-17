@@ -215,7 +215,7 @@ export async function getRecentPriceChanges(days: number, limit = 5){
 
 export async function getAllCategories(): Promise<Category[]>{
     return queryD1<Category>(
-      `SELECT * FROM categories ORDER BY display_order ASC, name_ja ASC`,
+      `SELECT * FROM categories ORDER BY sort_order ASC, name_ja ASC`,
     );
 }
 
@@ -245,7 +245,7 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]>{
        FROM categories c
        LEFT JOIN tools t ON t.category_id = c.id AND t.is_published = 1
        GROUP BY c.id
-       ORDER BY c.display_order ASC, c.name_ja ASC`,
+       ORDER BY c.sort_order ASC, c.name_ja ASC`,
     );
 }
 

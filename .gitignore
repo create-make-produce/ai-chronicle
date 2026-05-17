@@ -64,6 +64,7 @@ scripts/collect-news-bulk.ts
 scripts/seed-ph-top100.ts
 scripts/seed-ph-product.ts
 scripts/seed-ph-product-temp.ts
+scripts/seed-from-url.ts
 
 # 管理画面（ローカル専用・GitHubに上げない）
 src/app/admin/

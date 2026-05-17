@@ -163,7 +163,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                   <h2 className="section-label mb-3">リンク</h2>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center' }}>
                     {officialUrl && (
-                      <LinkBadge href={officialUrl} icon={<GlobeIcon />} topLabel="公式サイト" bottomLabel={officialDomain || 'Visit'} />
+                      <LinkBadge href={officialUrl} icon={<GlobeIcon />} topLabel="Webサイト" bottomLabel={officialDomain || 'Visit'} />
                     )}
                     {tool.ios_url && (
                       <LinkBadge href={tool.ios_url} icon={<AppleIcon />} topLabel="ダウンロード" bottomLabel="App Store" />

@@ -35,11 +35,12 @@ interface ExtractedToolData {
 const CATEGORY_MAP: Record<string, string> = {
   'text-generation': 'text-generation', text: 'text-generation', writing: 'text-generation', chat: 'text-generation',
   'image-generation': 'image-generation', image: 'image-generation',
-  'video-generation': 'video-generation', video: 'video-generation',
+  'video-generation': 'image-generation', video: 'image-generation',
   coding: 'coding', code: 'coding', developer: 'coding',
   audio: 'audio', music: 'audio', voice: 'audio', speech: 'audio',
   'data-analysis': 'data-analysis', data: 'data-analysis', analytics: 'data-analysis',
   productivity: 'productivity', workflow: 'productivity', automation: 'productivity',
+  agent: 'agent', autonomous: 'agent', workflow_ai: 'agent',
 };
 
 const FAILED_IDS_JOB = 'collect_failed_ids';
@@ -198,7 +199,7 @@ ${pageText ? truncateForAI(pageText, 8000) : '（取得失敗）'}
 
 AIツール定義：機械学習・LLM・画像生成AI・音声AI・コード補完AIを核心機能として使用するソフトウェア。
 
-{"is_ai_tool":true/false,"tool_name":"製品名のみ（会社名は含めない）またはnull","tagline":"英語キャッチコピーまたはnull","description":"3文以内英語またはnull","company_name":"会社名またはnull","has_free_plan":true/false/null,"starting_price_usd":数値またはnull,"category_hint":"text-generation/image-generation/video-generation/coding/audio/data-analysis/productivity/other","tags":["タグ"],"has_api":true/false/null,"supported_languages":["en"]またはnull}`;
+{"is_ai_tool":true/false,"tool_name":"製品名のみ（会社名は含めない）またはnull","tagline":"英語キャッチコピーまたはnull","description":"3文以内英語またはnull","company_name":"会社名またはnull","has_free_plan":true/false/null,"starting_price_usd":数値またはnull,"category_hint":"text-generation/image-generation/coding/audio/data-analysis/productivity/agent/other","tags":["タグ"],"has_api":true/false/null,"supported_languages":["en"]またはnull}`;
   const raw = await callAI(prompt);
   const sanitized = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
   return parseJsonResponse<ExtractedToolData>(sanitized);
