@@ -147,8 +147,8 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
         {/* 本文 */}
         <div className="max-w-5xl mx-auto section-px pb-16 space-y-4" style={{ paddingTop: '2rem' }}>
 
-          {/* 概要 + リンク + ニュース */}
-          {(description || hasLinks || toolNews.length > 0) && (
+          {/* 概要 + リンク */}
+          {(description || hasLinks) && (
             <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
 
               {description && (
@@ -159,7 +159,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
               )}
 
               {hasLinks && (
-                <div className="mb-5">
+                <div>
                   <h2 className="section-label mb-3">リンク</h2>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center' }}>
                     {officialUrl && (
@@ -180,14 +180,10 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                   </div>
                 </div>
               )}
-
-              {toolNews.length > 0 && (
-                <ToolNewsSection news={toolNews} locale={locale} />
-              )}
             </section>
           )}
 
-          {/* Note紹介 + リリース履歴タブ */}
+          {/* Note紹介 + 関連AIツールタブ */}
           <ToolMediaTabs
             noteArticles={noteArticles}
             locale={locale}
@@ -197,6 +193,13 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             relatedTools={relatedToolsFromRelations}
             currentToolId={tool.id}
           />
+
+          {/* ニュース */}
+          {toolNews.length > 0 && (
+            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+              <ToolNewsSection news={toolNews} locale={locale} />
+            </section>
+          )}
 
           <AdSlot slot="in-content" />
 
