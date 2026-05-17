@@ -54,7 +54,10 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
                 : 'AI最新情報データベース：最新ニュース・アップデート情報を一つの場所で確認'}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <Link href="/about" style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.82rem', color: '#8A9BB0', textDecoration: 'none' }}>
+              {isEn ? 'About' : '運営について'}
+            </Link>
             <Link href="/privacy" style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.82rem', color: '#8A9BB0', textDecoration: 'none' }}>
               {isEn ? 'Privacy Policy' : 'プライバシーポリシー'}
             </Link>

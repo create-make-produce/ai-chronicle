@@ -72,7 +72,7 @@ export default function PrivacyPage() {
 
         <div style={{ marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)', fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
           <p>制定日：2026年4月27日</p>
-          <p>AI Chronicle 運営事務局</p>
+          <p>AI Chronicle 運営担当</p>
         </div>
       </article>
     </main>
