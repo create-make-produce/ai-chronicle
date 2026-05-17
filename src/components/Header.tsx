@@ -81,18 +81,17 @@ export default function Header() {
             );
           })}
 
-          {/* 運営について：右端・セパレーター付き */}
-          <span style={{ width: '1px', height: '16px', background: 'rgba(0,140,237,0.2)', margin: '0 6px' }} />
+          {/* 運営について：右端 */}
           <Link
             href="/about"
             className={isActive('/about') ? '' : 'link-underline'}
             style={{
               fontFamily: 'Fira Sans, sans-serif',
-              fontSize: '0.78rem',
+              fontSize: '0.85rem',
               fontWeight: isActive('/about') ? 700 : 400,
-              color: isActive('/about') ? '#F0EBE1' : '#5A6A7D',
+              color: isActive('/about') ? '#F0EBE1' : '#7A8A99',
               background: isActive('/about') ? '#008CED' : 'transparent',
-              padding: '5px 12px',
+              padding: '5px 14px',
               borderRadius: '4px',
               textDecoration: 'none',
               transition: 'all 0.15s',
