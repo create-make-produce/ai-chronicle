@@ -23,7 +23,7 @@ export default function AboutPage() {
           <section>
             <h2 className="font-display text-xl mb-3">このサイトについて</h2>
             <p className="leading-relaxed text-[var(--color-text-sub)] mb-3">
-              AI Chronicleは、世界最大のプロダクト発見プラットフォーム「Product Hunt」の公式APIをはじめとする信頼性の高いデータをもとに、海外発の最新AIツール情報を日本語でいち早くお届けすることを目的としたデータベースサイトです。
+              AI Chronicleは、海外で発表された最新AIツール情報を日本語でいち早くお届けすることを目的としたデータベースサイトです。
             </p>
             <p className="leading-relaxed text-[var(--color-text-sub)] mb-3">
               英語圏では毎日数十本のAIツールが登場しますが、日本語でまとまった情報を得られる場所はまだ限られています。当サイトは「海外のAI最前線を、日本語で・素早く・わかりやすく」届けることをミッションとしています。
@@ -47,7 +47,7 @@ export default function AboutPage() {
             <div className="leading-relaxed text-[var(--color-text-sub)] space-y-3">
               <p>
                 <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>データソース：</span>
-                Product Hunt公式API・各ツール公式サイトなど、信頼性の高い一次情報源を優先して収集しています。
+                各ツール公式サイトなど、信頼性の高い一次情報源を優先して収集しています。
               </p>
               <p>
                 <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>掲載基準：</span>
