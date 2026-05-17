@@ -29,8 +29,9 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
   const [activeTab, setActiveTab] = useState<'note' | 'related'>('note');
   const [notePage, setNotePage] = useState(0);
 
-  const noteTotalPages = Math.ceil(noteArticles.length / NOTES_PER_PAGE);
-  const pagedNotes = noteArticles.slice(notePage * NOTES_PER_PAGE, (notePage + 1) * NOTES_PER_PAGE);
+  const sortedNotes = [...noteArticles].sort((a, b) => ((b as any).is_pinned ?? 0) - ((a as any).is_pinned ?? 0));
+  const noteTotalPages = Math.ceil(sortedNotes.length / NOTES_PER_PAGE);
+  const pagedNotes = sortedNotes.slice(notePage * NOTES_PER_PAGE, (notePage + 1) * NOTES_PER_PAGE);
   const filteredRelated = relatedTools.filter(t => t.id !== currentToolId);
 
   const tabs = [
@@ -87,14 +88,29 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
               </div>
             ) : (
               <>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                <style>{`
+                    .note-slider { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+                    @media (max-width: 767px) {
+                      .note-slider { display: flex; overflow-x: auto; gap: 0.75rem; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+                      .note-slider::-webkit-scrollbar { height: 4px; }
+                      .note-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; }
+                      .note-slider-item { flex: 0 0 72vw; max-width: 260px; scroll-snap-align: start; }
+                    }
+                  `}</style>
+                  <div className="note-slider">
                   {pagedNotes.map(article => (
                     <a key={article.id} href={article.note_url} target="_blank" rel="noopener noreferrer"
+                      className="note-slider-item"
                       style={{ textDecoration: 'none', color: 'inherit' }}>
                       <div style={{ background: '#111318', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(0,140,237,0.08)', transition: 'border-color 0.15s', height: '100%', display: 'flex', flexDirection: 'column' }}
                         onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,140,237,0.3)'}
                         onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,140,237,0.08)'}>
-                        <div style={{ width: '100%', aspectRatio: '16/9', background: '#0A0D12', overflow: 'hidden', flexShrink: 0 }}>
+                        <div style={{ width: '100%', aspectRatio: '16/9', background: '#0A0D12', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+                          {(article as any).is_pinned ? (
+                            <div style={{ position: 'absolute', top: '6px', left: '6px', zIndex: 2, background: '#008CED', color: '#fff', fontSize: '0.6rem', fontWeight: 700, padding: '2px 6px', borderRadius: '3px', letterSpacing: '0.05em' }}>
+                              📌 固定
+                            </div>
+                          ) : null}
                           {article.thumbnail_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={article.thumbnail_url} alt={article.title}
@@ -110,17 +126,11 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                             display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>
                             {article.title}
                           </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 'auto' }}>
-                            {article.author_icon_url && (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={article.author_icon_url} alt={article.author_name ?? ''}
-                                style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0 }} />
-                            )}
-                            <span style={{ fontSize: '0.72rem', color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                              {article.author_name}
+                          {article.published_at && (
+                            <span style={{ fontSize: '0.68rem', color: '#4A5568', marginTop: 'auto' }}>
+                              {article.published_at.slice(0, 10).replace(/-/g, '/')}
                             </span>
-
-                          </div>
+                          )}
                         </div>
                       </div>
                     </a>

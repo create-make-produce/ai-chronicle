@@ -98,7 +98,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
           <div style={{ position: 'absolute', top: '-20%', right: '15%', width: '2px', height: '140%', background: 'rgba(0,140,237,0.2)', transform: 'skewX(-8deg)' }} />
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
         </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ position: 'relative', zIndex: 1 }}>
+          <div className="max-w-7xl mx-auto section-px" style={{ position: 'relative', zIndex: 1 }}>
             <nav style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
               <Link href={localizedPath(locale, '/')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navHome}</Link>
               <span>/</span>
@@ -145,7 +145,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
         </section>
 
         {/* 本文 */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-4" style={{ paddingTop: '2rem' }}>
+        <div className="max-w-5xl mx-auto section-px pb-16 space-y-4" style={{ paddingTop: '2rem' }}>
 
           {/* 概要 + リンク + ニュース */}
           {(description || hasLinks || toolNews.length > 0) && (
