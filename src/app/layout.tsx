@@ -4,6 +4,7 @@ import { Inter, Noto_Sans_JP, Anton, Orbitron, Fira_Sans, Merriweather, Shippori
 import './globals.css';
 import Header from '@/components/Header';
 import FooterWrapper from '@/components/FooterWrapper';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'], weight: ['400','700','900'], variable: '--font-inter', display: 'swap' });
 const notoSansJP = Noto_Sans_JP({ subsets: ['latin'], weight: ['300','400','700'], variable: '--font-noto', display: 'swap' });
@@ -30,13 +31,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="ja"
+      data-theme="dark"
+      suppressHydrationWarning
       className={`${inter.variable} ${notoSansJP.variable} ${anton.variable} ${orbitron.variable} ${firaSans.variable} ${merriweather.variable} ${shipporiMincho.variable}`}
     >
-      <head />
-      <body className="min-h-screen flex flex-col antialiased" style={{ background: '#111318', overflowX: 'hidden' }}>
-        <Header />
-        {children}
-        <FooterWrapper />
+      <head>
+        {/* テーマフラッシュ防止：JS実行前にdata-themeをlocalStorageから復元 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('ai-chronicle-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}`,
+          }}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col antialiased" style={{ background: 'var(--color-bg)', overflowX: 'hidden' }}>
+        <ThemeProvider>
+          <Header />
+          {children}
+          <FooterWrapper />
+        </ThemeProvider>
       </body>
     </html>
   );

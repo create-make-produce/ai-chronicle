@@ -5,9 +5,9 @@ import type { News, Locale } from '@/types';
 
 const NEWS_TYPE_LABELS = {
   price_change: { ja: '価格改定', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.3)' },
-  new_tool:     { ja: '新機能',    color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
-  new_feature:  { ja: '新機能',    color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
-  other:        { ja: 'その他',    color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
+  new_tool:     { ja: '新機能',   color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
+  new_feature:  { ja: '新機能',   color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
+  other:        { ja: 'その他',   color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
 } as const;
 
 const PER_PAGE = 4;
@@ -27,7 +27,7 @@ export default function ToolNewsSection({ news, locale }: ToolNewsSectionProps) 
   const BTN = (disabled: boolean): React.CSSProperties => ({
     padding: '4px 14px', fontSize: '0.78rem',
     background: disabled ? 'rgba(0,140,237,0.04)' : 'rgba(0,140,237,0.1)',
-    color: disabled ? '#4A5568' : '#008CED',
+    color: disabled ? 'var(--color-text-muted)' : '#008CED',
     border: '1px solid rgba(0,140,237,0.2)', borderRadius: '3px',
     cursor: disabled ? 'default' : 'pointer',
     fontFamily: 'Fira Sans, sans-serif',
@@ -36,32 +36,24 @@ export default function ToolNewsSection({ news, locale }: ToolNewsSectionProps) 
   return (
     <div>
       <h2 className="section-label mb-3">このツールのニュース</h2>
-      <div style={{ overflow: 'hidden', borderRadius: '4px', border: '1px solid rgba(0,140,237,0.08)' }}>
+      <div style={{ overflow: 'hidden', borderRadius: '4px', border: '1px solid var(--color-note-card-border)' }}>
         {paged.map((item, i) => {
           const typeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
           const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
           return (
             <Link key={item.id} href={`/news/${item.slug}`}
-              className="news-row-tool group"
-              style={{
-                display: 'block',
-                padding: '0.75rem 1rem',
-                borderBottom: i < paged.length - 1 ? '1px solid var(--color-border)' : 'none',
-                textDecoration: 'none',
-                transition: 'background 0.15s',
-              }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,140,237,0.04)'}
+              style={{ display: 'block', padding: '0.75rem 1rem', borderBottom: i < paged.length - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none', transition: 'background 0.15s' }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-row-hover)'}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
             >
-              {/* PC：横並び / スマホ：縦積み */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#4A5568', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: 'var(--color-text-timestamp)', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   {item.published_at?.substring(0, 10)}
                 </time>
                 <span style={{ fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.border}`, flexShrink: 0 }}>
                   {badge.ja}
                 </span>
-                <span className="news-title-tool" style={{ fontSize: '0.85rem', color: 'var(--color-text)', fontFamily: 'Noto Sans JP, sans-serif', lineHeight: 1.5, flex: '1 1 200px' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text)', fontFamily: 'Noto Sans JP, sans-serif', lineHeight: 1.5, flex: '1 1 200px' }}>
                   {item.title_ja}
                 </span>
               </div>
@@ -73,7 +65,7 @@ export default function ToolNewsSection({ news, locale }: ToolNewsSectionProps) 
       {totalPages > 1 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', paddingTop: '1rem' }}>
           <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} style={BTN(page === 0)}>← 前へ</button>
-          <span style={{ fontSize: '0.78rem', color: '#6B7280', fontFamily: 'Fira Sans, monospace' }}>{page + 1} / {totalPages}</span>
+          <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', fontFamily: 'Fira Sans, monospace' }}>{page + 1} / {totalPages}</span>
           <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page === totalPages - 1} style={BTN(page === totalPages - 1)}>次へ →</button>
         </div>
       )}

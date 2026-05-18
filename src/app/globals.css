@@ -1,5 +1,5 @@
 /* src/app/globals.css */
-/* AI Chronicle — Dark Theme */
+/* AI Chronicle — Dark Theme + Light Theme */
 
 @import "tailwindcss";
 
@@ -11,6 +11,10 @@
    パープル:           #8B5CF6 / bg: #0F0720
    ゴールド:           #F59E0B / bg: #1A1000
    グリーン:           #10B981 / bg: #021A0F
+   ========================================= */
+
+/* =========================================
+   🌙 DARK THEME（デフォルト）
    ========================================= */
 :root {
   /* ベース */
@@ -39,6 +43,61 @@
   --color-price-bg:    #001025;
   --color-warn:        #F97316;
   --color-warn-bg:     #1A0A00;
+
+  /* テーマ固有変数（ダーク） */
+  --color-header-bg:        #0A0D12;
+  --color-header-border:    rgba(0, 140, 237, 0.12);
+  --color-page-gradient:    linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%);
+  --color-cat-gradient:     linear-gradient(135deg, #0D1F3C 0%, #112240 60%, #0A1A35 100%);
+  --color-panel-bg:         #1A1D24;
+  --color-panel-border:     rgba(0,140,237,0.1);
+  --color-note-card-bg:     #111318;
+  --color-note-card-border: rgba(0,140,237,0.08);
+  --color-text-timestamp:   #AABBCC;
+  --color-text-nav:         #7A8A99;
+  --color-text-breadcrumb:  #4A5568;
+  --color-select-bg:        #1A1D24;
+  --color-search-bg:        rgba(255,255,255,0.05);
+  --color-tab-inactive:     #6B7280;
+  --color-row-hover:        rgba(0,140,237,0.05);
+  --color-page-btn-border:  rgba(255,255,255,0.08);
+  --color-page-btn-text:    #7A8A99;
+}
+
+/* =========================================
+   ☀️ LIGHT THEME
+   ========================================= */
+[data-theme="light"] {
+  --color-bg:          #F8FAFC;
+  --color-bg-sub:      #EEF2F7;
+  --color-bg-card:     #FFFFFF;
+  --color-bg-page:     #F8FAFC;
+
+  --color-text:        #111827;
+  --color-text-sub:    #4B5563;
+  --color-text-muted:  #6B7280;
+  --color-border:      #D1D9E6;
+  --color-border-mid:  #9CA3AF;
+
+  --color-accent-bg:   #EBF5FF;
+
+  --color-header-bg:        #FFFFFF;
+  --color-header-border:    rgba(0, 140, 237, 0.2);
+  --color-page-gradient:    linear-gradient(135deg, #F0F4F8 0%, #E8EEF4 60%, #EBF0F6 100%);
+  --color-cat-gradient:     linear-gradient(135deg, #EEF4FF 0%, #E8F0FC 60%, #EFF5FF 100%);
+  --color-panel-bg:         #FFFFFF;
+  --color-panel-border:     rgba(0,140,237,0.18);
+  --color-note-card-bg:     #F4F7FA;
+  --color-note-card-border: rgba(0,140,237,0.12);
+  --color-text-timestamp:   #6B7280;
+  --color-text-nav:         #374151;
+  --color-text-breadcrumb:  #9CA3AF;
+  --color-select-bg:        #FFFFFF;
+  --color-search-bg:        rgba(0,0,0,0.03);
+  --color-tab-inactive:     #6B7280;
+  --color-row-hover:        rgba(0,140,237,0.04);
+  --color-page-btn-border:  #D1D9E6;
+  --color-page-btn-text:    #4B5563;
 }
 
 @theme inline {
@@ -266,6 +325,8 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
     text-overflow: unset !important;
   }
 }
+
+/* スクロールバー */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--color-bg); }
 ::-webkit-scrollbar-thumb { background: var(--color-border-mid); border-radius: 2px; }
@@ -343,4 +404,9 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
     padding-left: 8px;
     padding-right: 8px;
   }
+}
+
+/* ライトモード：テーマトグルボタン */
+.theme-toggle-btn {
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }

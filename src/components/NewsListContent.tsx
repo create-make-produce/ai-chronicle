@@ -11,14 +11,13 @@ interface NewsListContentProps {
 
 export default function NewsListContent({ news, locale }: NewsListContentProps) {
   const tt = t[locale];
-
   const grouped = groupByMonth(news);
 
   return (
-    <main className="flex-1">
+    <main className="flex-1" style={{ background: 'var(--color-page-gradient)' }}>
       <div className="max-w-4xl mx-auto section-px pt-10 pb-4">
         <h1 className="hero-title text-4xl sm:text-5xl mt-3 mb-3">{tt.secLatestNews}</h1>
-        <p className="text-base text-[var(--color-text-sub)]">
+        <p style={{ fontSize: '0.95rem', color: 'var(--color-text-sub)' }}>
           {locale === 'ja'
             ? '新機能・アップデート・価格改定に関する最新情報。'
             : 'New releases, price updates, and feature announcements for AI tools.'}
@@ -29,36 +28,19 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
         <AdSlot slot="header" className="mb-8" />
 
         {news.length === 0 ? (
-          <div className="py-16 text-center text-[var(--color-text-muted)] border border-dashed border-[var(--color-border)] rounded-sm">
+          <div style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--color-text-muted)', border: '1px dashed var(--color-border)', borderRadius: '2px' }}>
             {tt.emptyNews}
           </div>
         ) : (
-          <div className="space-y-10">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
             {grouped.map(({ month, items }) => (
               <section key={month}>
-                <h2 className="font-display text-lg tracking-tight text-[var(--color-text-sub)] mb-3">
+                <h2 style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-sub)', marginBottom: '0.75rem' }}>
                   {month}
                 </h2>
-                <div className="bg-white border border-[var(--color-border)] rounded-sm divide-y divide-[var(--color-border)]">
-                  {items.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={localizedPath(locale, `/news/${item.slug}`)}
-                      className="group flex items-center gap-4 px-4 py-3 hover:bg-[var(--color-bg-sub)] transition-colors"
-                    >
-                      <time className="shrink-0 w-20 text-xs font-mono text-[var(--color-text-muted)]">
-                        {formatDateShort(item.published_at)}
-                      </time>
-                      <span className="shrink-0 badge badge-outline uppercase tracking-wider text-[10px]">
-                        {newsTypeLabel(item.news_type, tt)}
-                      </span>
-                      <span className="flex-1 text-sm font-medium truncate">
-                        {locale === 'ja' ? item.title_ja : item.title_en || item.title_ja}
-                      </span>
-                      <span className="shrink-0 text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors">
-                        →
-                      </span>
-                    </Link>
+                <div style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-border)', borderRadius: '2px', overflow: 'hidden' }}>
+                  {items.map((item, idx) => (
+                    <NewsListRow key={item.id} item={item} locale={locale} isLast={idx === items.length - 1} tt={tt} />
                   ))}
                 </div>
               </section>
@@ -67,6 +49,46 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
         )}
       </div>
     </main>
+  );
+}
+
+function NewsListRow({ item, locale, isLast, tt }: { item: News; locale: Locale; isLast: boolean; tt: TDict }) {
+  const NEWS_TYPE_LABELS = {
+    price_change: { ja: '価格改定', en: 'Price Change', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.3)' },
+    new_tool:     { ja: '新機能',   en: 'New Feature',  color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
+    new_feature:  { ja: '新機能',   en: 'New Feature',  color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
+    other:        { ja: 'その他',   en: 'Other',        color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
+  } as const;
+  const typeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
+  const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
+
+  return (
+    <Link
+      href={localizedPath(locale, `/news/${item.slug}`)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '12px',
+        padding: '0.75rem 1rem', textDecoration: 'none',
+        borderBottom: isLast ? 'none' : '1px solid var(--color-border)',
+        transition: 'background 0.12s',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-row-hover)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+    >
+      <time style={{ flexShrink: 0, fontFamily: 'Fira Sans, monospace', fontSize: '0.75rem', color: 'var(--color-text-timestamp)' }}>
+        {formatDateShort(item.published_at)}
+      </time>
+      <span style={{
+        flexShrink: 0, fontSize: '0.65rem', fontWeight: 700,
+        color: badge.color, background: badge.bg,
+        padding: '2px 7px', borderRadius: '3px', border: `1px solid ${badge.border}`,
+        letterSpacing: '0.05em',
+      }}>
+        {locale === 'ja' ? badge.ja : badge.en}
+      </span>
+      <span style={{ flex: 1, fontSize: '0.88rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {locale === 'ja' ? item.title_ja : item.title_en || item.title_ja}
+      </span>
+    </Link>
   );
 }
 

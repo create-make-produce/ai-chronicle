@@ -18,11 +18,8 @@ export default function PageSelect({ currentPage, totalPages, basePath, month, l
     router.push(`${basePath}${query}`);
   };
 
-  // 表示するページ番号を計算（1 2 3 ... 13 14 15 形式）
   const getPages = (): (number | '...')[] => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
     const pages: (number | '...')[] = [];
     if (currentPage <= 4) {
       pages.push(1, 2, 3, 4, 5, '...', totalPages);
@@ -40,18 +37,19 @@ export default function PageSelect({ currentPage, totalPages, basePath, month, l
     fontWeight: 700,
     padding: '5px 10px',
     minWidth: '34px',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: '1px solid var(--color-page-btn-border)',
     borderRadius: '4px',
     cursor: 'pointer',
     transition: 'all 0.12s',
     textAlign: 'center',
+    background: 'transparent',
   };
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
       {getPages().map((p, i) =>
         p === '...' ? (
-          <span key={`ellipsis-${i}`} style={{ ...btnBase, border: 'none', color: '#4A5568', cursor: 'default' }}>
+          <span key={`ellipsis-${i}`} style={{ ...btnBase, border: 'none', color: 'var(--color-text-muted)', cursor: 'default' }}>
             ...
           </span>
         ) : (
@@ -61,8 +59,8 @@ export default function PageSelect({ currentPage, totalPages, basePath, month, l
             style={{
               ...btnBase,
               background: p === currentPage ? '#008CED' : 'transparent',
-              color: p === currentPage ? '#000' : '#7A8A99',
-              borderColor: p === currentPage ? '#008CED' : 'rgba(255,255,255,0.08)',
+              color: p === currentPage ? '#000' : 'var(--color-page-btn-text)',
+              borderColor: p === currentPage ? '#008CED' : 'var(--color-page-btn-border)',
             }}
           >
             {p}

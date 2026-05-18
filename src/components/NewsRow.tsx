@@ -56,9 +56,9 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         alignItems: 'center',
         gap: '1rem',
         padding: '0.85rem 1.25rem',
-        borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.04)',
+        borderBottom: isLast ? 'none' : '1px solid var(--color-border)',
         textDecoration: 'none',
-        background: hovered ? 'rgba(0,140,237,0.05)' : 'transparent',
+        background: hovered ? 'var(--color-row-hover)' : 'transparent',
         transition: 'background 0.12s',
       }}
     >
@@ -73,13 +73,13 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       }}>
         {badgeLabel}
       </span>
-      <span className="news-date" style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: '#AABBCC', letterSpacing: '0.02em' }}>
+      <span className="news-date" style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: 'var(--color-text-timestamp)', letterSpacing: '0.02em' }}>
         {date}
       </span>
-      <span className="news-title" style={{ fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: '#F0EBE1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span className="news-title" style={{ fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {title}
         {toolName && (
-          <span style={{ color: '#6B7280', marginLeft: '0.5rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ color: 'var(--color-text-muted)', marginLeft: '0.5rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             —
             {logoUrl && (
               // eslint-disable-next-line @next/next/no-img-element

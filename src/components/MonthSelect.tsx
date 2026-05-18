@@ -25,14 +25,7 @@ export default function MonthSelect({ months, selectedMonth, basePath, lang = 'j
 
   return (
     <div style={{ marginBottom: '2rem' }}>
-      <label
-        style={{
-          fontFamily: 'Fira Sans, sans-serif',
-          fontSize: '0.78rem',
-          color: '#4A5568',
-          marginRight: '0.75rem',
-        }}
-      >
+      <label style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.78rem', color: 'var(--color-text-sub)', marginRight: '0.75rem' }}>
         {lang === 'ja' ? '期間を選択：' : 'Select period:'}
       </label>
       <select
@@ -44,8 +37,8 @@ export default function MonthSelect({ months, selectedMonth, basePath, lang = 'j
         style={{
           fontFamily: 'Fira Sans, sans-serif',
           fontSize: '0.85rem',
-          color: '#F0EBE1',
-          background: '#1A1D24',
+          color: 'var(--color-text)',
+          background: 'var(--color-select-bg)',
           border: '1px solid rgba(0,140,237,0.3)',
           borderRadius: '4px',
           padding: '7px 14px',
@@ -55,7 +48,7 @@ export default function MonthSelect({ months, selectedMonth, basePath, lang = 'j
         }}
       >
         {months.map((m) => (
-          <option key={m} value={m} style={{ background: '#1A1D24' }}>
+          <option key={m} value={m} style={{ background: 'var(--color-select-bg)' }}>
             {formatMonth(m, lang)}
           </option>
         ))}

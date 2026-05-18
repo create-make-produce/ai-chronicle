@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import type { Locale, ToolWithPlans, Tool, News, ToolLaunch, NoteArticle } from '@/types';
 import { t, localizedPath } from '@/lib/i18n';
-import ToolCard from './ToolCard';
 import AdSlot from './AdSlot';
 import ToolMediaTabs from './ToolMediaTabs';
 import ToolNewsSection from './ToolNewsSection';
@@ -77,27 +76,17 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
   const initials = name.slice(0, 2).toUpperCase();
   const hasLinks = officialUrl || tool.twitter_handle || tool.github_url || tool.ios_url || tool.android_url;
 
-  const statusLabel = () => {
-    switch (tool.status) {
-      case 'beta':       return tt.badgeBeta;
-      case 'inactive':
-      case 'deprecated': return tt.badgeInactive;
-      default:           return tt.badgeActive;
-    }
-  };
-
   return (
     <>
-      <main className="flex-1" style={{ background: 'linear-gradient(135deg, #040912 0%, #0A1628 60%, #081428 100%)' }}>
+      <main className="flex-1" style={{ background: 'var(--color-page-gradient)' }}>
 
-        {/* ヘッダー */}
+        {/* ヘッダー（常にダーク） */}
         <section style={{ position: 'relative', overflow: 'hidden', background: '#040912', borderBottom: '1px solid rgba(0,140,237,0.15)', paddingTop: '16px', paddingBottom: '24px' }}>
-        {/* 背景：青い斜め帯 + ドット + 縦線 */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: '-20%', left: '-5%', width: '55%', height: '140%', background: 'linear-gradient(135deg, rgba(0,80,180,0.18) 0%, rgba(0,140,237,0.08) 100%)', transform: 'skewX(-8deg)' }} />
-          <div style={{ position: 'absolute', top: '-20%', right: '15%', width: '2px', height: '140%', background: 'rgba(0,140,237,0.2)', transform: 'skewX(-8deg)' }} />
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
-        </div>
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+            <div style={{ position: 'absolute', top: '-20%', left: '-5%', width: '55%', height: '140%', background: 'linear-gradient(135deg, rgba(0,80,180,0.18) 0%, rgba(0,140,237,0.08) 100%)', transform: 'skewX(-8deg)' }} />
+            <div style={{ position: 'absolute', top: '-20%', right: '15%', width: '2px', height: '140%', background: 'rgba(0,140,237,0.2)', transform: 'skewX(-8deg)' }} />
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
+          </div>
           <div className="max-w-7xl mx-auto section-px" style={{ position: 'relative', zIndex: 1 }}>
             <nav style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
               <Link href={localizedPath(locale, '/')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navHome}</Link>
@@ -129,7 +118,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                   {name}
                 </h1>
                 {tagline && (() => {
-                  const parts = tagline.split('。').map(s => s.trim()).filter(Boolean);
+                  const parts = tagline.split('。').map((s: string) => s.trim()).filter(Boolean);
                   return parts.length > 1 ? (
                     <div>
                       <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: '#9CA3AF', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
@@ -149,12 +138,13 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
 
           {/* 概要 + リンク */}
           {(description || hasLinks) && (
-            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
-
+            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
               {description && (
                 <div className="mb-5">
-                  <h2 className="font-display text-2xl tracking-tight mb-4">概要</h2>
-                  <div className="prose prose-sm max-w-none text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">{description.replace(/<br\s*\/?>/gi, '\n')}</div>
+                  <h2 className="font-display text-2xl tracking-tight mb-4" style={{ color: 'var(--color-text)' }}>概要</h2>
+                  <div style={{ fontSize: '0.95rem', lineHeight: 1.8, color: 'var(--color-text)', whiteSpace: 'pre-wrap' }}>
+                    {description.replace(/<br\s*\/?>/gi, '\n')}
+                  </div>
                 </div>
               )}
 
@@ -172,9 +162,9 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                       <LinkBadge href={tool.android_url} icon={<GooglePlayIcon />} topLabel="ダウンロード" bottomLabel="Google Play" />
                     )}
                     {(tool.twitter_handle || tool.github_url) && (
-                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.88rem', alignItems: 'center' }}>
-                        {tool.twitter_handle && <a href={`https://x.com/${tool.twitter_handle}`} target="_blank" rel="noopener noreferrer" className="link-underline">X @{tool.twitter_handle}</a>}
-                        {tool.github_url && <a href={tool.github_url} target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a>}
+                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.88rem', alignItems: 'center', color: 'var(--color-text)' }}>
+                        {tool.twitter_handle && <a href={`https://x.com/${tool.twitter_handle}`} target="_blank" rel="noopener noreferrer" className="link-underline" style={{ color: 'var(--color-accent)' }}>X @{tool.twitter_handle}</a>}
+                        {tool.github_url && <a href={tool.github_url} target="_blank" rel="noopener noreferrer" className="link-underline" style={{ color: 'var(--color-accent)' }}>GitHub</a>}
                       </div>
                     )}
                   </div>
@@ -196,7 +186,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
 
           {/* ニュース */}
           {toolNews.length > 0 && (
-            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
               <ToolNewsSection news={toolNews} locale={locale} />
             </section>
           )}
@@ -204,8 +194,8 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
           <AdSlot slot="in-content" />
 
           {(tool.demo_url || tool.video_url) && (
-            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
-              <h2 className="font-display text-2xl tracking-tight mb-4">メディア</h2>
+            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+              <h2 className="font-display text-2xl tracking-tight mb-4" style={{ color: 'var(--color-text)' }}>メディア</h2>
               <div className="flex flex-wrap gap-3">
                 {tool.demo_url && <a href={tool.demo_url} target="_blank" rel="noopener noreferrer" className="btn-outline">デモを見る →</a>}
                 {tool.video_url && <a href={tool.video_url} target="_blank" rel="noopener noreferrer" className="btn-outline">動画を見る →</a>}
@@ -214,9 +204,9 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
           )}
 
           {tool.user_count_label && (
-            <section style={{ background: '#1A1D24', border: '1px solid rgba(0,140,237,0.1)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
               <h2 className="section-label mb-2">ユーザー数</h2>
-              <p className="font-display text-xl">{tool.user_count_label}</p>
+              <p className="font-display text-xl" style={{ color: 'var(--color-text)' }}>{tool.user_count_label}</p>
             </section>
           )}
 
