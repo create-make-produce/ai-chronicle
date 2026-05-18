@@ -121,7 +121,7 @@ export default function Header() {
             運営について
           </Link>
 
-          {/* テーマトグル */}
+          {/* テーマトグル：非表示中（使う場合は display:'none' を 'flex' に変更） */}
           <button
             onClick={toggle}
             aria-label={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
@@ -129,7 +129,7 @@ export default function Header() {
             style={{
               width: '34px',
               height: '34px',
-              display: 'flex',
+              display: 'none',
               alignItems: 'center',
               justifyContent: 'center',
               background: 'transparent',
