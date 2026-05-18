@@ -198,7 +198,7 @@ async function extractToolData(post: ProductHuntPost, pageText: string | null): 
 ${pageText ? truncateForAI(pageText, 8000) : '（取得失敗）'}
 
 AIツール定義：機械学習・LLM・画像生成AI・音声AI・コード補完AIを核心機能として使用するソフトウェア。
-以下は is_ai_tool: false とすること：PyTorch/TensorFlowなどのMLフレームワーク・ライブラリ、TPU/GPU/NPUなどのハードウェア・チップ、開発者専用SDK・API単体（UIなし）、学術論文・データセット・ベンチマーク、企業向けクラウドプラットフォーム・管理コンソール機能・インフラサービス、ニュース記事・プレスリリース・発表ページ・ブログ記事。
+以下は is_ai_tool: false とすること：PyTorch/TensorFlowなどのMLフレームワーク・ライブラリ、TPU/GPU/NPUなどのハードウェア・チップ、開発者専用SDK・API単体（UIなし）、学術論文・データセット・ベンチマーク、企業向けクラウドプラットフォーム・管理コンソール機能・インフラサービス。
 
 {"is_ai_tool":true/false,"tool_name":"製品名のみ（会社名は含めない）またはnull","tagline":"英語キャッチコピーまたはnull","description":"3文以内英語またはnull","company_name":"会社名またはnull","has_free_plan":true/false/null,"starting_price_usd":数値またはnull,"category_hint":"text-generation/image-generation/coding/audio/data-analysis/productivity/agent/other","tags":["タグ"],"has_api":true/false/null,"supported_languages":["en"]またはnull}`;
   const raw = await callAI(prompt);

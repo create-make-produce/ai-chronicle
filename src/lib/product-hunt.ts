@@ -27,7 +27,30 @@ export interface ProductHuntPost {
   product_url: string | null;   // PHの製品ページURL
 }
 
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const TOKEN_CACHE_PATH = resolve(process.cwd(), '.ph-token-cache.json');
 let cachedToken: { token: string; expiresAt: number } | null = null;
+
+function loadTokenCache(): void {
+  try {
+    if (existsSync(TOKEN_CACHE_PATH)) {
+      const data = JSON.parse(readFileSync(TOKEN_CACHE_PATH, 'utf-8')) as { token: string; expiresAt: number };
+      if (data.token && data.expiresAt > Date.now() + 60_000) {
+        cachedToken = data;
+      }
+    }
+  } catch { /* キャッシュ読み込み失敗は無視 */ }
+}
+
+function saveTokenCache(token: string, expiresAt: number): void {
+  try {
+    writeFileSync(TOKEN_CACHE_PATH, JSON.stringify({ token, expiresAt }), 'utf-8');
+  } catch { /* キャッシュ保存失敗は無視 */ }
+}
+
+loadTokenCache();
 
 async function getAccessToken(): Promise<string> {
   if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
@@ -61,10 +84,10 @@ async function getAccessToken(): Promise<string> {
     expires_in: number;
   };
 
-  cachedToken = {
-    token: json.access_token,
-    expiresAt: Date.now() + json.expires_in * 1000,
-  };
+  const expiresAt = Date.now() + json.expires_in * 1000;
+  cachedToken = { token: json.access_token, expiresAt };
+  saveTokenCache(json.access_token, expiresAt);
+  console.log('  → PHトークン取得・キャッシュ保存');
 
   return json.access_token;
 }

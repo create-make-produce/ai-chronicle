@@ -61,7 +61,6 @@ scripts/collect-note-tools.ts
 scripts/collect-news-bulk.ts
 
 # シードスクリプト（ローカルのみ・GitHubに上げない）
-scripts/seed-ph-top100.ts
 scripts/seed-ph-product.ts
 scripts/seed-ph-product-temp.ts
 scripts/seed-from-url.ts
@@ -70,3 +69,6 @@ scripts/register-note-url.ts
 # 管理画面（ローカル専用・GitHubに上げない）
 src/app/admin/
 src/app/api/admin/
+
+# Product Hunt トークンキャッシュ（ローカルのみ）
+.ph-token-cache.json

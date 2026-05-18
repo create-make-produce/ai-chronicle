@@ -1,0 +1,35 @@
+name: Seed PH Top 300
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: '取得件数（デフォルト: 300）'
+        required: false
+        default: '300'
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run seed-ph-top100
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          PRODUCT_HUNT_API_KEY: ${{ secrets.PRODUCT_HUNT_API_KEY }}
+          PRODUCT_HUNT_API_SECRET: ${{ secrets.PRODUCT_HUNT_API_SECRET }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx tsx scripts/seed-ph-top100.ts ${{ github.event.inputs.count }}
