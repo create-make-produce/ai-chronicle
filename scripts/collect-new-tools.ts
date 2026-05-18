@@ -38,9 +38,9 @@ const CATEGORY_MAP: Record<string, string> = {
   'video-generation': 'image-generation', video: 'image-generation',
   coding: 'coding', code: 'coding', developer: 'coding',
   audio: 'audio', music: 'audio', voice: 'audio', speech: 'audio',
-  'data-analysis': 'productivity', data: 'productivity', analytics: 'productivity',
+  'data-analysis': 'research', data: 'research', analytics: 'research', analysis: 'research',
   productivity: 'productivity', workflow: 'productivity', automation: 'productivity',
-  research: 'research', analysis: 'research', analytics: 'research', data: 'research',
+  research: 'research',
   marketing: 'marketing', seo: 'marketing', advertising: 'marketing', social: 'marketing',
   agent: 'productivity', autonomous: 'productivity', workflow_ai: 'productivity',
 };
