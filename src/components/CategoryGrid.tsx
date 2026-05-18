@@ -10,9 +10,9 @@ const ICON_FILE: Record<string, string> = {
   'image-generation': 'cat-image.png',
   'coding':           'cat-coding.png',
   'audio':            'cat-audio.png',
-  'data-analysis':    'cat-data.png',
   'productivity':     'cat-productivity.png',
-  'agent':            'cat-agent.png',
+  'research':         'cat-research.png',
+  'marketing':        'cat-marketing.png',
   'other':            'cat-other.png',
 };
 
@@ -23,16 +23,16 @@ function FallbackIcon({ slug }: { slug: string }) {
       return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="14" height="2" rx="1"/><rect x="3" y="15" width="10" height="2" rx="1"/></svg>;
     case 'image-generation':
       return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
-    case 'agent':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><circle cx="19" cy="7" r="2"/><path d="M19 9v2m0 2h.01"/></svg>;
     case 'coding':
       return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>;
     case 'audio':
       return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
-    case 'data-analysis':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>;
     case 'productivity':
       return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+    case 'research':
+      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>;
+    case 'marketing':
+      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>;
     default:
       return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="#fff"/></svg>;
   }

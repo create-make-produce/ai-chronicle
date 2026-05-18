@@ -54,9 +54,11 @@ const CATEGORY_MAP: Record<string, string> = {
   'video-generation': 'image-generation', video: 'image-generation',
   coding: 'coding', code: 'coding', developer: 'coding',
   audio: 'audio', music: 'audio', voice: 'audio', speech: 'audio',
-  'data-analysis': 'data-analysis', data: 'data-analysis', analytics: 'data-analysis',
+  'data-analysis': 'productivity', data: 'productivity', analytics: 'productivity',
   productivity: 'productivity', workflow: 'productivity', automation: 'productivity',
-  agent: 'agent', autonomous: 'agent', workflow_ai: 'agent',
+  research: 'research', analysis: 'research', analytics: 'research', data: 'research',
+  marketing: 'marketing', seo: 'marketing', advertising: 'marketing', social: 'marketing',
+  agent: 'productivity', autonomous: 'productivity', workflow_ai: 'productivity',
 };
 
 // =====================
@@ -171,7 +173,17 @@ ${pageText ? truncateForAI(pageText, 8000) : '（取得失敗）'}
 AIツール定義：機械学習・LLM・画像生成AI・音声AI・コード補完AIを核心機能として使用するソフトウェア。
 以下は is_ai_tool: false とすること：PyTorch/TensorFlowなどのMLフレームワーク・ライブラリ、TPU/GPU/NPUなどのハードウェア・チップ、開発者専用SDK・API単体（UIなし）、学術論文・データセット・ベンチマーク、企業向けクラウドプラットフォーム・管理コンソール機能・インフラサービス。
 
-{"is_ai_tool":true/false,"tool_name":"製品名のみ（会社名は含めない・例: Claude by AnthropicならClaudeのみ）またはnull","tagline":"英語キャッチコピーまたはnull","description":"3文以内英語またはnull","company_name":"会社名またはnull","has_free_plan":true/false/null,"starting_price_usd":数値またはnull,"category_hint":"text-generation/image-generation/coding/audio/data-analysis/productivity/agent/other","tags":["タグ"],"has_api":true/false/null,"supported_languages":["en"]またはnull}`;
+【カテゴリ判定ルール（上から順に判定し、最初に該当したものを選ぶ）】
+1. image-generation: 画像生成・動画生成・動画編集・映像変換・字幕・SNS動画作成が主機能 → 迷わずimage-generation
+2. audio: 音声生成・音楽生成・文字起こし・声クローン・ポッドキャストが主機能 → audio
+3. coding: コード生成・補完・デバッグ・テスト・開発支援が主機能 → coding
+4. text-generation: テキスト生成・ライティング・翻訳・要約・チャットが主機能 → text-generation
+5. productivity: 業務効率化・タスク管理・会議要約・メール自動化・ワークフロー・カスタマーサポート自動化・スケジュール管理
+6. research: Web検索・情報収集・リサーチ・データ分析・表データ解析・グラフ化・売上分析・予測分析・要約が主目的
+7. marketing: SNS投稿作成・広告コピー生成・SEO記事・メールマーケティング・LP改善・集客・販売促進が主目的。文章生成が手段でも目的がマーケティングならここ
+8. other: 明らかにAIツールだが上記いずれにも当てはまらない場合のみ
+
+{"is_ai_tool":true/false,"tool_name":"製品名のみ（会社名は含めない・例: Claude by AnthropicならClaudeのみ）またはnull","tagline":"英語キャッチコピーまたはnull","description":"3文以内英語またはnull","company_name":"会社名またはnull","has_free_plan":true/false/null,"starting_price_usd":数値またはnull,"category_hint":"text-generation（テキスト生成・ライティング・翻訳・要約・チャットボット・文章校正）/image-generation（画像・動画・映像の生成・編集・変換・字幕生成・SNS動画作成）/audio（音声生成・音楽生成・文字起こし・声のクローン・ポッドキャスト編集）/coding（コード生成・補完・レビュー・デバッグ・テスト自動化・開発支援）/productivity（業務効率化・タスク管理・会議要約・メール自動化・ワークフロー・スケジュール管理）/research（情報収集・Web検索・リサーチ・データ分析・グラフ化・売上分析・予測分析・要約）/marketing（SNS投稿・広告コピー・SEO記事・メールマーケティング・LP改善・集客・販売促進）/other（上記いずれにも明確に当てはまらない場合のみ）","tags":["タグ"],"has_api":true/false/null,"supported_languages":["en"]またはnull}`;
 
   const raw = await callAI(prompt);
   const sanitized = raw.replace(/("(?:[^"\\]|\\.)*")/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
