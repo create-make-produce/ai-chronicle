@@ -363,7 +363,7 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
   .cat-icon {
     top: auto !important;
     bottom: 4px !important;
-    right: 6px !important;
+    right: 18px !important;
     transform: none !important;
     width: 36px !important;
     height: 36px !important;
