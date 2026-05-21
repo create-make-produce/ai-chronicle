@@ -92,14 +92,14 @@ async function findExistingTool(
 ): Promise<{ id: string; name_ja: string; name_en: string; slug: string } | null> {
   // 1. PH投稿IDで照合（最も確実）
   const byId = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
-    `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? AND is_published = 1 LIMIT 1`,
+    `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? LIMIT 1`,
     [post.id]
   );
   if (byId) return byId;
 
   // 2. ツール名（英語）完全一致（大文字小文字無視）
   const byName = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
-    `SELECT id, name_ja, name_en, slug FROM tools WHERE LOWER(name_en) = LOWER(?) AND is_published = 1 LIMIT 1`,
+    `SELECT id, name_ja, name_en, slug FROM tools WHERE LOWER(name_en) = LOWER(?) LIMIT 1`,
     [post.name]
   );
   if (byName) return byName;
@@ -108,7 +108,7 @@ async function findExistingTool(
   if (post.product_slug) {
     const normalizedProductSlug = post.product_slug.replace(/[-\s]/g, '').toLowerCase();
     const allTools = await db.query<{ id: string; name_ja: string; name_en: string; slug: string }>(
-      `SELECT id, name_ja, name_en, slug FROM tools WHERE is_published = 1`
+      `SELECT id, name_ja, name_en, slug FROM tools`
     );
     for (const tool of allTools) {
       const normalizedNameEn = tool.name_en.replace(/[-\s]/g, '').toLowerCase();
@@ -364,6 +364,18 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const translated = await translateToJapanese(post.name, extracted.tagline ?? post.tagline, extracted.description ?? post.description);
     const categoryId = await resolveCategoryId(db, extracted.category_hint);
     const nameEn = extracted.tool_name ?? post.name;
+
+    // Gemini抽出後のtool_nameで再度重複チェック（post.nameと異なる場合に重複登録を防ぐ）
+    if (extracted.tool_name && extracted.tool_name.toLowerCase() !== post.name.toLowerCase()) {
+      const duplicateByExtractedName = await db.first<{ count: number }>(
+        `SELECT COUNT(*) AS count FROM tools WHERE LOWER(name_en) = LOWER(?)`, [extracted.tool_name]
+      );
+      if (duplicateByExtractedName && duplicateByExtractedName.count > 0) {
+        console.log(`  ⏭️ スキップ: 抽出名が既存ツールと重複（${extracted.tool_name}）`);
+        return { success: true, skipped: true };
+      }
+    }
+
     const slug = await generateUniqueSlug(db, nameEn, post.website);
     const toolId = generateId('tool');
 
