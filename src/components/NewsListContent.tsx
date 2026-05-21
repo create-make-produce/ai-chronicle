@@ -54,8 +54,8 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
 
 function NewsListRow({ item, locale, isLast, tt }: { item: News; locale: Locale; isLast: boolean; tt: TDict }) {
   const NEWS_TYPE_LABELS = {
-    price_change: { ja: '価格改定', en: 'Price Change', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.3)' },
-    new_tool:     { ja: '新機能',   en: 'New Feature',  color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
+    price_change: { ja: '料金改定', en: 'Price Change', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.3)' },
+    new_tool:     { ja: '新ツール', en: 'New Tool',     color: '#FB7185', bg: 'rgba(251,113,133,0.12)', border: 'rgba(251,113,133,0.3)' },
     new_feature:  { ja: '新機能',   en: 'New Feature',  color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
     other:        { ja: 'その他',   en: 'Other',        color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
   } as const;
