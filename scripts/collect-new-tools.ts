@@ -90,18 +90,33 @@ async function findExistingTool(
   db: D1Client,
   post: ProductHuntPost
 ): Promise<{ id: string; name_ja: string; name_en: string; slug: string } | null> {
+  // 1. PH投稿IDで照合（最も確実）
   const byId = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
     `SELECT id, name_ja, name_en, slug FROM tools WHERE product_hunt_id = ? AND is_published = 1 LIMIT 1`,
     [post.id]
   );
   if (byId) return byId;
 
-  // name_en 大文字小文字無視でフォールバック照合
+  // 2. ツール名（英語）完全一致（大文字小文字無視）
   const byName = await db.first<{ id: string; name_ja: string; name_en: string; slug: string }>(
     `SELECT id, name_ja, name_en, slug FROM tools WHERE LOWER(name_en) = LOWER(?) AND is_published = 1 LIMIT 1`,
     [post.name]
   );
-  return byName ?? null;
+  if (byName) return byName;
+
+  // 3. PHの製品識別子とツール名をスペース・ハイフン・大文字小文字を無視して比較
+  if (post.product_slug) {
+    const normalizedProductSlug = post.product_slug.replace(/[-\s]/g, '').toLowerCase();
+    const allTools = await db.query<{ id: string; name_ja: string; name_en: string; slug: string }>(
+      `SELECT id, name_ja, name_en, slug FROM tools WHERE is_published = 1`
+    );
+    for (const tool of allTools) {
+      const normalizedNameEn = tool.name_en.replace(/[-\s]/g, '').toLowerCase();
+      if (normalizedNameEn === normalizedProductSlug) return tool;
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -311,9 +326,31 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       } catch { /* ignore */ }
     }
 
-    // ChatGPT GPTs・カスタムGPTはスキップ
-    if (post.website?.includes('chatgpt.com/g/')) {
-      console.log(`  ⏭️ スキップ: ChatGPT GPTs（${post.name}）`);
+    // 既存ツール照合を先に実行（is_ai_tool判定より優先）
+    const existingToolCheck = await findExistingTool(db, post);
+    if (existingToolCheck) {
+      // 既存ツールにヒット → ニュースとして保存してスキップ
+      const existingByPostId = await db.first<{ id: string }>(
+        `SELECT id FROM news WHERE source_ph_post_id = ? LIMIT 1`, [post.id]
+      );
+      if (!existingByPostId) {
+        const today = new Date().toISOString().slice(0, 10);
+        const existingByDate = await db.first<{ id: string }>(
+          `SELECT id FROM news WHERE tool_id = ? AND date(published_at) = ? LIMIT 1`,
+          [existingToolCheck.id, today]
+        );
+        if (!existingByDate) {
+          const taglineJa = post.tagline ? await translateLaunchTagline(post.tagline).catch(() => null) : null;
+          const launchDate = (post as any).featuredAt ? String((post as any).featuredAt).substring(0, 10) : null;
+          const newsType = await detectNewsType(post.name, post.tagline ?? null);
+          await createNews(db, {
+            type: newsType === 'price_change' ? 'price_change_launch' : 'new_feature',
+            tool: { id: existingToolCheck.id, slug: existingToolCheck.slug, name_ja: existingToolCheck.name_ja, name_en: existingToolCheck.name_en },
+            launch: { launch_name: post.name, tagline: post.tagline ?? null, tagline_ja: taglineJa, launch_date: launchDate, ph_post_id: post.id },
+          });
+          console.log(`  📰 既存ツールのニュースとして保存: ${existingToolCheck.name_en} → ${post.name}`);
+        }
+      }
       return { success: true, skipped: true };
     }
 
