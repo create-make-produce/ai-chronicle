@@ -36,9 +36,9 @@ let cachedToken: { token: string; expiresAt: number } | null = null;
 function loadTokenCache(): void {
   try {
     if (existsSync(TOKEN_CACHE_PATH)) {
-      const data = JSON.parse(readFileSync(TOKEN_CACHE_PATH, 'utf-8')) as { token: string; expiresAt: number };
-      if (data.token && data.expiresAt > Date.now() + 60_000) {
-        cachedToken = data;
+      const data = JSON.parse(readFileSync(TOKEN_CACHE_PATH, 'utf-8')) as { token: string; expiresAt: number | null };
+      if (data.token && (data.expiresAt === null || data.expiresAt > Date.now() + 60_000)) {
+        cachedToken = { token: data.token, expiresAt: data.expiresAt ?? Infinity };
       }
     }
   } catch { /* キャッシュ読み込み失敗は無視 */ }
@@ -53,7 +53,7 @@ function saveTokenCache(token: string, expiresAt: number): void {
 loadTokenCache();
 
 async function getAccessToken(): Promise<string> {
-  if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
+  if (cachedToken && (cachedToken.expiresAt === Infinity || cachedToken.expiresAt > Date.now() + 60_000)) {
     return cachedToken.token;
   }
 
