@@ -79,7 +79,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       <span className="news-title" style={{ fontFamily: lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {title}
         {toolName && (
-          <span style={{ color: 'var(--color-text-muted)', marginLeft: '0.5rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ color: '#9BA8B8', marginLeft: '0.5rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             —
             {logoUrl && (
               // eslint-disable-next-line @next/next/no-img-element
