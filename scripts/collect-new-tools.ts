@@ -261,8 +261,8 @@ async function translateToJapanese(phName: string, tagline: string | null, descr
 - tagline: ${tagline ?? '（なし）'}
 - description: ${description ?? '（なし）'}
 
-tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、最大2文、会社名・製品名禁止
-description_jaルール：2文・合計200文字以内・会社名・製品名・バージョン禁止・日本のAI初心者にもわかりやすい言葉で書く・「。」の後に改行（\n）を入れる・1文目は何ができるかと主な機能をまとめて書く・2文目は想定ユーザーで締める
+tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、25文字以内、会社名・製品名禁止
+description_jaルール：最大4文、合計200文字以内、会社名・製品名・バージョン禁止、日本のAI初心者にもわかりやすい言葉で書く、何ができるか・特徴・想定ユーザーを含む、各文末に「。」をつける
 search_keywordsルール：製品名のみ（機能説明・会社名・バージョン番号は絶対に入れない）英語の製品名とカタカナ読みのみ 例: "Fathom,ファザム" / "Claude,クロード" / "ChatGPT,チャットGPT"
 
 {"tagline_ja":"翻訳結果またはnull","description_ja":"各文末に「。」をつけた日本語概要またはnull","search_keywords":"keyword1,keyword2"}`;

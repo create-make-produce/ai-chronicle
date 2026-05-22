@@ -386,10 +386,20 @@ export function isAITool(post: ProductHuntPost): boolean {
  * AIツールの最新投稿のみに絞り込む（collect-new-toolsで使用）
  */
 export async function fetchLatestAIPosts(count: number = CONFIG.PRODUCT_HUNT_POSTS_PER_REQUEST): Promise<ProductHuntPost[]> {
-  const posts = await fetchLatestPosts(count);
-  return posts
-    .filter((p) => p.votesCount >= CONFIG.PRODUCT_HUNT_MIN_VOTES)
-    .filter(isAITool);
+  const query = `
+    query LatestAIPostsSingle($first: Int!) {
+      posts(first: $first, topic: "artificial-intelligence", order: NEWEST) {
+        edges { node { ${POST_FIELDS} } }
+      }
+    }
+  `;
+
+  type ResponseType = {
+    posts: { edges: Array<{ node: RawPostNode }> };
+  };
+
+  const data = await graphqlQuery<ResponseType>(query, { first: count });
+  return Promise.all(data.posts.edges.map(e => processPostNode(e.node)));
 }
 
 /**

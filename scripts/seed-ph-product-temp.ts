@@ -132,8 +132,8 @@ async function translateToJapanese(phName: string, tagline: string | null, descr
 【ツール名】: ${phName}
 - tagline: ${tagline ?? '（なし）'}
 - description: ${description ?? '（なし）'}
-tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、25文字以内、句読点なし
-description_jaルール：最大4文、合計200文字以内、「。」を文末につけその直後に改行（\\n）
+tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、25文字以内、会社名・製品名禁止
+description_jaルール：最大4文、合計200文字以内、会社名・製品名・バージョン禁止、日本のAI初心者にもわかりやすい言葉で書く、何ができるか・特徴・想定ユーザーを含む、各文末に「。」をつける
 search_keywordsルール：製品名とカタカナ読みのみ 例: "ChatGPT,チャットGPT" / "Claude,クロード"
 {"tagline_ja":"翻訳結果またはnull","description_ja":"翻訳結果またはnull","search_keywords":"keyword1,keyword2,..."}`;
   const raw = await callAI(prompt);
