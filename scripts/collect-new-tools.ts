@@ -218,7 +218,18 @@ async function extractToolData(post: ProductHuntPost, pageText: string | null): 
 ${pageText ? truncateForAI(pageText, 8000) : '（取得失敗）'}
 
 AIツール定義：機械学習・LLM・画像生成AI・音声AI・コード補完AIを核心機能として使用するソフトウェア。
-以下は is_ai_tool: false とすること：PyTorch/TensorFlowなどのMLフレームワーク・ライブラリ、TPU/GPU/NPUなどのハードウェア・チップ、開発者専用SDK・API単体（UIなし）、学術論文・データセット・ベンチマーク、企業向けクラウドプラットフォーム・管理コンソール機能・インフラサービス。
+以下は is_ai_tool: false とすること：
+・PyTorch/TensorFlowなどのMLフレームワーク・ライブラリ
+・TPU/GPU/NPUなどのハードウェア・チップ
+・開発者専用SDK・API単体（UIなし）
+・MCPサーバー・MCPプロトコル実装
+・学術論文・データセット・ベンチマーク
+・通知・メール・SMS・プッシュ配信などの送信インフラ
+・AIエージェント向けのセキュリティ・権限・鍵管理ツール
+・ロボティクス・ハードウェア制御のIDE・シミュレーター
+・企業向けクラウドインフラ・監視・ログ管理サービス
+・VSCode等の拡張機能マーケットプレイスのページ（公式サイトではない）
+・エンドユーザーが直接使うUIを持たない開発者向けツール全般
 
 【カテゴリ判定ルール（上から順に判定し、最初に該当したものを選ぶ）】
 1. image-generation: 画像生成・動画生成・動画編集・映像変換・字幕・SNS動画作成が主機能 → 迷わずimage-generation
@@ -248,7 +259,7 @@ async function translateToJapanese(phName: string, tagline: string | null, descr
 - description: ${description ?? '（なし）'}
 
 tagline_jaルール：「[カテゴリ] [キャッチコピー]」形式、最大2文、会社名・製品名禁止
-description_jaルール：最大4文・合計200文字以内・会社名・製品名・バージョン禁止・中学生でも意味がわかる日本語で書く・禁止語尾：「〜することが可能です」「〜をサポートします」「〜を実現します」「〜に最適です」「〜となっています」・「です・ます」は4文中2文まで、残りは体言止めか「〜できる」「〜が特徴」で締める・禁止語：「インサイト」「ソリューション」「シームレス」「ワークフロー」「スケーラブル」「オンボーディング」「エンゲージメント」（日本語に言い換えられるカタカナ専門用語全般）
+description_jaルール：2文・合計200文字以内・会社名・製品名・バージョン禁止・日本のAI初心者にもわかりやすい言葉で書く・「。」の後に改行（\n）を入れる・1文目は何ができるかと主な機能をまとめて書く・2文目は想定ユーザーで締める
 search_keywordsルール：製品名のみ（機能説明・会社名・バージョン番号は絶対に入れない）英語の製品名とカタカナ読みのみ 例: "Fathom,ファザム" / "Claude,クロード" / "ChatGPT,チャットGPT"
 
 {"tagline_ja":"翻訳結果またはnull","description_ja":"各文末に「。」をつけた日本語概要またはnull","search_keywords":"keyword1,keyword2"}`;
@@ -386,16 +397,18 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
     const isGithubOnly = officialUrl ? officialUrl.includes('github.com') : false;
+    const isStoreOnly = officialUrl ? (officialUrl.includes('apps.apple.com') || officialUrl.includes('play.google.com')) : false;
     const hasCompany = !!(extracted.company_name ?? null);
     const hasLogo = !!logoUrl;
-    const isPublished = hasOfficialUrl && confidenceOk && !isGithubOnly && hasCompany && hasLogo ? 1 : 0;
+    const isPublished = hasOfficialUrl && confidenceOk && !isGithubOnly && !isStoreOnly && hasCompany && hasLogo ? 1 : 0;
     if (isGithubOnly) console.log(`  ⚠ GitHub URLのため非公開: ${slug}`);
+    if (isStoreOnly) console.log(`  ⚠ App Store/Google Play URLのため非公開: ${slug}`);
     if (!hasCompany) console.log(`  ⚠ 会社名なしのため非公開: ${slug}`);
     if (!hasLogo) console.log(`  ⚠ ロゴなしのため非公開: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;
 
     const hasAppUrl = !!(post.ios_url ?? post.android_url);
-    const unpublishCondition = isGithubOnly || !hasCompany || !hasLogo;
+    const unpublishCondition = isGithubOnly || isStoreOnly || !hasCompany || !hasLogo;
     const toolStatus = (hasAppUrl && !unpublishCondition) ? 'pending' : 'active';
     const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
     if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);
