@@ -85,7 +85,7 @@ export default function HomeContent(p: HomeContentProps) {
 
       {/* 注目のNote記事（カテゴリ別） */}
       {categoryNotes.length > 0 && (
-        <Sec bg="var(--color-bg-sub)">
+        <Sec bg="var(--color-cat-gradient)">
           <SectionHead label="注目のNote記事" />
           <style>{`
             .note-slider::-webkit-scrollbar { height: 8px; cursor: pointer; }
