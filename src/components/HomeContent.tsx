@@ -88,8 +88,8 @@ export default function HomeContent(p: HomeContentProps) {
         <Sec bg="var(--color-bg-sub)">
           <SectionHead label="注目のNote記事" />
           <style>{`
-            .note-slider::-webkit-scrollbar { height: 6px; }
-            .note-slider::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+            .note-slider::-webkit-scrollbar { height: 8px; cursor: pointer; }
+            .note-slider::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
             .note-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; }
             .note-slider::-webkit-scrollbar-thumb:hover { background: #33AAFF; }
             @media (max-width: 767px) { .note-card { width: 60vw !important; } }
@@ -97,15 +97,20 @@ export default function HomeContent(p: HomeContentProps) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             {categoryNotes.map(cat => (
               <div key={cat.category_id}>
-                {/* カテゴリ行ヘッダー */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <Link href={`/tools?cat=${cat.category_slug}`}
-                    style={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em',
-                      textTransform: 'uppercase', color: 'var(--color-accent)', textDecoration: 'none',
-                      whiteSpace: 'nowrap' }}>
+                {/* カテゴリバッジ */}
+                <div style={{ marginBottom: '12px' }}>
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '4px 14px',
+                    background: '#008CED',
+                    color: '#fff',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    borderRadius: '4px',
+                    letterSpacing: '0.05em',
+                  }}>
                     {cat.category_name_ja}
-                  </Link>
-                  <div style={{ flex: 1, height: '1px', background: 'var(--color-border)' }} />
+                  </span>
                 </div>
                 {/* スライダー */}
                 <div className="note-slider" style={{
@@ -130,13 +135,6 @@ export default function HomeContent(p: HomeContentProps) {
                         WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
                         {article.title}
                       </p>
-                      {/* いいね数 */}
-                      {article.likes_count > 0 && (
-                        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-sub)',
-                          marginTop: '4px', display: 'block' }}>
-                          ♥ {article.likes_count}
-                        </span>
-                      )}
                     </a>
                   ))}
                 </div>

@@ -343,8 +343,12 @@ export async function getTopNoteArticlesByCategory(limitPerCategory = 10): Promi
   );
 
   // カテゴリごとにグループ化・上位limitPerCategory件に絞る
+  // 同じnote_urlが複数ツール（カテゴリ）に登録されている場合は最初の1件のみ採用
   const map = new Map<string, CategoryNoteArticles>();
+  const seenUrls = new Set<string>();
   for (const row of rows) {
+    if (seenUrls.has(row.note_url)) continue;
+    seenUrls.add(row.note_url);
     if (!map.has(row.category_id)) {
       map.set(row.category_id, {
         category_id: row.category_id,
