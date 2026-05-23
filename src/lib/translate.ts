@@ -49,13 +49,13 @@ export async function translateToJapanese(
 - description: ${description ?? '（なし）'}
 
 tagline_jaルール：
-・「[カテゴリ] [キャッチコピー]」形式・25文字以内・会社名・製品名禁止
+・「[カテゴリ] [キャッチコピー]」形式・35文字以内・会社名・製品名禁止
 ・「ソリューション」「シームレス」「インサイト」「ワークフロー」「エコシステム」等のカタカナ業界用語禁止
 ・何ができるかを具体的な動詞で表現する（例：「議事録を自動で文字起こし」「コードのバグを瞬時に検出」「SNS投稿をAIが自動で作成」）
 ・抽象的なキャッチコピー（「あなたの可能性を広げる」等）禁止
 
 description_jaルール：
-・最大4文・合計200文字以内
+・最低150文字・400文字以内
 ・会社名・製品名・バージョン番号禁止
 ・日本のAI初心者にも分かりやすい言葉で書く
 ・何ができるか・特徴・想定ユーザーを含む
@@ -67,7 +67,7 @@ description_jaルール：
 search_keywordsルール：製品名のみ（機能説明・会社名・バージョン番号は絶対に入れない）英語の製品名とカタカナ読みのみ
 例: "Fathom,ファザム" / "Claude,クロード" / "ChatGPT,チャットGPT" / "Midjourney,ミッドジャーニー"
 
-{"tagline_ja":"翻訳結果またはnull","description_ja":"各文末に「。」をつけた日本語概要またはnull","search_keywords":"keyword1,keyword2"}`;
+{"tagline_ja":"翻訳結果またはnull","description_ja":"150〜400文字・各文末に「。」をつけた日本語概要またはnull","search_keywords":"keyword1,keyword2"}`;
 
   const raw = await callAI(prompt);
   const sanitized = raw.replace(
