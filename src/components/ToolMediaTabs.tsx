@@ -72,6 +72,15 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                 <p style={{ color: 'var(--color-text-muted)', fontSize: '0.88rem', lineHeight: 1.8, marginBottom: '0.75rem' }}>
                   {toolName} に関する<br className="note-empty-br" />Note記事はまだありません
                 </p>
+                {/* ブルーオーシャン提案 */}
+                <div style={{ margin: '1rem auto', maxWidth: '480px', padding: '12px 16px', background: 'rgba(0,140,237,0.06)', border: '1px solid rgba(0,140,237,0.25)', borderRadius: '6px', textAlign: 'left' }}>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#008CED', margin: '0 0 6px', letterSpacing: '0.05em' }}>
+                    🎯 ブルーオーシャンチャンス
+                  </p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-sub)', lineHeight: 1.7, margin: 0 }}>
+                    このツールに関する日本語のNote記事はまだほとんどありません。いち早く紹介記事を書くことで、検索での先行者利益を狙えるかもしれません。
+                  </p>
+                </div>
                 <a href={`https://note.com/search?q=${encodeURIComponent(toolName + ' AI')}`}
                   target="_blank" rel="noopener noreferrer"
                   style={{ fontSize: '0.8rem', color: '#008CED', display: 'inline-block', marginBottom: '1rem' }}
@@ -95,6 +104,20 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                     .note-slider-item { flex: 0 0 72vw; max-width: 260px; scroll-snap-align: start; }
                   }
                 `}</style>
+                {/* 記事が少ない場合のブルーオーシャン提案 */}
+                {noteArticles.length <= 5 && (
+                  <div style={{ marginBottom: '1rem', padding: '10px 14px', background: 'rgba(0,140,237,0.06)', border: '1px solid rgba(0,140,237,0.25)', borderRadius: '6px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                    <span style={{ fontSize: '1rem', flexShrink: 0 }}>🎯</span>
+                    <div>
+                      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#008CED', margin: '0 0 3px', letterSpacing: '0.05em' }}>
+                        ブルーオーシャンチャンス
+                      </p>
+                      <p style={{ fontSize: '0.73rem', color: 'var(--color-text-sub)', lineHeight: 1.7, margin: 0 }}>
+                        このツールに関する日本語のNote記事はまだ{noteArticles.length}件しかありません。いち早く紹介記事を書くことで、検索での先行者利益を狙えるかもしれません。
+                      </p>
+                    </div>
+                  </div>
+                )}
                 <div className="note-slider" ref={sliderRef}>
                   {pagedNotes.map(article => (
                     <a key={article.id} href={article.note_url} target="_blank" rel="noopener noreferrer"

@@ -109,6 +109,37 @@ export default function HeroSection({ locale }: HeroSectionProps) {
                 {locale === 'ja' ? '最新情報' : 'LATEST INFO'}
               </h2>
             </motion.div>
+
+            <motion.div
+              initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
+              transition={{ duration:0.4, delay:0.22 }}
+              style={{ marginTop: '12px' }}>
+              <p style={{
+                fontFamily:    'var(--font-noto), sans-serif',
+                fontSize:      'clamp(0.72rem, 1.4vw, 0.85rem)',
+                color:         '#6B8FAF',
+                lineHeight:    1.7,
+                margin:        0,
+              }}>
+                {locale === 'ja'
+                  ? '海外の最新AIツールをどこよりも早く日本語でお届け'
+                  : 'Breaking AI tool news from around the world, in Japanese'}
+              </p>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+                {['速報', '英語一次情報', '日本語解説'].map(tag => (
+                  <span key={tag} style={{
+                    fontSize:      '0.58rem',
+                    fontWeight:    700,
+                    letterSpacing: '0.08em',
+                    color:         '#008CED',
+                    border:        '1px solid rgba(0,140,237,0.4)',
+                    borderRadius:  '2px',
+                    padding:       '2px 8px',
+                    background:    'rgba(0,140,237,0.06)',
+                  }}>{tag}</span>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
           {/* 右下：検索ボックス */}
