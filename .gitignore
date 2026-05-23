@@ -80,3 +80,13 @@ scripts/extract-unchecked.ts
 scripts/apply-check-results.ts
 unchecked-tools.csv
 check-results.csv
+
+# ドキュメント・メモ（GitHubに上げない）
+*.md
+
+# PHデバッグスクリプト（不要）
+ph-debug.mjs
+ph-debug2.mjs
+ph-debug3.mjs
+ph-debug4.mjs
+ph-debug5.mjs

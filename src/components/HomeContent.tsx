@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import type { Locale, Tool, News } from '@/types';
-import type { CategoryWithCount } from '@/lib/db';
+import type { CategoryWithCount, CategoryNoteArticles } from '@/lib/db';
 import { t, type TDict, localizedPath } from '@/lib/i18n';
 import HeroSection from './HeroSection';
 import CategoryGrid from './CategoryGrid';
@@ -18,6 +18,7 @@ interface HomeContentProps {
   latestNews: News[];
   newTools: Tool[];
   categories: CategoryWithCount[];
+  categoryNotes: CategoryNoteArticles[];
   priceChanges: Array<{
     tool_slug: string; tool_name_ja: string; tool_name_en: string;
     plan_name: string; price_usd: number | null; previous_price_usd: number | null;
@@ -26,7 +27,7 @@ interface HomeContentProps {
 }
 
 export default function HomeContent(p: HomeContentProps) {
-  const { locale, latestNews, newTools, categories } = p;
+  const { locale, latestNews, newTools, categories, categoryNotes } = p;
   const tt = t[locale];
 
   return (
@@ -78,6 +79,69 @@ export default function HomeContent(p: HomeContentProps) {
               style={{ color:'var(--color-accent)' }}>
               {tt.secSeeAll}
             </Link>
+          </div>
+        </Sec>
+      )}
+
+      {/* 注目のNote記事（カテゴリ別） */}
+      {categoryNotes.length > 0 && (
+        <Sec bg="var(--color-bg-sub)">
+          <SectionHead label="注目のNote記事" />
+          <style>{`
+            .note-slider::-webkit-scrollbar { height: 6px; }
+            .note-slider::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+            .note-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; }
+            .note-slider::-webkit-scrollbar-thumb:hover { background: #33AAFF; }
+            @media (max-width: 767px) { .note-card { width: 60vw !important; } }
+          `}</style>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+            {categoryNotes.map(cat => (
+              <div key={cat.category_id}>
+                {/* カテゴリ行ヘッダー */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <Link href={`/tools?cat=${cat.category_slug}`}
+                    style={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.1em',
+                      textTransform: 'uppercase', color: 'var(--color-accent)', textDecoration: 'none',
+                      whiteSpace: 'nowrap' }}>
+                    {cat.category_name_ja}
+                  </Link>
+                  <div style={{ flex: 1, height: '1px', background: 'var(--color-border)' }} />
+                </div>
+                {/* スライダー */}
+                <div className="note-slider" style={{
+                  display: 'flex', gap: '12px', overflowX: 'auto', overflowY: 'hidden',
+                  paddingBottom: '10px', WebkitOverflowScrolling: 'touch' as any,
+                }}>
+                  {cat.articles.map(article => (
+                    <a key={article.id} className="note-card"
+                      href={article.note_url} target="_blank" rel="noopener noreferrer"
+                      style={{ flexShrink: 0, width: '200px', textDecoration: 'none', display: 'block' }}>
+                      {/* サムネ */}
+                      <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '6px',
+                        overflow: 'hidden', marginBottom: '8px',
+                        background: 'var(--color-border)' }}>
+                        <img src={article.thumbnail_url} alt={article.title}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          loading="lazy" />
+                      </div>
+                      {/* タイトル */}
+                      <p style={{ fontSize: '0.75rem', color: 'var(--color-text)', lineHeight: 1.5,
+                        margin: 0, overflow: 'hidden', display: '-webkit-box',
+                        WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
+                        {article.title}
+                      </p>
+                      {/* いいね数 */}
+                      {article.likes_count > 0 && (
+                        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-sub)',
+                          marginTop: '4px', display: 'block' }}>
+                          ♥ {article.likes_count}
+                        </span>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </Sec>
       )}

@@ -299,6 +299,71 @@ export async function getRelatedNews(toolId: string | null, excludeId: string, l
 }
 
 // =============================================
+// Note記事（TOPページ用・カテゴリ別）
+// =============================================
+
+export interface NoteArticleForTop {
+  id: string;
+  title: string;
+  thumbnail_url: string;
+  note_url: string;
+  likes_count: number;
+  published_at: string | null;
+  category_id: string;
+  category_name_ja: string;
+  category_slug: string;
+  category_sort_order: number;
+}
+
+export interface CategoryNoteArticles {
+  category_id: string;
+  category_name_ja: string;
+  category_slug: string;
+  sort_order: number;
+  articles: NoteArticleForTop[];
+}
+
+export async function getTopNoteArticlesByCategory(limitPerCategory = 10): Promise<CategoryNoteArticles[]> {
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const rows = await queryD1<NoteArticleForTop>(
+    `SELECT
+       na.id, na.title, na.thumbnail_url, na.note_url, na.likes_count, na.published_at,
+       c.id as category_id, c.name_ja as category_name_ja, c.slug as category_slug,
+       c.sort_order as category_sort_order
+     FROM tool_note_articles na
+     JOIN tools t ON na.tool_id = t.id
+     JOIN categories c ON t.category_id = c.id
+     WHERE t.is_published = 1
+       AND na.thumbnail_url IS NOT NULL
+       AND na.thumbnail_url != ''
+       AND na.published_at >= ?
+     ORDER BY c.sort_order ASC, na.likes_count DESC
+     LIMIT 500`,
+    [since]
+  );
+
+  // カテゴリごとにグループ化・上位limitPerCategory件に絞る
+  const map = new Map<string, CategoryNoteArticles>();
+  for (const row of rows) {
+    if (!map.has(row.category_id)) {
+      map.set(row.category_id, {
+        category_id: row.category_id,
+        category_name_ja: row.category_name_ja,
+        category_slug: row.category_slug,
+        sort_order: row.category_sort_order,
+        articles: [],
+      });
+    }
+    const cat = map.get(row.category_id)!;
+    if (cat.articles.length < limitPerCategory) {
+      cat.articles.push(row);
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.sort_order - b.sort_order);
+}
+
+// =============================================
 // 集約（ツール詳細ページ用）
 // =============================================
 
