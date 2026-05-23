@@ -318,6 +318,7 @@ export interface NoteArticleForTop {
 export interface CategoryNoteArticles {
   category_id: string;
   category_name_ja: string;
+  category_name_en: string;
   category_slug: string;
   sort_order: number;
   articles: NoteArticleForTop[];
@@ -328,8 +329,8 @@ export async function getTopNoteArticlesByCategory(limitPerCategory = 10): Promi
   const rows = await queryD1<NoteArticleForTop>(
     `SELECT
        na.id, na.title, na.thumbnail_url, na.note_url, na.likes_count, na.published_at,
-       c.id as category_id, c.name_ja as category_name_ja, c.slug as category_slug,
-       c.sort_order as category_sort_order
+       c.id as category_id, c.name_ja as category_name_ja, c.name_en as category_name_en,
+       c.slug as category_slug, c.sort_order as category_sort_order
      FROM tool_note_articles na
      JOIN tools t ON na.tool_id = t.id
      JOIN categories c ON t.category_id = c.id
@@ -353,6 +354,7 @@ export async function getTopNoteArticlesByCategory(limitPerCategory = 10): Promi
       map.set(row.category_id, {
         category_id: row.category_id,
         category_name_ja: row.category_name_ja,
+        category_name_en: (row as any).category_name_en ?? '',
         category_slug: row.category_slug,
         sort_order: row.category_sort_order,
         articles: [],

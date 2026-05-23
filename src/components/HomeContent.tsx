@@ -18,7 +18,7 @@ interface HomeContentProps {
   latestNews: News[];
   newTools: Tool[];
   categories: CategoryWithCount[];
-  categoryNotes: CategoryNoteArticles[];
+  categoryNotes?: CategoryNoteArticles[];
   priceChanges: Array<{
     tool_slug: string; tool_name_ja: string; tool_name_en: string;
     plan_name: string; price_usd: number | null; previous_price_usd: number | null;
@@ -27,7 +27,7 @@ interface HomeContentProps {
 }
 
 export default function HomeContent(p: HomeContentProps) {
-  const { locale, latestNews, newTools, categories, categoryNotes } = p;
+  const { locale, latestNews, newTools, categories, categoryNotes = [] } = p;
   const tt = t[locale];
 
   return (
@@ -99,18 +99,11 @@ export default function HomeContent(p: HomeContentProps) {
               <div key={cat.category_id}>
                 {/* カテゴリバッジ */}
                 <div style={{ marginBottom: '12px' }}>
-                  <span style={{
-                    display: 'inline-block',
-                    padding: '4px 14px',
-                    background: '#008CED',
-                    color: '#fff',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    borderRadius: '4px',
-                    letterSpacing: '0.05em',
-                  }}>
-                    {cat.category_name_ja}
-                  </span>
+                  <CategoryBadge
+                    slug={cat.category_slug}
+                    nameJa={cat.category_name_ja}
+                    nameEn={cat.category_name_en}
+                  />
                 </div>
                 {/* スライダー */}
                 <div className="note-slider" style={{
@@ -258,6 +251,70 @@ function ToolSlider({ tools, locale, categories, tt }: {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+const CAT_ICON_FILE: Record<string, string> = {
+  'text-generation':  'cat-text.png',
+  'image-generation': 'cat-image.png',
+  'coding':           'cat-coding.png',
+  'audio':            'cat-audio.png',
+  'productivity':     'cat-productivity.png',
+  'research':         'cat-research.png',
+  'marketing':        'cat-marketing.png',
+  'other':            'cat-other.png',
+};
+
+function CategoryBadge({ slug, nameJa, nameEn }: { slug: string; nameJa: string; nameEn: string }) {
+  const DARK  = '#0A1628';
+  const BLUE1 = '#005BBB';
+  const BLUE2 = '#008CED';
+  const iconFile = CAT_ICON_FILE[slug];
+  const L = { position: 'absolute' as const, background: BLUE2 };
+  const R = { position: 'absolute' as const, background: '#FFFFFF' };
+
+  return (
+    <div style={{
+      position: 'relative', overflow: 'hidden',
+      background: DARK, border: '1px solid #1A3860', borderRadius: '3px',
+      height: '38px', width: '140px',
+    }}>
+      {/* 青グラデ三角 */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `linear-gradient(135deg, ${BLUE1}, ${BLUE2})`,
+        clipPath: 'polygon(55% 0%, 100% 0%, 100% 100%, 42% 100%)',
+      }} />
+      {/* //// */}
+      <div style={{ position: 'absolute', bottom: 4, right: 6, fontSize: '0.45rem', fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '0.08em' }}>
+        ////
+      </div>
+      {/* アイコン（左端） */}
+      <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {iconFile ? (
+          <img src={`/icons/${iconFile}`} alt={nameEn} style={{ width: '22px', height: '22px', objectFit: 'fill' }} />
+        ) : (
+          <svg width="22" height="22" viewBox="0 0 24 24" stroke="#fff" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+        )}
+      </div>
+      {/* 日本語テキスト（アイコン右） */}
+      <div style={{ position: 'absolute', left: 40, top: 0, bottom: 0, right: '42%', display: 'flex', alignItems: 'center' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff', lineHeight: 1, margin: 0, textShadow: '1px 1px 4px rgba(0,0,0,0.6)', whiteSpace: 'nowrap' }}>
+          {nameJa}
+        </p>
+      </div>
+      {/* HUDコーナー */}
+      <div style={{ ...L, top:0, left:0, width:8, height:2 }} />
+      <div style={{ ...L, top:0, left:0, width:2, height:8 }} />
+      <div style={{ ...R, top:0, right:0, width:8, height:2 }} />
+      <div style={{ ...R, top:0, right:0, width:2, height:8 }} />
+      <div style={{ ...L, bottom:0, left:0, width:8, height:2 }} />
+      <div style={{ ...L, bottom:0, left:0, width:2, height:8 }} />
+      <div style={{ ...R, bottom:0, right:0, width:8, height:2 }} />
+      <div style={{ ...R, bottom:0, right:0, width:2, height:8 }} />
     </div>
   );
 }
