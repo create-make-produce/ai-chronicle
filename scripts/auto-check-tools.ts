@@ -296,6 +296,7 @@ async function main() {
       // Gemini判定
       const prompt = buildPrompt(tool.name_en, tool.official_url, pageText);
       const rawResponse = await callGeminiCheck(prompt);
+      console.log(`  🤖 Gemini応答: ${rawResponse.trim().slice(0, 200)}`);
       const parsed = parseResponse(rawResponse);
       console.log(`  → 判定: ${parsed.result}${parsed.category ? ` / カテゴリ: ${parsed.category}` : ''}`);
 
