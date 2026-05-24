@@ -2,14 +2,15 @@
 // AI Chronicle - AIツール自動判定スクリプト
 // =============================================
 // 対象  : is_published=1 かつ admin_checked=0 のツール（未処理全件）
-// 処理  : 公式サイトを取得 → Geminiで ai/not_ai/review 判定 → DB直接更新
+// 処理  : 公式サイトを取得 → Geminiで ai/not_ai/review + カテゴリ判定 → DB直接更新
 // モデル: CONFIG.CHECK_AI_MODEL（config.tsのみで変更可能）
 // 実行  : npx tsx scripts/auto-check-tools.ts
 // オプション: --dry-run → DBを更新せず結果だけ表示
 //
 // ・未処理ツールを全件処理する（バッチサイズ制限なし）
 // ・429（RPD上限）が来たら即中断・次回起動時に続きから再開
-// ・処理済み管理はDBフラグのみ（done file不要・GitHub Actions対応）
+// ・処理済み管理はDBフラグのみ（GitHub Actions対応）
+// ・ai判定時はカテゴリも同時に更新
 // ・GitHub Actions: 30分おき自動実行
 // =============================================
 
@@ -27,12 +28,39 @@ import { D1Client } from '../src/lib/d1-rest';
 // =====================
 
 type CheckResult = 'ai' | 'not_ai' | 'review';
+type CategorySlug =
+  | 'image-generation'
+  | 'audio'
+  | 'coding'
+  | 'text-generation'
+  | 'productivity'
+  | 'research'
+  | 'marketing'
+  | 'other';
+
+interface GeminiResponse {
+  result: CheckResult;
+  category?: CategorySlug;
+}
 
 interface ToolRow {
   id: string;
   name_en: string;
   official_url: string | null;
+  category_id: string | null;
 }
+
+// カテゴリスラッグ → category_id マッピング
+const CATEGORY_MAP: Record<CategorySlug, string> = {
+  'image-generation': 'cat_image',
+  'audio':            'cat_audio',
+  'coding':           'cat_coding',
+  'text-generation':  'cat_text',
+  'productivity':     'cat_productivity',
+  'research':         'cat_research',
+  'marketing':        'cat_marketing',
+  'other':            'cat_other',
+};
 
 const isDryRun = process.argv.includes('--dry-run');
 
@@ -89,7 +117,7 @@ async function callGeminiCheck(prompt: string): Promise<string> {
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
-        maxOutputTokens: 50,
+        maxOutputTokens: 100,
         temperature: 0,
       },
     }),
@@ -135,22 +163,51 @@ not_ai：以下のいずれかに該当する
   - 既存プロダクトの機能追加・機能拡張（独立したエントリーポイントがない）
 review：サイト内容がツール名と一致しない、またはアクセスできず判断できない
 
-【回答】以下のいずれか1単語のみ：
-ai
-not_ai
-review`;
+【カテゴリ判定（resultがaiの場合のみ・上から順に判定して最初に該当したもの）】
+image-generation : 画像生成・動画生成・動画編集・映像変換・字幕・SNS動画作成が主機能
+audio            : 音声生成・音楽生成・文字起こし・声クローン・ポッドキャストが主機能
+coding           : コード生成・補完・デバッグ・テスト・開発支援が主機能
+text-generation  : テキスト生成・ライティング・翻訳・要約・チャットが主機能
+productivity     : 業務効率化・タスク管理・会議要約・メール自動化・ワークフロー・カスタマーサポート自動化
+research         : Web検索・情報収集・リサーチ・データ分析・グラフ化・予測分析が主目的
+marketing        : SNS投稿・広告コピー・SEO記事・メールマーケティング・集客・販売促進が主目的
+other            : 上記いずれにも当てはまらない
+
+【回答形式】JSON1行のみ・余分なテキスト不要
+resultがaiの場合   : {"result":"ai","category":"カテゴリスラッグ"}
+resultがai以外の場合: {"result":"not_ai"} または {"result":"review"}`;
 }
 
 // =====================
 // 判定結果パース
 // =====================
 
-function parseResult(text: string): CheckResult {
-  const lower = text.trim().toLowerCase();
-  if (lower.includes('not_ai')) return 'not_ai';
-  if (lower.includes('review')) return 'review';
-  if (lower.includes('ai')) return 'ai';
-  return 'review';
+function parseResponse(text: string): GeminiResponse {
+  try {
+    const cleaned = text.trim()
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/, '');
+    const json = JSON.parse(cleaned) as GeminiResponse;
+
+    // result検証
+    if (!['ai', 'not_ai', 'review'].includes(json.result)) {
+      return { result: 'review' };
+    }
+
+    // ai判定時のカテゴリ検証
+    if (json.result === 'ai') {
+      const validCategory = json.category && json.category in CATEGORY_MAP
+        ? json.category
+        : 'other' as CategorySlug;
+      return { result: 'ai', category: validCategory };
+    }
+
+    return { result: json.result };
+  } catch {
+    // パース失敗は安全側に倒す
+    return { result: 'review' };
+  }
 }
 
 // =====================
@@ -166,7 +223,7 @@ async function main() {
   const db = D1Client.fromEnv();
 
   const tools = await db.query<ToolRow>(
-    `SELECT id, name_en, official_url
+    `SELECT id, name_en, official_url, category_id
      FROM tools
      WHERE is_published = 1 AND admin_checked = 0
      ORDER BY created_at ASC`
@@ -212,18 +269,22 @@ async function main() {
 
       // Gemini判定
       const prompt = buildPrompt(tool.name_en, tool.official_url, pageText);
-      const response = await callGeminiCheck(prompt);
-      const result = parseResult(response);
-      console.log(`  → 判定: ${result}`);
+      const rawResponse = await callGeminiCheck(prompt);
+      const parsed = parseResponse(rawResponse);
+      console.log(`  → 判定: ${parsed.result}${parsed.category ? ` / カテゴリ: ${parsed.category}` : ''}`);
 
       if (!isDryRun) {
-        if (result === 'ai') {
+        if (parsed.result === 'ai') {
+          const newCategoryId = CATEGORY_MAP[parsed.category ?? 'other'];
           await db.execute(
-            `UPDATE tools SET admin_checked=1, updated_at=datetime('now') WHERE id=?`,
-            [tool.id]
+            `UPDATE tools SET admin_checked=1, category_id=?, updated_at=datetime('now') WHERE id=?`,
+            [newCategoryId, tool.id]
           );
+          if (tool.category_id !== newCategoryId) {
+            console.log(`  📁 カテゴリ更新: ${tool.category_id} → ${newCategoryId}`);
+          }
           aiCount++;
-        } else if (result === 'not_ai') {
+        } else if (parsed.result === 'not_ai') {
           await db.execute(
             `UPDATE tools SET is_published=0, updated_at=datetime('now') WHERE id=?`,
             [tool.id]
@@ -237,8 +298,8 @@ async function main() {
           reviewCount++;
         }
       } else {
-        if (result === 'ai') aiCount++;
-        else if (result === 'not_ai') notAiCount++;
+        if (parsed.result === 'ai') aiCount++;
+        else if (parsed.result === 'not_ai') notAiCount++;
         else reviewCount++;
       }
 
