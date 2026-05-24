@@ -37,7 +37,7 @@ export const CONFIG = {
   PRODUCT_HUNT_DAILY_REQUEST_LIMIT: 80,
 
   // =============================================
-  // AI プロバイダー設定
+  // AI プロバイダー設定（既存スクリプト共通）
   // =============================================
   AI_PROVIDER: 'gemini' as 'gemini' | 'openai' | 'claude',
   AI_MODEL: 'gemini-3.1-flash-lite',
@@ -51,6 +51,12 @@ export const CONFIG = {
   // =============================================
   GEMINI_MODEL: 'gemini-3.1-flash-lite',
   GEMINI_MAX_RETRIES: 3,
+
+  // =============================================
+  // AIツール自動判定（auto-check-tools.ts 専用）
+  // ここだけ変更すればモデル切り替え可能
+  // =============================================
+  CHECK_AI_MODEL: 'gemini-3.5-flash',
 
   // =============================================
   // スクレイピング設定
