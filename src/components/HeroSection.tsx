@@ -17,7 +17,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    router.push(locale === 'ja' ? `/tools?q=${encodeURIComponent(q)}` : `/en/tools?q=${encodeURIComponent(q)}`);
+    router.push(`/tools?q=${encodeURIComponent(q)}`);
   };
 
   return (
