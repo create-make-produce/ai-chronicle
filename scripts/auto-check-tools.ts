@@ -263,7 +263,6 @@ async function main() {
   let notAiCount = 0;
   let reviewCount = 0;
   let errorCount = 0;
-  const reviewTools: { name_en: string; url: string }[] = [];
 
   for (let i = 0; i < tools.length; i++) {
     const tool = tools[i];
@@ -277,7 +276,6 @@ async function main() {
           `UPDATE tools SET status='pending', is_published=0, updated_at=datetime('now') WHERE id=?`,
           [tool.id]
         );
-        reviewTools.push({ name_en: tool.name_en, url: '' });
       }
       reviewCount++;
       continue;
@@ -321,7 +319,6 @@ async function main() {
             `UPDATE tools SET status='pending', is_published=0, updated_at=datetime('now') WHERE id=?`,
             [tool.id]
           );
-          reviewTools.push({ name_en: tool.name_en, url: tool.official_url ?? '' });
           reviewCount++;
         }
       } else {
@@ -357,7 +354,7 @@ async function main() {
   // メール通知（review発生 or DB内pending存在時）
   // =====================
   if (!isDryRun) {
-    await sendNotificationIfNeeded(db, reviewTools);
+    await sendNotificationIfNeeded(db);
   }
 }
 
@@ -365,8 +362,7 @@ async function main() {
 // DB内のpendingツール取得 + メール送信
 // =====================
 
-async function sendNotificationIfNeeded(db: D1Client, reviewTools: { name_en: string; url: string }[]): Promise<void> {
-  // メール設定が揃っていない場合はスキップ（通常処理に影響しない）
+async function sendNotificationIfNeeded(db: D1Client): Promise<void> {
   const gmailUser = process.env.GMAIL_FROM;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
   const notifyTo  = process.env.NOTIFY_EMAIL;
@@ -376,7 +372,6 @@ async function sendNotificationIfNeeded(db: D1Client, reviewTools: { name_en: st
   }
 
   try {
-    // DB内の既存pendingツールを取得
     const pendingTools = await db.query<PendingTool>(
       `SELECT id, name_en, official_url, status, created_at
        FROM tools
@@ -384,33 +379,18 @@ async function sendNotificationIfNeeded(db: D1Client, reviewTools: { name_en: st
        ORDER BY created_at DESC`
     );
 
-    // reviewもpendingもなければ送信しない
-    if (reviewTools.length === 0 && pendingTools.length === 0) {
-      console.log('📧 通知対象なし（review=0 / pending=0）');
+    if (pendingTools.length === 0) {
+      console.log('📧 保留ツールなし・通知スキップ');
       return;
     }
 
-    // メール本文生成
     let body = `AI Chronicle - 保留ツール通知\n`;
-    body += `実行日時: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}\n\n`;
-
-    if (reviewTools.length > 0) {
-      body += `【今回のチェックでreviewになったツール: ${reviewTools.length}件】\n`;
-      for (const t of reviewTools) {
-        body += `  - ${t.name_en}  ${t.url}\n`;
-      }
-      body += '\n';
+    body += `実行日時: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}\n`;
+    body += `保留件数: ${pendingTools.length}件\n\n`;
+    for (const t of pendingTools) {
+      body += `  - ${t.name_en}  ${t.official_url ?? 'URLなし'}\n`;
     }
-
-    if (pendingTools.length > 0) {
-      body += `【DB内の保留ツール合計: ${pendingTools.length}件】\n`;
-      for (const t of pendingTools) {
-        body += `  - ${t.name_en}  ${t.official_url ?? 'URLなし'}\n`;
-      }
-      body += '\n';
-    }
-
-    body += `管理画面で確認してください。\nhttp://localhost:3000/admin/dashboard?tab=tools\n`;
+    body += `\n管理画面で確認してください。\nhttp://localhost:3000/admin/dashboard?tab=tools\n`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -420,13 +400,12 @@ async function sendNotificationIfNeeded(db: D1Client, reviewTools: { name_en: st
     await transporter.sendMail({
       from: gmailUser,
       to: notifyTo,
-      subject: `[AI Chronicle] 保留ツール通知 review:${reviewTools.length}件 / pending:${pendingTools.length}件`,
+      subject: `[AI Chronicle] 保留ツール通知 ${pendingTools.length}件`,
       text: body,
     });
 
-    console.log(`📧 メール送信完了 → ${notifyTo}`);
+    console.log(`📧 メール送信完了 → ${notifyTo}（保留${pendingTools.length}件）`);
   } catch (err: any) {
-    // メール送信失敗は警告のみ・処理は継続済み
     console.warn(`📧 メール送信失敗（処理には影響なし）: ${err?.message ?? err}`);
   }
 }
