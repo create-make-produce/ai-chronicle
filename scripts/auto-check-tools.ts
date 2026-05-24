@@ -126,7 +126,6 @@ async function callGeminiCheck(prompt: string): Promise<string> {
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
-        maxOutputTokens: 100,
         temperature: 0,
       },
     }),
