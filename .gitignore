@@ -81,6 +81,14 @@ scripts/apply-check-results.ts
 unchecked-tools.csv
 check-results.csv
 
+# キーワード管理スクリプト（ローカルのみ・GitHubに上げない）
+scripts/cleanup-keywords.ts
+scripts/list-katakana-keywords.ts
+scripts/list-all-keywords.ts
+
+# Noteいいね数更新スクリプト（ローカルのみ・GitHubに上げない）
+scripts/update-note-likes.ts
+
 # ドキュメント・メモ（GitHubに上げない）
 *.md
 
