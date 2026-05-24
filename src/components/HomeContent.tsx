@@ -95,7 +95,7 @@ export default function HomeContent(p: HomeContentProps) {
             @media (max-width: 767px) { .note-card { width: 60vw !important; } }
           `}</style>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-            {categoryNotes.map(cat => (
+            {categoryNotes.filter(cat => cat.articles.length >= 6).map(cat => (
               <div key={cat.category_id}>
                 {/* カテゴリバッジ */}
                 <div style={{ marginBottom: '12px' }}>

@@ -64,8 +64,9 @@ description_jaルール：
 ・複数の内容は「、」でつないで1文にまとめる
 ・各文末に「。」をつける
 
-search_keywordsルール：製品名のみ（機能説明・会社名・バージョン番号は絶対に入れない）英語の製品名とカタカナ読みのみ
-例: "Fathom,ファザム" / "Claude,クロード" / "ChatGPT,チャットGPT" / "Midjourney,ミッドジャーニー"
+search_keywordsルール：英語の製品名のみ（カタカナ読みは登録しない・機能説明・会社名・バージョン番号は絶対に入れない）
+・ツール名自体がカタカナの場合のみカタカナで登録する
+例: "Fathom" / "Claude" / "ChatGPT" / "Midjourney"
 
 {"tagline_ja":"翻訳結果またはnull","description_ja":"150〜400文字・各文末に「。」をつけた日本語概要またはnull","search_keywords":"keyword1,keyword2"}`;
 
