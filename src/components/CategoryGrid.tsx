@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import type { Locale } from '@/types';
 import type { CategoryWithCount } from '@/lib/db';
 
+// アイコンファイル（webp対応・png fallback）
 const ICON_FILE: Record<string, string> = {
   'text-generation':  'cat-text.png',
   'image-generation': 'cat-image.png',
@@ -16,41 +17,39 @@ const ICON_FILE: Record<string, string> = {
   'other':            'cat-other.png',
 };
 
-function FallbackIcon({ slug }: { slug: string }) {
-  const s = { stroke: '#fff', strokeWidth: '1.5', fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+// カテゴリごとのパステルカラー
+const CAT_PASTEL: Record<string, { bg: string; iconColor: string; border: string }> = {
+  'text-generation':  { bg: 'rgba(139,184,255,0.12)', iconColor: '#8BB8FF', border: 'rgba(139,184,255,0.35)' },
+  'image-generation': { bg: 'rgba(255,182,200,0.12)', iconColor: '#FFB6C8', border: 'rgba(255,182,200,0.35)' },
+  'audio':            { bg: 'rgba(192,168,255,0.12)', iconColor: '#C0A8FF', border: 'rgba(192,168,255,0.35)' },
+  'coding':           { bg: 'rgba(168,240,212,0.12)', iconColor: '#A8F0D4', border: 'rgba(168,240,212,0.35)' },
+  'productivity':     { bg: 'rgba(255,200,130,0.12)', iconColor: '#FFC882', border: 'rgba(255,200,130,0.35)' },
+  'research':         { bg: 'rgba(130,210,200,0.12)', iconColor: '#82D2C8', border: 'rgba(130,210,200,0.35)' },
+  'marketing':        { bg: 'rgba(255,224,102,0.12)', iconColor: '#FFE066', border: 'rgba(255,224,102,0.35)' },
+  'other':            { bg: 'rgba(200,200,200,0.12)', iconColor: '#AAAAAA', border: 'rgba(200,200,200,0.35)' },
+};
+
+// フォールバックSVGアイコン（パステルカラー版）
+function FallbackIcon({ slug, color }: { slug: string; color: string }) {
+  const s = { stroke: color, strokeWidth: '1.8', fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   switch (slug) {
     case 'text-generation':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="14" height="2" rx="1"/><rect x="3" y="15" width="10" height="2" rx="1"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="14" height="2" rx="1"/><rect x="3" y="15" width="10" height="2" rx="1"/></svg>;
     case 'image-generation':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
     case 'coding':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>;
     case 'audio':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
     case 'productivity':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>;
     case 'research':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
     case 'marketing':
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>;
     default:
-      return <svg width="42" height="42" viewBox="0 0 24 24" {...s}><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="#fff"/></svg>;
+      return <svg width="44" height="44" viewBox="0 0 24 24" {...s}><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><circle cx="12" cy="16" r="0.5" fill={color}/></svg>;
   }
-}
-
-function HudCorners({ left = '#008CED', right = '#001433' }: { left?: string; right?: string }) {
-  const L = { position: 'absolute' as const, background: left };
-  const R = { position: 'absolute' as const, background: right };
-  return <>
-    <div style={{ ...L, top:0, left:0, width:12, height:2 }} />
-    <div style={{ ...L, top:0, left:0, width:2, height:12 }} />
-    <div style={{ ...R, top:0, right:0, width:12, height:2 }} />
-    <div style={{ ...R, top:0, right:0, width:2, height:12 }} />
-    <div style={{ ...L, bottom:0, left:0, width:12, height:2 }} />
-    <div style={{ ...L, bottom:0, left:0, width:2, height:12 }} />
-    <div style={{ ...R, bottom:0, right:0, width:12, height:2 }} />
-    <div style={{ ...R, bottom:0, right:0, width:2, height:12 }} />
-  </>;
 }
 
 interface CategoryGridProps {
@@ -59,60 +58,95 @@ interface CategoryGridProps {
 }
 
 export default function CategoryGrid({ categories, locale }: CategoryGridProps) {
-  const DARK  = '#0A1628';
-  const BLUE1 = '#005BBB';
-  const BLUE2 = '#008CED';
-
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       {categories.map((cat, i) => {
-        const name_ja  = cat.name_ja;
-        const name_en  = cat.name_en;
-        const dispName = locale === 'ja' ? name_ja : name_en;
+        const dispName = locale === 'ja' ? cat.name_ja : cat.name_en;
+        const href     = locale === 'ja' ? `/tools?cat=${cat.slug}` : `/en/tools?cat=${cat.slug}`;
         const iconFile = ICON_FILE[cat.slug];
-        // カテゴリグリッドから /tools?cat=slug に遷移（カテゴリページ不要）
-        const href = locale === 'ja' ? `/tools?cat=${cat.slug}` : `/en/tools?cat=${cat.slug}`;
+        const pastel   = CAT_PASTEL[cat.slug] ?? CAT_PASTEL.other;
 
         return (
           <motion.div key={cat.id}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.2, delay: i * 0.02 }}
+            transition={{ duration: 0.25, delay: i * 0.03 }}
           >
             <Link
               href={href}
-              className="group relative block overflow-hidden transition-transform duration-150 hover:-translate-y-0.5"
-              style={{ background: DARK, border: '1px solid #1A3860', borderRadius: '3px', height: '72px' }}
+              style={{
+                display:         'flex',
+                alignItems:      'center',
+                justifyContent:  'space-between',
+                gap:             '12px',
+                padding:         '14px 16px',
+                height:          '72px',
+                background:      pastel.bg,
+                border:          `1px solid ${pastel.border}`,
+                borderRadius:    '8px',
+                textDecoration:  'none',
+                transition:      'all 0.15s ease',
+                position:        'relative',
+                overflow:        'hidden',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px ${pastel.bg.replace('0.12', '0.4')}`;
+                (e.currentTarget as HTMLElement).style.borderColor = pastel.iconColor;
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                (e.currentTarget as HTMLElement).style.borderColor = pastel.border;
+              }}
             >
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: `linear-gradient(135deg, ${BLUE1}, ${BLUE2})`,
-                clipPath: 'polygon(55% 0%, 100% 0%, 100% 100%, 42% 100%)',
-              }} />
-              <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: '0.55rem', fontWeight: 700, color: 'rgba(0,0,0,0.35)', letterSpacing: '0.08em' }}>
-                ////
-              </div>
-              <div className="cat-icon" style={{ position: 'absolute', right: '6%', top: '60%', transform: 'translateY(-50%)', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.25))' }}>
-                {iconFile ? (
-                  <img src={`/icons/${iconFile}`} alt={name_en} style={{ width: '38px', height: '38px', objectFit: 'fill', display: 'block' }} />
-                ) : (
-                  <FallbackIcon slug={cat.slug} />
-                )}
-              </div>
-              <div className="cat-text-area" style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '72%', padding: '0 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: '4px', gap: 2 }}>
-                <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: dispName.length > 7 ? '1rem' : '1.15rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.6)' }}>
+              {/* テキスト */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p className="cat-text-area" style={{
+                  fontFamily: 'var(--font-noto), sans-serif',
+                  fontSize:   dispName.length > 7 ? '0.95rem' : '1.05rem',
+                  fontWeight: 700,
+                  color:      'var(--color-text)',
+                  lineHeight: 1.2,
+                  margin:     0,
+                }}>
                   {dispName}
                 </p>
                 {locale === 'ja' && (
-                  <p style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: '0.58rem', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>
-                    {name_en}
+                  <p style={{
+                    fontFamily:    'var(--font-fira), system-ui',
+                    fontSize:      '0.58rem',
+                    letterSpacing: '0.08em',
+                    color:         'var(--color-text-muted)',
+                    textTransform: 'uppercase',
+                    margin:        '3px 0 0',
+                  }}>
+                    {cat.name_en}
                   </p>
                 )}
               </div>
-              <HudCorners left={BLUE2} right="#FFFFFF" />
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none"
-                style={{ boxShadow: `inset 0 0 0 1px ${BLUE2}`, borderRadius: '3px' }} />
+
+              {/* アイコン */}
+              <div className="cat-icon" style={{
+                flexShrink:  0,
+                width:       44,
+                height:      44,
+                display:     'flex',
+                alignItems:  'center',
+                justifyContent: 'center',
+              }}>
+                {iconFile ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={`/icons/${iconFile}`}
+                    alt={cat.name_en}
+                    style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                  />
+                ) : (
+                  <FallbackIcon slug={cat.slug} color={pastel.iconColor} />
+                )}
+              </div>
             </Link>
           </motion.div>
         );
