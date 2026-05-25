@@ -77,6 +77,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         gap: '1rem',
         padding: '0.85rem 1.25rem',
         borderBottom: isLast ? 'none' : '1px solid var(--color-border)',
+        borderLeft: `3px solid ${badge.color}`,
         textDecoration: 'none',
         background: hovered ? 'var(--color-row-hover)' : 'transparent',
         transition: 'background 0.12s',

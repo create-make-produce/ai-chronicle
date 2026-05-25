@@ -40,17 +40,22 @@ export default function HomeContent(p: HomeContentProps) {
       {latestNews.length > 0 && (
         <Sec bg="var(--color-page-gradient)" paddingBottom={24}>
           <SectionHeadWithTime label={locale==='ja'?'最新ニュース':'Latest News'} isoTime={latestNews[0]?.published_at} locale={locale} />
-          <div style={{ border:'1px solid var(--color-border)', borderRadius:'4px', overflow:'hidden' }}>
-            {latestNews.map((n, i) => (
-              <NewsRow
-                key={n.id}
-                item={n as any}
-                href={localizedPath(locale, `/news/${n.slug}`)}
-                lang={locale}
-                isLast={i === latestNews.length - 1}
-              />
-            ))}
-          </div>
+          {/* 1件目：大きなカード */}
+          <NewsCardTop item={latestNews[0] as any} href={localizedPath(locale, `/news/${latestNews[0].slug}`)} lang={locale} />
+          {/* 2件目以降：左アクセントライン付きリスト */}
+          {latestNews.length > 1 && (
+            <div style={{ border:'1px solid var(--color-border)', borderRadius:'4px', overflow:'hidden', marginTop:'12px' }}>
+              {latestNews.slice(1).map((n, i) => (
+                <NewsRow
+                  key={n.id}
+                  item={n as any}
+                  href={localizedPath(locale, `/news/${n.slug}`)}
+                  lang={locale}
+                  isLast={i === latestNews.length - 2}
+                />
+              ))}
+            </div>
+          )}
           <div className="mt-4 text-right">
             <Link href={localizedPath(locale,'/news')}
               className="text-xs font-bold tracking-widest uppercase link-underline"
@@ -152,6 +157,93 @@ function Sec({ children, bg, paddingBottom }: { children: React.ReactNode; bg?: 
         {children}
       </div>
     </section>
+  );
+}
+
+// ── 最新ニュース1件目：大きなカード ──
+function NewsCardTop({ item, href, lang }: {
+  item: {
+    id: string; slug: string; title_ja: string; title_en?: string;
+    news_type: string; published_at: string;
+    tool_name_ja?: string; tool_name_en?: string; tool_logo_url?: string;
+  };
+  href: string;
+  lang: 'ja' | 'en';
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  const NEWS_COLORS: Record<string, { color: string; bg: string; border: string; label: string }> = {
+    new_tool:     { color:'var(--color-news-new-tool)',     bg:'var(--color-news-new-tool-bg)',     border:'var(--color-news-new-tool-border)',     label: lang==='en'?'New Tool':'新ツール' },
+    new_feature:  { color:'var(--color-news-new-feature)',  bg:'var(--color-news-new-feature-bg)',  border:'var(--color-news-new-feature-border)',  label: lang==='en'?'New Feature':'新機能' },
+    price_change: { color:'var(--color-news-price-change)', bg:'var(--color-news-price-change-bg)', border:'var(--color-news-price-change-border)', label: lang==='en'?'Price Change':'料金改定' },
+    other:        { color:'var(--color-news-other)',        bg:'var(--color-news-other-bg)',        border:'var(--color-news-other-border)',        label: lang==='en'?'Other':'その他' },
+  };
+
+  const typeKey = item.news_type ?? 'other';
+  const badge = NEWS_COLORS[typeKey] ?? NEWS_COLORS.other;
+  const title = lang === 'en' ? (item.title_en || item.title_ja) : item.title_ja;
+  const toolName = lang === 'en' ? item.tool_name_en : item.tool_name_ja;
+  const logoUrl = item.tool_logo_url ?? null;
+
+  const date = (() => {
+    try {
+      const raw = item.published_at?.includes('Z') ? item.published_at : item.published_at?.replace(' ','T')+'Z';
+      const d = new Date(raw);
+      const jst = new Date(d.getTime() + 9*60*60*1000);
+      const pad = (n: number) => String(n).padStart(2,'0');
+      return `${jst.getUTCFullYear()}/${pad(jst.getUTCMonth()+1)}/${pad(jst.getUTCDate())} ${pad(jst.getUTCHours())}:${pad(jst.getUTCMinutes())}`;
+    } catch { return item.published_at?.substring(0,10) ?? ''; }
+  })();
+
+  return (
+    <Link href={href}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display:        'block',
+        textDecoration: 'none',
+        borderTop:      '1px solid var(--color-border)',
+        borderRight:    '1px solid var(--color-border)',
+        borderBottom:   '1px solid var(--color-border)',
+        borderLeft:     `4px solid ${badge.color}`,
+        borderRadius:   '4px',
+        padding:        '16px 20px',
+        background:     hovered ? 'var(--color-row-hover)' : 'transparent',
+        transition:     'all 0.15s',
+      }}>
+      {/* バッジ＋日時 */}
+      <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
+        <span style={{
+          fontSize:'0.7rem', fontWeight:700,
+          color: badge.color, background: badge.bg,
+          border: `1px solid ${badge.border}`,
+          padding:'2px 8px', borderRadius:'3px',
+        }}>{badge.label}</span>
+        <span style={{ fontSize:'0.75rem', color:'var(--color-text-timestamp)', fontFamily:'Fira Sans, monospace' }}>
+          {date}
+        </span>
+      </div>
+      {/* ツール情報（タイトルより上） */}
+      {toolName && (
+        <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
+          {logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt={toolName}
+              style={{ width:'18px', height:'18px', borderRadius:'3px', objectFit:'contain' }} />
+          )}
+          <span style={{ fontSize:'0.82rem', color:'var(--color-text-sub)', fontWeight:600 }}>{toolName}</span>
+        </div>
+      )}
+      {/* タイトル */}
+      <p style={{
+        fontFamily: lang==='en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif',
+        fontSize:   '1.05rem',
+        fontWeight: 700,
+        color:      'var(--color-text)',
+        margin:     0,
+        lineHeight: 1.5,
+      }}>{title}</p>
+    </Link>
   );
 }
 
