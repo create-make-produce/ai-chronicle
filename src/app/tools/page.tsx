@@ -4,20 +4,19 @@ import ToolsListContent from '@/components/ToolsListContent';
 
 export const metadata = {
   title: 'すべてのAIツール一覧 | AI Chronicle',
-  description: '登録済みのAIツールをすべて一覧表示。カテゴリ・価格・機能で絞り込み可能。',
+  description: '登録済みのAIツールをすべて一覧表示。カテゴリ・機能で絞り込み可能。',
 };
 
 async function queryD1(sql: string, params: (string | number | null)[] = []) {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const dbId = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const token = process.env.CLOUDFLARE_API_TOKEN;
+  const dbId      = process.env.CLOUDFLARE_D1_DATABASE_ID;
+  const token     = process.env.CLOUDFLARE_API_TOKEN;
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
     {
-      method: 'POST',
+      method:  'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sql, params }),
-      next: { revalidate: 3600 },
+      body:    JSON.stringify({ sql, params }),
     }
   );
   const data = await res.json();
@@ -36,7 +35,7 @@ async function getTools() {
 
 async function getCategories() {
   return queryD1(
-    `SELECT id, slug, name_ja, name_en FROM categories ORDER BY display_order ASC`
+    `SELECT id, slug, name_ja, name_en FROM categories ORDER BY sort_order ASC`
   );
 }
 

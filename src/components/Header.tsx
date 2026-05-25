@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
 
 const NAV_ITEMS = [
-  { href: '/',        label: 'TOP' },
-  { href: '/news',    label: 'ニュース' },
-  { href: '/monthly', label: '月刊AIアップデート' },
-  { href: '/tools',   label: 'AIツール一覧' },
+  { href: '/',        en: 'TOP',      ja: 'トップ' },
+  { href: '/news',    en: 'NEWS',     ja: 'ニュース' },
+  { href: '/monthly', en: 'MONTHLY',  ja: '月刊AI' },
+  { href: '/tools',   en: 'TOOLS',    ja: 'AIツール一覧' },
 ];
 
 function SunIcon() {
@@ -42,17 +42,17 @@ export default function Header() {
 
   return (
     <header style={{
-      background:    'var(--color-header-bg)',
-      borderBottom:  '1px solid var(--color-border)',
-      position:      'sticky',
-      top:           0,
-      zIndex:        50,
+      background:   'var(--color-header-bg)',
+      borderBottom: '1px solid var(--color-border)',
+      position:     'sticky',
+      top:          0,
+      zIndex:       50,
     }}>
       <div style={{
         maxWidth:       '1280px',
         margin:         '0 auto',
         padding:        '0 1.5rem',
-        height:         '56px',
+        height:         '60px',
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'space-between',
@@ -62,9 +62,9 @@ export default function Header() {
         <Link href="/" style={{ textDecoration: 'none' }}>
           <span style={{
             fontFamily:    'Orbitron, sans-serif',
-            fontSize:      '1.05rem',
+            fontSize:      '1.25rem',
             fontWeight:    900,
-            letterSpacing: '0.06em',
+            letterSpacing: '0.09em',
             color:         'var(--color-text)',
           }}>
             AI<span style={{ color: '#008CED' }}>/</span>CHRONICLE
@@ -72,39 +72,98 @@ export default function Header() {
         </Link>
 
         {/* デスクトップナビ */}
-        <nav className="header-desktop-nav" style={{ display: 'flex', alignItems: 'stretch', gap: '2px', height: '100%' }}>
-          {[...NAV_ITEMS, { href: '/about', label: '運営について' }].map((item) => {
+        <nav className="header-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+
+          {/* ナビアイテム */}
+          {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 style={{
-                  fontFamily:     'var(--font-noto), Noto Sans JP, sans-serif',
-                  fontSize:       '0.875rem',
-                  fontWeight:     active ? 700 : 400,
-                  color:          active ? 'var(--color-accent)' : 'var(--color-text-nav)',
-                  padding:        '0 16px',
-                  textDecoration: 'none',
                   display:        'flex',
+                  flexDirection:  'column',
                   alignItems:     'center',
-                  position:       'relative',
-                  whiteSpace:     'nowrap',
-                  transition:     'color 0.15s',
-                  // アクティブは下ライン
-                  borderBottom:   active ? '2px solid var(--color-accent)' : '2px solid transparent',
+                  gap:            '1px',
+                  padding:        '6px 14px',
+                  textDecoration: 'none',
+                  borderRadius:   '6px',
+                  transition:     'background 0.15s',
+                  background:     active ? 'rgba(0,140,237,0.08)' : 'transparent',
                 }}
                 onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--color-accent)';
+                  if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(0,140,237,0.05)';
                 }}
                 onMouseLeave={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--color-text-nav)';
+                  if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent';
                 }}
               >
-                {item.label}
+                {/* ドット＋英語名 */}
+                <span style={{ display:'flex', alignItems:'center', gap:'5px' }}>
+                  <span style={{
+                    width:        '6px',
+                    height:       '6px',
+                    borderRadius: '50%',
+                    background:   active ? 'var(--color-accent)' : 'var(--color-border-mid)',
+                    flexShrink:   0,
+                    transition:   'background 0.15s',
+                  }} />
+                  <span style={{
+                    fontFamily:    'var(--font-fira), system-ui',
+                    fontSize:      '0.8rem',
+                    fontWeight:    700,
+                    letterSpacing: '0.08em',
+                    color:         active ? 'var(--color-accent)' : 'var(--color-text)',
+                    transition:    'color 0.15s',
+                  }}>{item.en}</span>
+                </span>
+                {/* 日本語サブ */}
+                <span style={{
+                  fontFamily: 'var(--font-noto), sans-serif',
+                  fontSize:   '0.58rem',
+                  color:      active ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                  transition: 'color 0.15s',
+                }}>{item.ja}</span>
               </Link>
             );
           })}
+
+          {/* ABOUTピルボタン */}
+          <Link
+            href="/about"
+            style={{
+              fontFamily:     'var(--font-fira), system-ui',
+              fontSize:       '0.75rem',
+              fontWeight:     700,
+              letterSpacing:  '0.1em',
+              textDecoration: 'none',
+              padding:        '7px 18px',
+              borderRadius:   '999px',
+              border:         isActive('/about')
+                ? '1.5px solid var(--color-accent)'
+                : '1.5px solid var(--color-border-mid)',
+              color:          isActive('/about') ? 'var(--color-accent)' : 'var(--color-text-sub)',
+              background:     isActive('/about') ? 'rgba(0,140,237,0.08)' : 'transparent',
+              transition:     'all 0.15s',
+              whiteSpace:     'nowrap',
+              marginLeft:     '8px',
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.borderColor = 'var(--color-accent)';
+              el.style.color       = 'var(--color-accent)';
+            }}
+            onMouseLeave={e => {
+              if (!isActive('/about')) {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--color-border-mid)';
+                el.style.color       = 'var(--color-text-sub)';
+              }
+            }}
+          >
+            ABOUT
+          </Link>
 
           {/* テーマトグル（非表示中） */}
           <button
@@ -112,16 +171,11 @@ export default function Header() {
             aria-label={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
             className="theme-toggle-btn"
             style={{
-              width: '34px', height: '34px',
-              display: 'none',
-              alignItems: 'center', justifyContent: 'center',
-              background: 'transparent',
-              border: '1px solid var(--color-border)',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              color: 'var(--color-text-nav)',
-              marginLeft: '6px',
-              flexShrink: 0,
+              width:'34px', height:'34px', display:'none',
+              alignItems:'center', justifyContent:'center',
+              background:'transparent', border:'1px solid var(--color-border)',
+              borderRadius:'4px', cursor:'pointer',
+              color:'var(--color-text-nav)', marginLeft:'6px', flexShrink:0,
             }}
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}

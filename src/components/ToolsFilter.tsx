@@ -121,7 +121,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
             onFocus={e => { e.currentTarget.style.borderColor = 'rgba(0,140,237,0.8)'; const btn = e.currentTarget.nextElementSibling as HTMLElement | null; if (btn) btn.style.borderColor = 'rgba(0,140,237,0.8)'; }}
             onBlur={e => { e.currentTarget.style.borderColor = 'rgba(0,140,237,0.3)'; const btn = e.currentTarget.nextElementSibling as HTMLElement | null; if (btn) btn.style.borderColor = '#008CED'; }}
           />
-          <button type="submit" style={{ padding: '10px 20px', background: '#008CED', border: '1px solid #008CED', borderRadius: '0 2px 2px 0', color: '#000', fontFamily: 'var(--font-fira), system-ui', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+          <button type="submit" style={{ padding: '10px 20px', background: '#008CED', border: '1px solid #008CED', borderRadius: '0 2px 2px 0', color: '#FFFFFF', fontFamily: 'var(--font-fira), system-ui', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
             {locale === 'ja' ? '検索' : 'Search'}
           </button>
         </div>
@@ -163,7 +163,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
             ) : (
               <button type="button" key={p}
                 onClick={() => { setCurrentPage(p as number); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.82rem', fontWeight: 700, padding: '5px 10px', minWidth: '34px', border: `1px solid ${p === safePage ? '#008CED' : 'var(--color-page-btn-border)'}`, borderRadius: '4px', background: p === safePage ? '#008CED' : 'transparent', color: p === safePage ? '#000' : 'var(--color-page-btn-text)', cursor: 'pointer' }}>
+                style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.82rem', fontWeight: 700, padding: '5px 10px', minWidth: '34px', border: `1px solid ${p === safePage ? '#008CED' : 'var(--color-page-btn-border)'}`, borderRadius: '4px', background: p === safePage ? '#008CED' : 'transparent', color: p === safePage ? '#FFFFFF' : 'var(--color-page-btn-text)', cursor: 'pointer' }}>
                 {p}
               </button>
             )

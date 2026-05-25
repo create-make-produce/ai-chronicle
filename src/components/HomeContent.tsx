@@ -94,54 +94,93 @@ export default function HomeContent(p: HomeContentProps) {
 
       {/* 注目のNote記事（カテゴリ別） */}
       {categoryNotes.length > 0 && (
-        <Sec bg="var(--color-cat-gradient)">
+        <Sec bg="var(--color-bg)">
           <SectionHead label="注目のNote記事" />
           <style>{`
-            .note-slider::-webkit-scrollbar { height: 8px; cursor: pointer; }
-            .note-slider::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
-            .note-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; }
-            .note-slider::-webkit-scrollbar-thumb:hover { background: #33AAFF; }
-            @media (max-width: 767px) { .note-card { width: 60vw !important; } }
+            .note-slider::-webkit-scrollbar { height: 4px; }
+            .note-slider::-webkit-scrollbar-track { background: var(--color-border); border-radius: 2px; }
+            .note-slider::-webkit-scrollbar-thumb { background: var(--color-border-mid); border-radius: 2px; }
+            .note-slider::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+            @media (max-width: 767px) { .note-card { width: 72vw !important; } }
+            .note-card:hover .note-thumb { transform: scale(1.04); }
+            .note-card:hover .note-title { color: var(--color-accent) !important; }
           `}</style>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-            {categoryNotes.filter(cat => cat.articles.length >= 6).map(cat => (
-              <div key={cat.category_id}>
-                {/* カテゴリバッジ */}
-                <div style={{ marginBottom: '12px' }}>
-                  <CategoryBadge
-                    slug={cat.category_slug}
-                    nameJa={cat.category_name_ja}
-                    nameEn={cat.category_name_en}
-                  />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            {categoryNotes.filter(cat => cat.articles.length >= 6).map(cat => {
+              const pastel = NOTE_CAT_PASTEL[cat.category_slug] ?? NOTE_CAT_PASTEL.other;
+              return (
+                <div key={cat.category_id}>
+                  {/* パステルカテゴリバッジ */}
+                  <div style={{ marginBottom: '14px' }}>
+                    <span style={{
+                      display:       'inline-flex',
+                      alignItems:    'center',
+                      gap:           '7px',
+                      padding:       '5px 14px',
+                      borderRadius:  '999px',
+                      background:    pastel.bg,
+                      border:        `1px solid ${pastel.border}`,
+                      fontSize:      '0.78rem',
+                      fontWeight:    700,
+                      color:         pastel.color,
+                    }}>
+                      {CAT_ICON_FILE[cat.category_slug] && (
+                        <img src={`/icons/${CAT_ICON_FILE[cat.category_slug]}`}
+                          alt={cat.category_name_en}
+                          style={{ width:'16px', height:'16px', objectFit:'contain' }} />
+                      )}
+                      {cat.category_name_ja}
+                    </span>
+                  </div>
+
+                  {/* スライダー */}
+                  <div className="note-slider" style={{
+                    display: 'flex', gap: '14px',
+                    overflowX: 'auto', overflowY: 'hidden',
+                    paddingBottom: '8px',
+                    WebkitOverflowScrolling: 'touch' as any,
+                  }}>
+                    {cat.articles.map(article => (
+                      <a key={article.id} className="note-card"
+                        href={article.note_url} target="_blank" rel="noopener noreferrer"
+                        style={{ flexShrink: 0, width: '210px', textDecoration: 'none', display: 'block' }}>
+                        {/* サムネ */}
+                        <div style={{
+                          width: '100%', aspectRatio: '16/9',
+                          borderRadius: '8px', overflow: 'hidden',
+                          marginBottom: '10px',
+                          background: 'var(--color-bg-sub)',
+                          border: `1px solid ${pastel.border}`,
+                        }}>
+                          <img
+                            src={article.thumbnail_url}
+                            alt={article.title}
+                            className="note-thumb"
+                            style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', transition:'transform 0.25s ease' }}
+                            loading="lazy"
+                          />
+                        </div>
+                        {/* タイトル */}
+                        <p className="note-title" style={{
+                          fontSize:        '0.8rem',
+                          fontWeight:      500,
+                          color:           'var(--color-text)',
+                          lineHeight:      1.55,
+                          margin:          0,
+                          overflow:        'hidden',
+                          display:         '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical' as any,
+                          transition:      'color 0.15s',
+                        }}>
+                          {article.title}
+                        </p>
+                      </a>
+                    ))}
+                  </div>
                 </div>
-                {/* スライダー */}
-                <div className="note-slider" style={{
-                  display: 'flex', gap: '12px', overflowX: 'auto', overflowY: 'hidden',
-                  paddingBottom: '10px', WebkitOverflowScrolling: 'touch' as any,
-                }}>
-                  {cat.articles.map(article => (
-                    <a key={article.id} className="note-card"
-                      href={article.note_url} target="_blank" rel="noopener noreferrer"
-                      style={{ flexShrink: 0, width: '200px', textDecoration: 'none', display: 'block' }}>
-                      {/* サムネ */}
-                      <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '6px',
-                        overflow: 'hidden', marginBottom: '8px',
-                        background: 'var(--color-border)' }}>
-                        <img src={article.thumbnail_url} alt={article.title}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                          loading="lazy" />
-                      </div>
-                      {/* タイトル */}
-                      <p style={{ fontSize: '0.75rem', color: 'var(--color-text)', lineHeight: 1.5,
-                        margin: 0, overflow: 'hidden', display: '-webkit-box',
-                        WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
-                        {article.title}
-                      </p>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Sec>
       )}
@@ -366,10 +405,10 @@ function ToolSlider({ tools, locale, categories, tt }: {
   return (
     <div>
       <style>{`
-        #tool-slider::-webkit-scrollbar { height: 8px; cursor: pointer; }
-        #tool-slider::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        #tool-slider::-webkit-scrollbar-thumb { background: #008CED; border-radius: 4px; }
-        #tool-slider::-webkit-scrollbar-thumb:hover { background: #33AAFF; }
+        #tool-slider::-webkit-scrollbar { height: 4px; }
+        #tool-slider::-webkit-scrollbar-track { background: var(--color-border); border-radius: 2px; }
+        #tool-slider::-webkit-scrollbar-thumb { background: var(--color-border-mid); border-radius: 2px; }
+        #tool-slider::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
         @media (max-width: 767px) {
           .tool-slider-card { width: calc(72vw) !important; }
         }
@@ -405,6 +444,18 @@ function ToolSlider({ tools, locale, categories, tt }: {
     </div>
   );
 }
+
+// Noteセクション用パステルカラー
+const NOTE_CAT_PASTEL: Record<string, { bg: string; color: string; border: string }> = {
+  'text-generation':  { bg: 'rgba(139,184,255,0.12)', color: '#5A8ED4', border: 'rgba(139,184,255,0.4)' },
+  'image-generation': { bg: 'rgba(255,182,200,0.12)', color: '#D46A8A', border: 'rgba(255,182,200,0.4)' },
+  'audio':            { bg: 'rgba(192,168,255,0.12)', color: '#8A68D4', border: 'rgba(192,168,255,0.4)' },
+  'coding':           { bg: 'rgba(168,240,212,0.12)', color: '#3DA882', border: 'rgba(168,240,212,0.4)' },
+  'productivity':     { bg: 'rgba(255,200,130,0.12)', color: '#C47A2A', border: 'rgba(255,200,130,0.4)' },
+  'research':         { bg: 'rgba(130,210,200,0.12)', color: '#3A9A8A', border: 'rgba(130,210,200,0.4)' },
+  'marketing':        { bg: 'rgba(255,224,102,0.12)', color: '#B49A0A', border: 'rgba(255,224,102,0.4)' },
+  'other':            { bg: 'rgba(200,200,200,0.10)', color: '#888888', border: 'rgba(200,200,200,0.35)' },
+};
 
 const CAT_ICON_FILE: Record<string, string> = {
   'text-generation':  'cat-text.png',

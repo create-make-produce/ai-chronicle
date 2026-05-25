@@ -59,7 +59,7 @@ export default function PageSelect({ currentPage, totalPages, basePath, month, l
             style={{
               ...btnBase,
               background: p === currentPage ? '#008CED' : 'transparent',
-              color: p === currentPage ? '#000' : 'var(--color-page-btn-text)',
+              color: p === currentPage ? '#FFFFFF' : 'var(--color-page-btn-text)',
               borderColor: p === currentPage ? '#008CED' : 'var(--color-page-btn-border)',
             }}
           >
