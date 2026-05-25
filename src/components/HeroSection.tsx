@@ -152,7 +152,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           <p key={i} style={{
             fontFamily:'var(--font-noto-serif), serif',
             fontSize:  'clamp(1rem, 1.6vw, 1.2rem)',
-            fontWeight:400, color:'#1A5A9C',
+            fontWeight:700, color:'#1A5A9C',
             margin:'0 0 2px', lineHeight:1.8,
           }}>{line}</p>
         ))}

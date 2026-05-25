@@ -33,7 +33,7 @@ export default function HomeContent(p: HomeContentProps) {
 
   return (
     <main className="flex-1">
-      <HeroSection locale={locale} latestNews={latestNews} />
+      <HeroSection locale={locale} />
       <AdSlot slot="header" />
 
       {/* 最新ニュース */}
