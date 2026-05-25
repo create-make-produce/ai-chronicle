@@ -1,7 +1,8 @@
 // src/components/HomeContent.tsx
 'use client';
 import Link from 'next/link';
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import type { Locale, Tool, News } from '@/types';
 import type { CategoryWithCount, CategoryNoteArticles } from '@/lib/db';
@@ -32,7 +33,7 @@ export default function HomeContent(p: HomeContentProps) {
 
   return (
     <main className="flex-1">
-      <HeroSection locale={locale} />
+      <HeroSection locale={locale} latestNews={latestNews} />
       <AdSlot slot="header" />
 
       {/* 最新ニュース */}
@@ -63,7 +64,10 @@ export default function HomeContent(p: HomeContentProps) {
       {/* カテゴリ */}
       {categories.length > 0 && (
         <Sec bg="var(--color-cat-gradient)">
-          <SectionHead label={locale==='ja'?'AIカテゴリ':'AI Categories'} />
+          <CategorySectionHead
+            label={locale==='ja'?'AIカテゴリ':'AI Categories'}
+            locale={locale}
+          />
           <CategoryGrid categories={categories} locale={locale} />
         </Sec>
       )}
@@ -159,6 +163,61 @@ function SectionHead({ label }: { label: string }) {
         {label}
       </h2>
       <div className="mt-2 h-px w-10" style={{ background:'var(--color-accent)' }} />
+    </motion.div>
+  );
+}
+
+function CategorySectionHead({ label, locale }: { label: string; locale: Locale }) {
+  const [query, setQuery] = useState('');
+  const router = useRouter();
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    router.push(locale === 'ja' ? `/tools?q=${encodeURIComponent(q)}` : `/en/tools?q=${encodeURIComponent(q)}`);
+  };
+  return (
+    <motion.div initial={{ opacity:0, x:-12 }} whileInView={{ opacity:1, x:0 }}
+      viewport={{ once:true }} transition={{ duration:0.3 }}
+      className="cat-header-layout">
+      <div>
+        <h2 className="font-display text-2xl sm:text-3xl" style={{ color:'var(--color-text)' }}>
+          {label}
+        </h2>
+        <div className="mt-2 h-px w-10" style={{ background:'var(--color-accent)' }} />
+      </div>
+      <div className="cat-header-search">
+        <form onSubmit={handleSearch} style={{ display:'flex' }}>
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder={locale === 'ja' ? 'ツール名・機能・用途で検索...' : 'Search by name, feature...'}
+            style={{
+              flex:'1', fontFamily:'var(--font-noto), sans-serif', fontSize:'0.875rem',
+              padding:'10px 14px', background:'var(--color-bg)',
+              border:'1px solid var(--color-border-mid)', borderRight:'none',
+              borderRadius:'3px 0 0 3px', color:'var(--color-text)', outline:'none',
+              transition:'border-color 180ms ease',
+            }}
+            onFocus={e => e.currentTarget.style.borderColor = 'var(--color-accent)'}
+            onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border-mid)'}
+          />
+          <button type="submit" style={{
+            padding:'10px 18px', background:'var(--color-accent)',
+            border:'1px solid var(--color-accent)', borderRadius:'0 3px 3px 0',
+            color:'#FFFFFF', fontFamily:'var(--font-fira), system-ui',
+            fontSize:'0.78rem', fontWeight:700, letterSpacing:'0.1em',
+            textTransform:'uppercase', cursor:'pointer', whiteSpace:'nowrap',
+            transition:'background 180ms ease',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--color-accent-hover)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--color-accent)'}
+          >
+            {locale === 'ja' ? '検索' : 'Search'}
+          </button>
+        </form>
+      </div>
     </motion.div>
   );
 }
