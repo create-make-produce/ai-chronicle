@@ -462,3 +462,16 @@ p, li, dd, dt, td, th { font-feature-settings: "palt" 1; word-break: break-word;
 @media (max-width: 767px) {
   .hero-circle-wrap { display: none !important; }
 }
+
+/* =========================================
+   ドット背景（全ページ共通）
+   ========================================= */
+body {
+  background-image: radial-gradient(circle, #C8CDD8 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
+  background-attachment: fixed;
+}
+/* カード・パネルは背景を白で上書き（ドットが透けないように） */
+.card, .clean-table, [style*="var(--color-bg-sub)"] {
+  background-color: var(--color-bg-card);
+}

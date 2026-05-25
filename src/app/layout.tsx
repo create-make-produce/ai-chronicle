@@ -1,6 +1,6 @@
 // src/app/layout.tsx
 import type { Metadata } from 'next';
-import { Inter, Noto_Sans_JP, Anton, Orbitron, Fira_Sans, Merriweather, Shippori_Mincho } from 'next/font/google';
+import { Inter, Noto_Sans_JP, Noto_Serif_JP, Anton, Orbitron, Fira_Sans, Merriweather, Shippori_Mincho, Kaisei_Decol } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import FooterWrapper from '@/components/FooterWrapper';
@@ -13,6 +13,8 @@ const firaSans = Fira_Sans({ subsets: ['latin'], weight: ['400','600','700','800
 const merriweather = Merriweather({ subsets: ['latin'], weight: ['400','700','900'], variable: '--font-merriweather', display: 'swap' });
 const shipporiMincho = Shippori_Mincho({ subsets: ['latin'], weight: ['400','500','600','700','800'], variable: '--font-shippori', display: 'swap' });
 const orbitron = Orbitron({ subsets: ['latin'], weight: ['400','700','900'], variable: '--font-orbitron', display: 'swap' });
+const kaiseiDecol = Kaisei_Decol({ subsets: ['latin'], weight: ['400','700'], variable: '--font-kaisei-decol', display: 'swap' });
+const notoSerifJP = Noto_Serif_JP({ subsets: ['latin'], weight: ['400','500','600','700'], variable: '--font-noto-serif', display: 'swap' });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chronicle-76h.pages.dev';
 
@@ -33,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="ja"
       data-theme="dark"
       suppressHydrationWarning
-      className={`${inter.variable} ${notoSansJP.variable} ${anton.variable} ${orbitron.variable} ${firaSans.variable} ${merriweather.variable} ${shipporiMincho.variable}`}
+      className={`${inter.variable} ${notoSansJP.variable} ${anton.variable} ${orbitron.variable} ${firaSans.variable} ${merriweather.variable} ${shipporiMincho.variable} ${kaiseiDecol.variable} ${notoSerifJP.variable}`}
     >
       <head>
         {/* テーマフラッシュ防止：JS実行前にdata-themeをlocalStorageから復元 */}
