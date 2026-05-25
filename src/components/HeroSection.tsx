@@ -5,11 +5,11 @@ import { motion } from 'framer-motion';
 import type { Locale } from '@/types';
 
 const HERO_PHOTOS = [
-  '/hero/hero1.jpg',
-  '/hero/hero2.jpg',
-  '/hero/hero3.jpg',
-  '/hero/hero4.jpg',
-  '/hero/hero5.jpg',
+  '/hero/hero1.webp',
+  '/hero/hero2.webp',
+  '/hero/hero3.webp',
+  '/hero/hero4.webp',
+  '/hero/hero5.webp',
 ];
 
 interface HeroSectionProps {
@@ -137,6 +137,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           fontWeight:700, margin:'0 0 10px', lineHeight:1.3,
           background:'linear-gradient(135deg, #0A2040 0%, #0070CC 100%)',
           WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
+          filter:'drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 6px rgba(255,255,255,0.95))',
         }}>
           {locale === 'ja' ? 'AIの世界は、毎日動いている' : 'The AI world moves every day'}
         </p>
