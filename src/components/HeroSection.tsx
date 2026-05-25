@@ -155,6 +155,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             fontSize:  'clamp(1rem, 1.6vw, 1.2rem)',
             fontWeight:700, color:'#1A5A9C',
             margin:'0 0 2px', lineHeight:1.8,
+            filter:'drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 6px rgba(255,255,255,0.95))',
           }}>{line}</p>
         ))}
       </motion.div>

@@ -478,6 +478,14 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     }
 
     if (finalPublished) {
+      // 24時間以内に同ツールのニュースが既にある場合はスキップ
+      const recentNews = await db.first<{ id: string }>(
+        `SELECT id FROM news WHERE tool_id = ? AND published_at > datetime('now', '-24 hours') LIMIT 1`,
+        [toolId]
+      );
+      if (recentNews) {
+        console.log(`  ⏭ ニュース生成スキップ（24時間以内に既存）`);
+      } else {
       const category = categoryId ? await db.first<{ name_ja: string }>('SELECT name_ja FROM categories WHERE id = ?', [categoryId]) : null;
       await createNews(db, {
         type: 'new_tool',
@@ -492,6 +500,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
           category_name_ja: category?.name_ja ?? null,
         },
       });
+      } // end recentNews check
     }
 
     return { success: true, toolId };
