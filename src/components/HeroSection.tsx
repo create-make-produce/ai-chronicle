@@ -24,6 +24,12 @@ export default function HeroSection({ locale }: HeroSectionProps) {
     return () => clearInterval(t);
   }, []);
 
+  const BORDER_GRADIENT = [
+    'conic-gradient(from 0deg,',
+    '#29B6F6, #1565C0, #6A1B9A, #E91E63,',
+    '#F44336, #FF9800, #FDD835, #26A69A, #29B6F6)',
+  ].join(' ');
+
   return (
     <section style={{
       position:     'relative',
@@ -33,7 +39,6 @@ export default function HeroSection({ locale }: HeroSectionProps) {
       height:       '560px',
     }}>
 
-      {/* ドット背景 */}
       <div style={{
         position:        'absolute', inset: 0, pointerEvents: 'none',
         backgroundImage: 'radial-gradient(circle, #C0C8D4 1.3px, transparent 1.3px)',
@@ -43,50 +48,42 @@ export default function HeroSection({ locale }: HeroSectionProps) {
 
       <style>{`
         @media (max-width: 960px) { .hero-circle-area { display: none !important; } }
+        @keyframes border-spin    { from { transform: rotate(0deg); }   to { transform: rotate(360deg); }  }
+        @keyframes border-counter { from { transform: rotate(0deg); }   to { transform: rotate(-360deg); } }
+        .circle-outer { animation: border-spin    5s linear infinite; }
+        .circle-inner { animation: border-counter 5s linear infinite; }
       `}</style>
 
-      {/* ── 大きな●（上下100pxずつ隠れる） ── */}
       <div className="hero-circle-area" style={{
-        position:  'absolute',
-        right:     '-140px',
-        top:       '50%',
-        transform: 'translateY(-50%)',
-        zIndex:    1,
-        width:     '760px',
-        height:    '760px',
+        position: 'absolute', right: '-140px', top: '50%',
+        transform: 'translateY(-50%)', zIndex: 1,
+        width: '760px', height: '760px',
       }}>
-        <div style={{
+        <div className="circle-outer" style={{
           width: '100%', height: '100%',
-          borderRadius: '50%',
-          padding: '3px',
-          background: 'linear-gradient(135deg, #FFB6C8 0%, #8BB8FF 35%, #A8F0D4 65%, #FFE066 100%)',
+          borderRadius: '50%', padding: '2px',
+          background: BORDER_GRADIENT,
         }}>
-          <div style={{
+          <div className="circle-inner" style={{
             width: '100%', height: '100%',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            position: 'relative',
-            background: '#EBF5FF',
+            borderRadius: '50%', overflow: 'hidden',
+            position: 'relative', background: '#EBF5FF',
           }}>
             {HERO_PHOTOS.map((photo, i) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img key={i} src={photo} alt="" style={{
                 position: 'absolute', inset: 0,
-                width: '100%', height: '100%',
-                objectFit: 'cover',
-                opacity: i === activeIdx ? 1 : 0,
-                transition: 'opacity 1.4s ease',
+                width: '100%', height: '100%', objectFit: 'cover',
+                opacity: i === activeIdx ? 1 : 0, transition: 'opacity 1.4s ease',
               }} />
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── タイトル（左上） ── */}
       <div style={{ position: 'relative', zIndex: 2, paddingTop: '64px' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div style={{ maxWidth: '520px' }}>
-
             <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.3 }}
               style={{ marginBottom:'14px' }}>
               <span style={{
@@ -100,7 +97,6 @@ export default function HeroSection({ locale }: HeroSectionProps) {
                 <span style={{ width:24, height:2, background:'var(--color-accent)', display:'inline-block', borderRadius:1 }} />
               </span>
             </motion.div>
-
             <motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.06 }}
               style={{
                 fontFamily:'var(--font-fira), system-ui', fontWeight:900,
@@ -108,10 +104,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
                 letterSpacing:'-0.04em', textTransform:'uppercase', margin:0,
                 background:'linear-gradient(135deg, #0A2040 0%, #004A8F 100%)',
                 WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-              }}>
-              AI TOOLS
-            </motion.h1>
-
+              }}>AI TOOLS</motion.h1>
             <motion.h2 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.12 }}
               style={{
                 fontFamily:'var(--font-fira), system-ui', fontWeight:900,
@@ -119,46 +112,34 @@ export default function HeroSection({ locale }: HeroSectionProps) {
                 letterSpacing:'-0.03em', margin:'6px 0 0',
                 background:'linear-gradient(135deg, #0070CC 0%, #00AAFF 100%)',
                 WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-              }}>
-              {locale === 'ja' ? '最新情報' : 'LATEST INFO'}
-            </motion.h2>
-
+              }}>{locale === 'ja' ? '最新情報' : 'LATEST INFO'}</motion.h2>
           </div>
         </div>
       </div>
 
-      {/* ── コピーテキスト（画面中央・少し下・左揃えブロック） ── */}
       <motion.div
         initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
         transition={{ duration:0.5, delay:0.25 }}
         style={{
-          position:      'absolute',
-          top:           '64%',          /* 少し下 */
-          left:          '42%',
-          transform:     'translate(-50%, -50%)',
-          zIndex:        3,
-          display:       'inline-block', /* コンテンツ幅に縮む */
-          textAlign:     'left',         /* ブロック内は左揃え */
-          pointerEvents: 'none',
-          maxWidth:      '80%',
+          position: 'absolute',
+          top:      '58%',
+          left:     '30%',
+          transform:'translate(-50%, -50%)',
+          zIndex:   3,
+          display:  'inline-block',
+          textAlign:'left',
+          pointerEvents:'none',
+          maxWidth: '80%',
         }}>
-
-        {/* 1行目：大きく・グラデーション */}
         <p style={{
-          fontFamily:         'var(--font-noto-serif), serif',
-          fontSize:           'clamp(1.6rem, 3vw, 2.2rem)',
-          fontWeight:         700,
-          margin:             '0 0 10px',
-          lineHeight:         1.3,
-          background:         'linear-gradient(135deg, #0A2040 0%, #0070CC 100%)',
-          WebkitBackgroundClip:'text',
-          WebkitTextFillColor:'transparent',
-          backgroundClip:     'text',
+          fontFamily:'var(--font-noto-serif), serif',
+          fontSize:  'clamp(2rem, 3.5vw, 2.8rem)',
+          fontWeight:700, margin:'0 0 10px', lineHeight:1.3,
+          background:'linear-gradient(135deg, #0A2040 0%, #0070CC 100%)',
+          WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
         }}>
           {locale === 'ja' ? 'AIの世界は、毎日動いている' : 'The AI world moves every day'}
         </p>
-
-        {/* 2〜4行目：小さく・アクセントブルー */}
         {(locale === 'ja' ? [
           '海外発の最新ツールを日本語でいち早く',
           '新機能 / 新サービス / 料金改定',
@@ -169,17 +150,12 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           'Stay ahead. Miss nothing',
         ]).map((line, i) => (
           <p key={i} style={{
-            fontFamily: 'var(--font-noto-serif), serif',
-            fontSize:   'clamp(0.85rem, 1.4vw, 1rem)',
-            fontWeight: 400,
-            color:      '#1A5A9C',
-            margin:     '0 0 2px',
-            lineHeight: 1.8,
-          }}>
-            {line}
-          </p>
+            fontFamily:'var(--font-noto-serif), serif',
+            fontSize:  'clamp(1rem, 1.6vw, 1.2rem)',
+            fontWeight:400, color:'#1A5A9C',
+            margin:'0 0 2px', lineHeight:1.8,
+          }}>{line}</p>
         ))}
-
       </motion.div>
 
     </section>
