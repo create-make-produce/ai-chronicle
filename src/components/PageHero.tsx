@@ -19,7 +19,7 @@ interface PageHeroProps {
 export default function PageHero({
   breadcrumbs, label, watermark, theme = PAGE_THEMES.home, children,
 }: PageHeroProps) {
-  const wm = watermark ?? label.split(' ')[0];
+  const wm = watermark ?? (label ? label.split(' ')[0] : '');
 
   return (
     <section
