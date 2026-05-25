@@ -256,8 +256,7 @@ async function main() {
 
   if (tools.length === 0) {
     console.log('処理対象がありません。');
-    return;
-  }
+  } else {
 
   let aiCount = 0;
   let notAiCount = 0;
@@ -345,13 +344,14 @@ async function main() {
     }
   }
 
-  console.log('\n=============================');
-  console.log(`ai=${aiCount} / not_ai=${notAiCount} / review=${reviewCount} / error=${errorCount}`);
-  if (isDryRun) console.log('※ DRY RUN のためDBは変更されていません');
-  console.log('=============================\n');
+    console.log('\n=============================');
+    console.log(`ai=${aiCount} / not_ai=${notAiCount} / review=${reviewCount} / error=${errorCount}`);
+    if (isDryRun) console.log('※ DRY RUN のためDBは変更されていません');
+    console.log('=============================\n');
+  }
 
   // =====================
-  // メール通知（review発生 or DB内pending存在時）
+  // メール通知（件数に関わらず常に実行）
   // =====================
   if (!isDryRun) {
     await sendNotificationIfNeeded(db);
