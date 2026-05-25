@@ -1,6 +1,8 @@
 // src/components/ToolsFilter.tsx
 'use client';
 import { useState, useMemo } from 'react';
+import type { PageTheme } from '@/lib/page-themes';
+import { PAGE_THEMES } from '@/lib/page-themes';
 import type { Locale, Tool } from '@/types';
 import { t } from '@/lib/i18n';
 import ToolCard from './ToolCard';
@@ -20,12 +22,13 @@ interface ToolsFilterProps {
   categories?: Category[];
   initialCat?: string;
   initialQ?: string;
+  theme?: PageTheme;
 }
 
 type SortKey = 'newest' | 'name';
 const PER_PAGE = 12;
 
-export default function ToolsFilter({ tools, locale, categorySlug, categoryName, categories = [], initialCat = '', initialQ = '' }: ToolsFilterProps) {
+export default function ToolsFilter({ tools, locale, categorySlug, categoryName, categories = [], initialCat = '', initialQ = '', theme = PAGE_THEMES.tools }: ToolsFilterProps) {
   const [query,       setQuery]       = useState(initialQ);
   const [inputValue,  setInputValue]  = useState(initialQ);
   const [selectedCat, setSelectedCat] = useState(initialCat || categorySlug || '');
@@ -79,7 +82,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
     fontSize: '0.85rem',
     padding: '10px 12px',
     background: 'var(--color-select-bg)',
-    border: '1px solid rgba(0,140,237,0.3)',
+    border: `1px solid rgba(${theme.rgb},0.3)`,
     color: 'var(--color-text)',
     cursor: 'pointer',
     outline: 'none',
@@ -117,11 +120,11 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
           <input
             type="text" value={inputValue} onChange={e => setInputValue(e.target.value)}
             placeholder={locale === 'ja' ? 'ツール名・機能・用途で検索...' : 'Search by name, feature, or use case...'}
-            style={{ flex: 1, maxWidth: '420px', fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.88rem', padding: '10px 14px', background: 'var(--color-search-bg)', border: '1px solid rgba(0,140,237,0.3)', borderRight: 'none', borderRadius: '2px 0 0 2px', color: 'var(--color-text)', outline: 'none' }}
+            style={{ flex: 1, maxWidth: '420px', fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.88rem', padding: '10px 14px', background: 'var(--color-search-bg)', border: `1px solid rgba(${theme.rgb},0.3)`, borderRight: 'none', borderRadius: '2px 0 0 2px', color: 'var(--color-text)', outline: 'none' }}
             onFocus={e => { e.currentTarget.style.borderColor = 'rgba(0,140,237,0.8)'; const btn = e.currentTarget.nextElementSibling as HTMLElement | null; if (btn) btn.style.borderColor = 'rgba(0,140,237,0.8)'; }}
-            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(0,140,237,0.3)'; const btn = e.currentTarget.nextElementSibling as HTMLElement | null; if (btn) btn.style.borderColor = '#008CED'; }}
+            onBlur={e => { e.currentTarget.style.borderColor = `rgba(${theme.rgb},0.3)`; const btn = e.currentTarget.nextElementSibling as HTMLElement | null; if (btn) btn.style.borderColor = theme.accent; }}
           />
-          <button type="submit" style={{ padding: '10px 20px', background: '#008CED', border: '1px solid #008CED', borderRadius: '0 2px 2px 0', color: '#FFFFFF', fontFamily: 'var(--font-fira), system-ui', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+          <button type="submit" style={{ padding: '10px 20px', background: theme.accent, border: `1px solid ${theme.accent}`, borderRadius: '0 2px 2px 0', color: '#FFFFFF', fontFamily: 'var(--font-fira), system-ui', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
             {locale === 'ja' ? '検索' : 'Search'}
           </button>
         </div>
@@ -163,7 +166,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
             ) : (
               <button type="button" key={p}
                 onClick={() => { setCurrentPage(p as number); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.82rem', fontWeight: 700, padding: '5px 10px', minWidth: '34px', border: `1px solid ${p === safePage ? '#008CED' : 'var(--color-page-btn-border)'}`, borderRadius: '4px', background: p === safePage ? '#008CED' : 'transparent', color: p === safePage ? '#FFFFFF' : 'var(--color-page-btn-text)', cursor: 'pointer' }}>
+                style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.82rem', fontWeight: 700, padding: '5px 10px', minWidth: '34px', border: `1px solid ${p === safePage ? theme.accent : 'var(--color-page-btn-border)'}`, borderRadius: '4px', background: p === safePage ? theme.accent : 'transparent', color: p === safePage ? '#FFFFFF' : 'var(--color-page-btn-text)', cursor: 'pointer' }}>
                 {p}
               </button>
             )

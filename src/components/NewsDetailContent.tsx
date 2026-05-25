@@ -4,26 +4,27 @@ import Link from 'next/link';
 import type { Locale, News, Tool } from '@/types';
 import { t, localizedPath } from '@/lib/i18n';
 import AdSlot from './AdSlot';
+import PageHero from './PageHero';
+import { PAGE_THEMES } from '@/lib/page-themes';
 
 const NEWS_TYPE_LABELS = {
-  price_change: { ja: '料金改定',  en: 'Price Change', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)',  border: 'rgba(252,211,77,0.3)'  },
-  new_tool:     { ja: '新ツール',  en: 'New Tool',     color: '#FB7185', bg: 'rgba(251,113,133,0.12)', border: 'rgba(251,113,133,0.3)' },
-  new_feature:  { ja: '新機能',    en: 'New Feature',  color: '#60A5FA', bg: 'rgba(96,165,250,0.12)',  border: 'rgba(96,165,250,0.3)'  },
-  other:        { ja: 'その他',    en: 'Other',        color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)',  border: 'rgba(156,163,175,0.3)' },
+  price_change: { ja: '料金改定', en: 'Price Change', color: 'var(--color-news-price-change)', bg: 'var(--color-news-price-change-bg)', border: 'var(--color-news-price-change-border)' },
+  new_tool:     { ja: '新ツール', en: 'New Tool',     color: 'var(--color-news-new-tool)',     bg: 'var(--color-news-new-tool-bg)',     border: 'var(--color-news-new-tool-border)'     },
+  new_feature:  { ja: '新機能',   en: 'New Feature',  color: 'var(--color-news-new-feature)',  bg: 'var(--color-news-new-feature-bg)',  border: 'var(--color-news-new-feature-border)'  },
+  other:        { ja: 'その他',   en: 'Other',        color: 'var(--color-news-other)',        bg: 'var(--color-news-other-bg)',        border: 'var(--color-news-other-border)'        },
 } as const;
 
 function formatDateTime(isoStr: string, locale: Locale): string {
   try {
     const raw = isoStr.includes('Z') ? isoStr : isoStr.replace(' ', 'T') + 'Z';
-    const d = new Date(raw);
+    const d   = new Date(raw);
     const pad = (n: number) => String(n).padStart(2, '0');
     if (locale === 'ja') {
       const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
       return `${jst.getUTCFullYear()}年${jst.getUTCMonth() + 1}月${jst.getUTCDate()}日  ${pad(jst.getUTCHours())}:${pad(jst.getUTCMinutes())} JST`;
-    } else {
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}  ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
     }
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}  ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
   } catch { return isoStr?.slice(0, 10) ?? ''; }
 }
 
@@ -51,45 +52,51 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
   return (
     <main className="flex-1" style={{ background: 'var(--color-page-gradient)' }}>
 
-      {/* ━━━ ヒーローヘッダー（常にダーク） ━━━ */}
-      <div style={{
-        position: 'relative', overflow: 'hidden', background: '#040912',
-        borderBottom: '1px solid rgba(0,140,237,0.15)',
-        paddingTop: '16px', paddingBottom: '24px',
-      }}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: '-20%', left: '-5%', width: '55%', height: '140%', background: 'linear-gradient(135deg, rgba(0,80,180,0.18) 0%, rgba(0,140,237,0.08) 100%)', transform: 'skewX(-8deg)' }} />
-          <div style={{ position: 'absolute', top: '-20%', right: '15%', width: '2px', height: '140%', background: 'rgba(0,140,237,0.2)', transform: 'skewX(-8deg)' }} />
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
+      <PageHero
+        theme={PAGE_THEMES.news}
+        breadcrumbs={[
+          { label: tt.navHome, href: localizedPath(locale, '/') },
+          { label: tt.navNews, href: localizedPath(locale, '/news') },
+          { label: title },
+        ]}
+        label="AI NEWS"
+        watermark="NEWS"
+      >
+        {/* バッジ＋日時 */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+          <span style={{
+            fontFamily:    'Fira Sans, sans-serif',
+            fontSize:      '0.72rem',
+            fontWeight:    700,
+            color:         badge.color,
+            background:    badge.bg,
+            padding:       '3px 10px',
+            borderRadius:  '3px',
+            border:        `1px solid ${badge.border}`,
+            letterSpacing: '0.05em',
+          }}>
+            {badgeLabel}
+          </span>
+          <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.82rem', color: 'var(--color-text-timestamp)', letterSpacing: '0.02em' }}>
+            {dateTime}
+          </time>
         </div>
 
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 1 }}>
-          <nav style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem", fontSize: "0.78rem", color: "#4A5568", marginBottom: "1.25rem" }}>
-            <Link href={localizedPath(locale, '/')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navHome}</Link>
-            <span>/</span>
-            <Link href={localizedPath(locale, '/news')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navNews}</Link>
-            <span>/</span>
-            <span style={{ color: '#F0EBE1' }}>{title}</span>
-          </nav>
-          <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#008CED', marginBottom: '0.5rem' }}>
-            AI News
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '0.75rem' }}>
-            <span style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '3px 10px', borderRadius: '3px', border: `1px solid ${badge.border}`, letterSpacing: '0.05em' }}>
-              {badgeLabel}
-            </span>
-            <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.82rem', color: '#AABBCC', letterSpacing: '0.02em' }}>
-              {dateTime}
-            </time>
-          </div>
-          <h1 style={{ fontFamily: locale === 'ja' ? 'Noto Sans JP, sans-serif' : 'Fira Sans, sans-serif', fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 900, lineHeight: 1.35, color: '#F0EBE1', margin: 0 }}>
-            {title}
-          </h1>
-        </div>
-      </div>
+        {/* タイトル */}
+        <h1 style={{
+          fontFamily: locale === 'ja' ? 'Noto Sans JP, sans-serif' : 'Fira Sans, sans-serif',
+          fontSize:   'clamp(1.5rem, 3vw, 2.25rem)',
+          fontWeight: 900,
+          lineHeight: 1.35,
+          color:      'var(--color-text)',
+          margin:     0,
+        }}>
+          {title}
+        </h1>
+      </PageHero>
 
       {/* ━━━ 記事本文エリア ━━━ */}
-      <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <article className="max-w-3xl mx-auto section-px py-10">
         {body && (
           <div style={{ fontSize: '0.95rem', lineHeight: 1.95, color: 'var(--color-text)', whiteSpace: 'pre-wrap', marginBottom: '2.5rem' }}>
             {body}
@@ -116,7 +123,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
                     {locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en}
                   </p>
                   {(locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en) && (
-                    <p style={{ fontSize: '0.82rem', color: 'var(--color-text-sub)', margin: '3px 0 0' }}>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
                       {locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en}
                     </p>
                   )}
@@ -139,13 +146,15 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
             <h2 style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
               {tt.secRelatedNews}
             </h2>
-            <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', overflow: 'hidden', background: 'var(--color-panel-bg)' }}>
+            <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', overflow: 'hidden', background: 'var(--color-bg)' }}>
               {relatedNews.map((item, idx) => {
                 const itemTypeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
                 const itemBadge   = NEWS_TYPE_LABELS[itemTypeKey] ?? NEWS_TYPE_LABELS.other;
                 return (
-                  <Link key={item.id} href={localizedPath(locale, `/news/${item.slug}`)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '0.75rem 1rem', textDecoration: 'none', borderBottom: idx < relatedNews.length - 1 ? '1px solid var(--color-border)' : 'none', transition: 'background 0.12s' }}
+                  <Link
+                    key={item.id}
+                    href={localizedPath(locale, `/news/${item.slug}`)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '0.75rem 1rem', textDecoration: 'none', borderBottom: idx < relatedNews.length - 1 ? '1px solid var(--color-border)' : 'none', borderLeft: `3px solid ${itemBadge.color}`, transition: 'background 0.12s' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-row-hover)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >

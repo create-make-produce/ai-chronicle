@@ -160,6 +160,18 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         ))}
       </motion.div>
 
+      {/* 下部アクセントライン：左から青・右へ薄く（写真と被らないよう） */}
+      <div style={{
+        position:   'absolute',
+        bottom:     0,
+        left:       0,
+        right:      0,
+        height:     '2px',
+        zIndex:     4,
+        background: 'linear-gradient(to right, #008CED 0%, rgba(0,140,237,0.2) 60%, transparent 100%)',
+        pointerEvents: 'none',
+      }} />
+
     </section>
   );
 }

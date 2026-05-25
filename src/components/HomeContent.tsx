@@ -66,6 +66,8 @@ export default function HomeContent(p: HomeContentProps) {
         </Sec>
       )}
 
+      <SectionDivider direction="right" />
+
       {/* カテゴリ */}
       {categories.length > 0 && (
         <Sec bg="var(--color-cat-gradient)">
@@ -76,6 +78,8 @@ export default function HomeContent(p: HomeContentProps) {
           <CategoryGrid categories={categories} locale={locale} />
         </Sec>
       )}
+
+      <SectionDivider direction="left" />
 
       {/* 最新アップデート */}
       {newTools.length > 0 && (
@@ -91,6 +95,8 @@ export default function HomeContent(p: HomeContentProps) {
           </div>
         </Sec>
       )}
+
+      <SectionDivider direction="right" />
 
       {/* 注目のNote記事（カテゴリ別） */}
       {categoryNotes.length > 0 && (
@@ -185,6 +191,16 @@ export default function HomeContent(p: HomeContentProps) {
         </Sec>
       )}
     </main>
+  );
+}
+
+
+function SectionDivider({ direction }: { direction: 'left' | 'right' }) {
+  const grad = direction === 'left'
+    ? 'linear-gradient(to right, #008CED 0%, rgba(0,140,237,0.2) 60%, transparent 100%)'
+    : 'linear-gradient(to left,  #008CED 0%, rgba(0,140,237,0.2) 60%, transparent 100%)';
+  return (
+    <div style={{ height: '2px', background: grad }} />
   );
 }
 

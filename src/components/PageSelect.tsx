@@ -1,5 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import type { PageTheme } from '@/lib/page-themes';
+import { PAGE_THEMES } from '@/lib/page-themes';
 
 interface PageSelectProps {
   currentPage: number;
@@ -7,9 +9,10 @@ interface PageSelectProps {
   basePath: string;
   month?: string;
   lang?: 'ja' | 'en';
+  theme?: PageTheme;
 }
 
-export default function PageSelect({ currentPage, totalPages, basePath, month, lang = 'ja' }: PageSelectProps) {
+export default function PageSelect({ currentPage, totalPages, basePath, month, lang = 'ja', theme = PAGE_THEMES.home }: PageSelectProps) {
   const router = useRouter();
   if (totalPages <= 1) return null;
 
@@ -58,9 +61,9 @@ export default function PageSelect({ currentPage, totalPages, basePath, month, l
             onClick={() => goTo(p as number)}
             style={{
               ...btnBase,
-              background: p === currentPage ? '#008CED' : 'transparent',
+              background: p === currentPage ? theme.accent : 'transparent',
               color: p === currentPage ? '#FFFFFF' : 'var(--color-page-btn-text)',
-              borderColor: p === currentPage ? '#008CED' : 'var(--color-page-btn-border)',
+              borderColor: p === currentPage ? theme.accent : 'var(--color-page-btn-border)',
             }}
           >
             {p}

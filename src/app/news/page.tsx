@@ -1,8 +1,9 @@
 export const runtime = 'edge';
 
-import Link from 'next/link';
 import { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';
+import PageHero from '@/components/PageHero';
+import { PAGE_THEMES } from '@/lib/page-themes';
 
 export const metadata: Metadata = {
   title: 'AIツール最新ニュース | AI Chronicle',
@@ -15,11 +16,7 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
   const token     = process.env.CLOUDFLARE_API_TOKEN;
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
-    {
-      method:  'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ sql, params }),
-    }
+    { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }) }
   );
   const data = await res.json();
   return data.result?.[0]?.results ?? [];
@@ -30,11 +27,8 @@ async function getLatestNews() {
     `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en,
             t.slug as tool_slug, t.logo_url as tool_logo_url
      FROM news n LEFT JOIN tools t ON n.tool_id = t.id
-     WHERE n.is_published = 1
-       AND (n.tool_id IS NULL OR t.is_published = 1)
-     ORDER BY n.published_at DESC
-     LIMIT 50`,
-    []
+     WHERE n.is_published = 1 AND (n.tool_id IS NULL OR t.is_published = 1)
+     ORDER BY n.published_at DESC LIMIT 50`
   );
 }
 
@@ -45,7 +39,7 @@ function groupByMonth(items: NewsItem[]): Array<{ monthKey: string; monthLabel: 
   for (const n of items) {
     const dateStr = n.published_at as string;
     if (!dateStr) continue;
-    const d = new Date((dateStr.includes('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z'));
+    const d = new Date(dateStr.includes('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z');
     if (Number.isNaN(d.getTime())) continue;
     const jst   = new Date(d.getTime() + 9 * 60 * 60 * 1000);
     const key   = `${jst.getUTCFullYear()}-${String(jst.getUTCMonth() + 1).padStart(2, '0')}`;
@@ -58,135 +52,48 @@ function groupByMonth(items: NewsItem[]): Array<{ monthKey: string; monthLabel: 
     .map(([key, { label, items }]) => ({ monthKey: key, monthLabel: label, items }));
 }
 
+const theme = PAGE_THEMES.news;
+
 export default async function NewsPage() {
   const newsItems = await getLatestNews();
   const grouped   = groupByMonth(newsItems as NewsItem[]);
 
   return (
     <main style={{ minHeight: '100vh' }}>
-
-      {/* ── Hero ── */}
-      <section
-        className="hero-bg"
-        style={{
-          backgroundColor: 'var(--color-bg)',
-          borderBottom:    '1px solid var(--color-border)',
-          paddingTop:      '36px',
-          paddingBottom:   '36px',
-        }}
+      <PageHero
+        breadcrumbs={[{ label: 'ホーム', href: '/' }, { label: 'ニュース' }]}
+        label="AI NEWS"
+        watermark="NEWS"
+        theme={theme}
       >
-        <div className="max-w-7xl mx-auto section-px">
-          {/* パンくず */}
-          <nav style={{
-            display:      'flex',
-            flexWrap:     'wrap',
-            alignItems:   'center',
-            gap:          '0.4rem',
-            fontSize:     '0.78rem',
-            marginBottom: '1.25rem',
-          }}>
-            <Link href="/" style={{ color: 'var(--color-text-breadcrumb)', textDecoration: 'none' }}>ホーム</Link>
-            <span style={{ color: 'var(--color-border-mid)' }}>/</span>
-            <span style={{ color: 'var(--color-text)' }}>ニュース</span>
-          </nav>
+        <h1 style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: 'clamp(2rem, 5vw, 2.8rem)', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1.1, letterSpacing: '0.01em', textTransform: 'uppercase', marginBottom: '10px' }}>
+          最新ニュース
+        </h1>
+        <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0 }}>
+          新機能・アップデート・価格改定に関する最新情報
+        </p>
+      </PageHero>
 
-          {/* セクションラベル */}
-          <span className="section-label" style={{ marginBottom: '10px' }}>AI NEWS</span>
-
-          {/* タイトル */}
-          <h1 style={{
-            fontFamily:    'var(--font-fira), system-ui',
-            fontSize:      'clamp(2rem, 5vw, 2.8rem)',
-            fontWeight:    900,
-            color:         'var(--color-text)',
-            lineHeight:    1.1,
-            letterSpacing: '0.01em',
-            textTransform: 'uppercase',
-            marginTop:     '10px',
-            marginBottom:  '10px',
-          }}>
-            最新ニュース
-          </h1>
-
-          <p style={{
-            fontFamily: 'var(--font-noto), sans-serif',
-            fontSize:   '0.9rem',
-            color:      'var(--color-text-muted)',
-            margin:     0,
-          }}>
-            新機能・アップデート・価格改定に関する最新情報
-          </p>
-        </div>
-      </section>
-
-      {/* ── コンテンツ ── */}
       <div style={{ background: 'var(--color-page-gradient)' }}>
         <div className="max-w-7xl mx-auto section-px" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
           {newsItems.length === 0 ? (
-            <div style={{
-              textAlign:    'center',
-              padding:      '4rem 2rem',
-              color:        'var(--color-text-muted)',
-              border:       '1px dashed var(--color-border)',
-              borderRadius: '4px',
-              fontFamily:   'var(--font-noto), sans-serif',
-              fontSize:     '0.9rem',
-            }}>
+            <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--color-text-muted)', border: '1px dashed var(--color-border)', borderRadius: '4px' }}>
               ニュースはまだありません。
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
               {grouped.map(({ monthKey, monthLabel, items }) => (
                 <section key={monthKey}>
-                  {/* 月見出し */}
-                  <div style={{
-                    display:      'flex',
-                    alignItems:   'center',
-                    gap:          '10px',
-                    marginBottom: '10px',
-                  }}>
-                    <span style={{
-                      width:      '22px',
-                      height:     '2px',
-                      background: 'var(--color-accent)',
-                      display:    'inline-block',
-                      flexShrink: 0,
-                    }} />
-                    <h2 style={{
-                      fontFamily:    'var(--font-fira), system-ui',
-                      fontWeight:    800,
-                      fontSize:      '0.9rem',
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      color:         'var(--color-text-muted)',
-                      margin:        0,
-                    }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <span style={{ width: '22px', height: '2px', background: theme.accent, display: 'inline-block', flexShrink: 0 }} />
+                    <h2 style={{ fontFamily: 'var(--font-fira), system-ui', fontWeight: 800, fontSize: '0.9rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', margin: 0 }}>
                       {monthLabel}
                     </h2>
-                    <span style={{
-                      fontSize:   '0.72rem',
-                      fontWeight: 600,
-                      color:      'var(--color-border-mid)',
-                    }}>
-                      {items.length}件
-                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-border-mid)' }}>{items.length}件</span>
                   </div>
-
-                  {/* ニュースリスト */}
-                  <div style={{
-                    background:   'var(--color-bg)',
-                    border:       '1px solid var(--color-border)',
-                    borderRadius: '4px',
-                    overflow:     'hidden',
-                  }}>
+                  <div style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
                     {items.map((item, idx) => (
-                      <NewsRow
-                        key={item.id as string}
-                        item={item as any}
-                        href={`/news/${item.slug as string}`}
-                        lang="ja"
-                        isLast={idx === items.length - 1}
-                      />
+                      <NewsRow key={item.id as string} item={item as any} href={`/news/${item.slug as string}`} lang="ja" isLast={idx === items.length - 1} />
                     ))}
                   </div>
                 </section>

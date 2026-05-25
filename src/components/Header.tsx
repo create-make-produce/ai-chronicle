@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
+import { getThemeByPath } from '@/lib/page-themes';
 
 const NAV_ITEMS = [
   { href: '/',        en: 'TOP',      ja: 'トップ' },
@@ -32,8 +33,13 @@ function MoonIcon() {
 }
 
 export default function Header() {
-  const pathname = usePathname();
+  const pathname   = usePathname();
   const { theme, toggle } = useTheme();
+
+  // 現在ページのテーマカラー
+  const pageTheme  = getThemeByPath(pathname);
+  const accent     = pageTheme.accent;
+  const accentRgb  = pageTheme.rgb;
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -48,6 +54,17 @@ export default function Header() {
       top:          0,
       zIndex:       50,
     }}>
+      {/* ヘッダー下部：ページカラーの細いアクセントライン */}
+      <div style={{
+        position:   'absolute',
+        bottom:     0,
+        left:       0,
+        right:      0,
+        height:     '2px',
+        background: `linear-gradient(to right, ${accent} 0%, rgba(${accentRgb},0.2) 60%, transparent 100%)`,
+        transition: 'background 0.3s ease',
+      }} />
+
       <div style={{
         maxWidth:       '1280px',
         margin:         '0 auto',
@@ -56,6 +73,7 @@ export default function Header() {
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'space-between',
+        position:       'relative',
       }}>
 
         {/* ロゴ */}
@@ -67,16 +85,20 @@ export default function Header() {
             letterSpacing: '0.09em',
             color:         'var(--color-text)',
           }}>
-            AI<span style={{ color: '#008CED' }}>/</span>CHRONICLE
+            AI<span style={{ color: accent, transition: 'color 0.3s' }}>/</span>CHRONICLE
           </span>
         </Link>
 
         {/* デスクトップナビ */}
         <nav className="header-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
 
-          {/* ナビアイテム */}
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
+            // このナビ項目のテーマカラー（アクティブ時のみ使用）
+            const itemTheme = getThemeByPath(item.href);
+            const itemAccent = itemTheme.accent;
+            const itemRgb    = itemTheme.rgb;
+
             return (
               <Link
                 key={item.href}
@@ -90,22 +112,22 @@ export default function Header() {
                   textDecoration: 'none',
                   borderRadius:   '6px',
                   transition:     'background 0.15s',
-                  background:     active ? 'rgba(0,140,237,0.08)' : 'transparent',
+                  background:     active ? `rgba(${itemRgb},0.08)` : 'transparent',
                 }}
                 onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(0,140,237,0.05)';
+                  if (!active) (e.currentTarget as HTMLElement).style.background = `rgba(${itemRgb},0.05)`;
                 }}
                 onMouseLeave={e => {
                   if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent';
                 }}
               >
                 {/* ドット＋英語名 */}
-                <span style={{ display:'flex', alignItems:'center', gap:'5px' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <span style={{
                     width:        '6px',
                     height:       '6px',
                     borderRadius: '50%',
-                    background:   active ? 'var(--color-accent)' : 'var(--color-border-mid)',
+                    background:   active ? itemAccent : 'var(--color-border-mid)',
                     flexShrink:   0,
                     transition:   'background 0.15s',
                   }} />
@@ -114,7 +136,7 @@ export default function Header() {
                     fontSize:      '0.8rem',
                     fontWeight:    700,
                     letterSpacing: '0.08em',
-                    color:         active ? 'var(--color-accent)' : 'var(--color-text)',
+                    color:         active ? itemAccent : 'var(--color-text)',
                     transition:    'color 0.15s',
                   }}>{item.en}</span>
                 </span>
@@ -122,7 +144,7 @@ export default function Header() {
                 <span style={{
                   fontFamily: 'var(--font-noto), sans-serif',
                   fontSize:   '0.58rem',
-                  color:      active ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                  color:      active ? itemAccent : 'var(--color-text-muted)',
                   transition: 'color 0.15s',
                 }}>{item.ja}</span>
               </Link>
@@ -141,18 +163,18 @@ export default function Header() {
               padding:        '7px 18px',
               borderRadius:   '999px',
               border:         isActive('/about')
-                ? '1.5px solid var(--color-accent)'
+                ? `1.5px solid ${accent}`
                 : '1.5px solid var(--color-border-mid)',
-              color:          isActive('/about') ? 'var(--color-accent)' : 'var(--color-text-sub)',
-              background:     isActive('/about') ? 'rgba(0,140,237,0.08)' : 'transparent',
+              color:          isActive('/about') ? accent : 'var(--color-text-sub)',
+              background:     isActive('/about') ? `rgba(${accentRgb},0.08)` : 'transparent',
               transition:     'all 0.15s',
               whiteSpace:     'nowrap',
               marginLeft:     '8px',
             }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLElement;
-              el.style.borderColor = 'var(--color-accent)';
-              el.style.color       = 'var(--color-accent)';
+              el.style.borderColor = accent;
+              el.style.color       = accent;
             }}
             onMouseLeave={e => {
               if (!isActive('/about')) {
@@ -171,11 +193,11 @@ export default function Header() {
             aria-label={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
             className="theme-toggle-btn"
             style={{
-              width:'34px', height:'34px', display:'none',
-              alignItems:'center', justifyContent:'center',
-              background:'transparent', border:'1px solid var(--color-border)',
-              borderRadius:'4px', cursor:'pointer',
-              color:'var(--color-text-nav)', marginLeft:'6px', flexShrink:0,
+              width: '34px', height: '34px', display: 'none',
+              alignItems: 'center', justifyContent: 'center',
+              background: 'transparent', border: '1px solid var(--color-border)',
+              borderRadius: '4px', cursor: 'pointer',
+              color: 'var(--color-text-nav)', marginLeft: '6px', flexShrink: 0,
             }}
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}

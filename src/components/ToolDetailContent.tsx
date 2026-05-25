@@ -5,6 +5,8 @@ import { t, localizedPath } from '@/lib/i18n';
 import AdSlot from './AdSlot';
 import ToolMediaTabs from './ToolMediaTabs';
 import ToolNewsSection from './ToolNewsSection';
+import PageHero from './PageHero';
+import { PAGE_THEMES } from '@/lib/page-themes';
 
 interface ToolDetailContentProps {
   tool: ToolWithPlans;
@@ -46,9 +48,7 @@ function GooglePlayIcon() {
   );
 }
 
-function LinkBadge({ href, icon, topLabel, bottomLabel }: {
-  href: string; icon: React.ReactNode; topLabel: string; bottomLabel: string;
-}) {
+function LinkBadge({ href, icon, topLabel, bottomLabel }: { href: string; icon: React.ReactNode; topLabel: string; bottomLabel: string }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer nofollow"
       style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#000', color: '#fff', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '8px', padding: '6px 14px', textDecoration: 'none', lineHeight: 1.3, minWidth: '130px' }}>
@@ -61,13 +61,15 @@ function LinkBadge({ href, icon, topLabel, bottomLabel }: {
   );
 }
 
-export default function ToolDetailContent({ tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [], relatedToolsFromRelations = [] }: ToolDetailContentProps) {
-  const tt = t[locale];
-  const name = locale === 'ja' ? tool.name_ja : tool.name_en;
-  const tagline = locale === 'ja' ? tool.tagline_ja : tool.tagline_en;
+export default function ToolDetailContent({
+  tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [], relatedToolsFromRelations = [],
+}: ToolDetailContentProps) {
+  const tt          = t[locale];
+  const name        = locale === 'ja' ? tool.name_ja : tool.name_en;
+  const tagline     = locale === 'ja' ? tool.tagline_ja : tool.tagline_en;
   const description = locale === 'ja' ? tool.description_ja : tool.description_en;
 
-  const officialUrl = tool.official_url && !isProductHuntUrl(tool.official_url) ? tool.official_url : null;
+  const officialUrl    = tool.official_url && !isProductHuntUrl(tool.official_url) ? tool.official_url : null;
   const officialDomain = (() => {
     try { return officialUrl ? new URL(officialUrl).hostname.replace('www.', '') : ''; }
     catch { return ''; }
@@ -80,65 +82,60 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
     <>
       <main className="flex-1" style={{ background: 'var(--color-page-gradient)' }}>
 
-        {/* ヘッダー（常にダーク） */}
-        <section style={{ position: 'relative', overflow: 'hidden', background: '#040912', borderBottom: '1px solid rgba(0,140,237,0.15)', paddingTop: '16px', paddingBottom: '24px' }}>
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-            <div style={{ position: 'absolute', top: '-20%', left: '-5%', width: '55%', height: '140%', background: 'linear-gradient(135deg, rgba(0,80,180,0.18) 0%, rgba(0,140,237,0.08) 100%)', transform: 'skewX(-8deg)' }} />
-            <div style={{ position: 'absolute', top: '-20%', right: '15%', width: '2px', height: '140%', background: 'rgba(0,140,237,0.2)', transform: 'skewX(-8deg)' }} />
-            <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,140,237,0.12) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
-          </div>
-          <div className="max-w-7xl mx-auto section-px" style={{ position: 'relative', zIndex: 1 }}>
-            <nav style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#4A5568', marginBottom: '1.25rem' }}>
-              <Link href={localizedPath(locale, '/')} style={{ color: '#4A5568', textDecoration: 'none' }}>{tt.navHome}</Link>
-              <span>/</span>
-              <Link href={localizedPath(locale, '/tools')} style={{ color: '#4A5568', textDecoration: 'none' }}>すべてのAI</Link>
-              {tool.category && (
-                <>
-                  <span>/</span>
-                  <Link href={localizedPath(locale, `/category/${tool.category.slug}`)} style={{ color: '#4A5568', textDecoration: 'none' }}>
-                    {tool.category.name_ja}
-                  </Link>
-                </>
+        <PageHero
+          theme={PAGE_THEMES.tools}
+          breadcrumbs={[
+            { label: tt.navHome, href: localizedPath(locale, '/') },
+            { label: 'すべてのAI', href: localizedPath(locale, '/tools') },
+            ...(tool.category ? [{ label: tool.category.name_ja, href: localizedPath(locale, `/category/${tool.category.slug}`) }] : []),
+            { label: name },
+          ]}
+          label="AI TOOL"
+          watermark={tool.name_en}
+        >
+          {/* ロゴ＋ツール名 */}
+          <div className="tool-hero-layout">
+            <div style={{
+              flexShrink: 0, width: '64px', height: '64px', borderRadius: '8px',
+              background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.08)', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+            }}>
+              {tool.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={tool.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 800, fontSize: '1.4rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>{initials}</span>
               )}
-              <span>/</span>
-              <span style={{ color: '#F0EBE1' }}>{name}</span>
-            </nav>
-
-            <div className="tool-hero-layout">
-              <div style={{ flexShrink: 0, width: '56px', height: '56px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                {tool.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={tool.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{
+                fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+                fontWeight: 800, color: 'var(--color-text)', lineHeight: 1.1,
+                letterSpacing: '0.01em', marginBottom: '0.5rem', textTransform: 'none',
+              }}>
+                {name}
+              </h1>
+              {tagline && (() => {
+                const parts = tagline.split('。').map((s: string) => s.trim()).filter(Boolean);
+                return parts.length > 1 ? (
+                  <div>
+                    <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: 'var(--color-text-sub)', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
+                    <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0', lineHeight: 1.6 }}>{parts[1]}</p>
+                  </div>
                 ) : (
-                  <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 800, fontSize: '1.5rem', color: '#F0EBE1', textTransform: 'uppercase' }}>{initials}</span>
-                )}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h1 style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, color: '#F0EBE1', lineHeight: 1.1, letterSpacing: '0.02em', marginBottom: '0.4rem' }}>
-                  {name}
-                </h1>
-                {tagline && (() => {
-                  const parts = tagline.split('。').map((s: string) => s.trim()).filter(Boolean);
-                  return parts.length > 1 ? (
-                    <div>
-                      <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: '#9CA3AF', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
-                      <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: '#6B7280', margin: '2px 0 0 0', lineHeight: 1.6 }}>{parts[1]}</p>
-                    </div>
-                  ) : (
-                    <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: '#7A8A99', margin: 0 }}>{tagline.replace(/。/g, '')}</p>
-                  );
-                })()}
-              </div>
+                  <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: 'var(--color-text-muted)', margin: 0 }}>{tagline.replace(/。/g, '')}</p>
+                );
+              })()}
             </div>
           </div>
-        </section>
+        </PageHero>
 
-        {/* 本文 */}
+        {/* ── 本文 ── */}
         <div className="max-w-5xl mx-auto section-px pb-16 space-y-4" style={{ paddingTop: '2rem' }}>
 
-          {/* 概要 + リンク */}
           {(description || hasLinks) && (
-            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+            <section style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-accent)', borderRadius: '4px', padding: '1.5rem' }}>
               {description && (
                 <div className="mb-5">
                   <h2 className="font-display text-2xl tracking-tight mb-4" style={{ color: 'var(--color-text)' }}>概要</h2>
@@ -147,22 +144,15 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
                   </div>
                 </div>
               )}
-
               {hasLinks && (
                 <div>
                   <h2 className="section-label mb-3">リンク</h2>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center' }}>
-                    {officialUrl && (
-                      <LinkBadge href={officialUrl} icon={<GlobeIcon />} topLabel="Webサイト" bottomLabel={officialDomain || 'Visit'} />
-                    )}
-                    {tool.ios_url && (
-                      <LinkBadge href={tool.ios_url} icon={<AppleIcon />} topLabel="ダウンロード" bottomLabel="App Store" />
-                    )}
-                    {tool.android_url && (
-                      <LinkBadge href={tool.android_url} icon={<GooglePlayIcon />} topLabel="ダウンロード" bottomLabel="Google Play" />
-                    )}
+                    {officialUrl && <LinkBadge href={officialUrl} icon={<GlobeIcon />} topLabel="Webサイト" bottomLabel={officialDomain || 'Visit'} />}
+                    {tool.ios_url && <LinkBadge href={tool.ios_url} icon={<AppleIcon />} topLabel="ダウンロード" bottomLabel="App Store" />}
+                    {tool.android_url && <LinkBadge href={tool.android_url} icon={<GooglePlayIcon />} topLabel="ダウンロード" bottomLabel="Google Play" />}
                     {(tool.twitter_handle || tool.github_url) && (
-                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.88rem', alignItems: 'center', color: 'var(--color-text)' }}>
+                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.88rem', alignItems: 'center' }}>
                         {tool.twitter_handle && <a href={`https://x.com/${tool.twitter_handle}`} target="_blank" rel="noopener noreferrer" className="link-underline" style={{ color: 'var(--color-accent)' }}>X @{tool.twitter_handle}</a>}
                         {tool.github_url && <a href={tool.github_url} target="_blank" rel="noopener noreferrer" className="link-underline" style={{ color: 'var(--color-accent)' }}>GitHub</a>}
                       </div>
@@ -173,7 +163,6 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             </section>
           )}
 
-          {/* Note紹介 + 関連AIツールタブ */}
           <ToolMediaTabs
             noteArticles={noteArticles}
             locale={locale}
@@ -184,9 +173,8 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
             currentToolId={tool.id}
           />
 
-          {/* ニュース */}
           {toolNews.length > 0 && (
-            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+            <section style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-accent)', borderRadius: '4px', padding: '1.5rem' }}>
               <ToolNewsSection news={toolNews} locale={locale} />
             </section>
           )}
@@ -194,7 +182,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
           <AdSlot slot="in-content" />
 
           {(tool.demo_url || tool.video_url) && (
-            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+            <section style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-accent)', borderRadius: '4px', padding: '1.5rem' }}>
               <h2 className="font-display text-2xl tracking-tight mb-4" style={{ color: 'var(--color-text)' }}>メディア</h2>
               <div className="flex flex-wrap gap-3">
                 {tool.demo_url && <a href={tool.demo_url} target="_blank" rel="noopener noreferrer" className="btn-outline">デモを見る →</a>}
@@ -204,7 +192,7 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
           )}
 
           {tool.user_count_label && (
-            <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', padding: '1.5rem' }}>
+            <section style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-accent)', borderRadius: '4px', padding: '1.5rem' }}>
               <h2 className="section-label mb-2">ユーザー数</h2>
               <p className="font-display text-xl" style={{ color: 'var(--color-text)' }}>{tool.user_count_label}</p>
             </section>
@@ -217,10 +205,8 @@ export default function ToolDetailContent({ tool, relatedTools, locale, toolNews
       <script type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'SoftwareApplication',
-          name,
-          description: description || undefined,
+          '@context': 'https://schema.org', '@type': 'SoftwareApplication',
+          name, description: description || undefined,
           url: tool.official_url || undefined,
           applicationCategory: 'AIApplication',
         }) }}
