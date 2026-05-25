@@ -10,7 +10,7 @@ interface Crumb {
 
 interface PageHeroProps {
   breadcrumbs: Crumb[];
-  label: string;
+  label?: string;
   watermark?: string;
   theme?: PageTheme;
   children: React.ReactNode;
@@ -98,7 +98,7 @@ export default function PageHero({
         </nav>
 
         {/* セクションラベル（theme色でインライン描画） */}
-        <div style={{
+        {label && <div style={{
           display:       'inline-flex',
           alignItems:    'center',
           gap:           '8px',
@@ -110,7 +110,7 @@ export default function PageHero({
         }}>
           <span style={{ width: '20px', height: '2px', background: theme.accent, flexShrink: 0 }} />
           {label}
-        </div>
+        </div>}
 
         {/* タイトル等 */}
         <div style={{ marginTop: '14px' }}>
@@ -118,5 +118,73 @@ export default function PageHero({
         </div>
       </div>
     </section>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 全ページ共通：2段タイトルコンポーネント
+// 上段：英語大文字（テーマカラーグラデ）
+// 下段：日本語（濃紺ソリッド）
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export function PageHeroTitle({
+  en, ja, theme, subtitle, extra,
+}: {
+  en: string;
+  ja: string;
+  theme: PageTheme;
+  subtitle?: string;
+  extra?: React.ReactNode;  // 月ラベル等の追加要素
+}) {
+  return (
+    <div>
+      {/* 英語ライン：テーマカラー→濃紺グラデ */}
+      <div style={{
+        fontFamily:             'var(--font-fira), system-ui',
+        fontWeight:             900,
+        fontSize:               'clamp(2rem, 5.5vw, 3.6rem)',
+        lineHeight:             0.95,
+        letterSpacing:          '-0.02em',
+        background:             `linear-gradient(135deg, ${theme.accent} 0%, var(--color-text) 100%)`,
+        WebkitBackgroundClip:   'text',
+        WebkitTextFillColor:    'transparent',
+        backgroundClip:         'text',
+        marginBottom:           '6px',
+      }}>
+        {en}
+      </div>
+
+      {/* 日本語ライン */}
+      <div style={{
+        display:    'flex',
+        alignItems: 'baseline',
+        gap:        '16px',
+        flexWrap:   'wrap',
+      }}>
+        <div style={{
+          fontFamily:   'var(--font-noto), sans-serif',
+          fontWeight:   700,
+          fontSize:     'clamp(1.5rem, 3.5vw, 2.2rem)',
+          lineHeight:   1.15,
+          color:        'var(--color-text)',
+          marginBottom: subtitle ? '10px' : 0,
+        }}>
+          {ja}
+        </div>
+        {extra}
+      </div>
+
+      {/* サブタイトル */}
+      {subtitle && (
+        <p style={{
+          fontFamily: 'var(--font-noto), sans-serif',
+          fontSize:   '0.9rem',
+          color:      'var(--color-text-muted)',
+          margin:     0,
+          lineHeight: 1.6,
+        }}>
+          {subtitle}
+        </p>
+      )}
+    </div>
   );
 }

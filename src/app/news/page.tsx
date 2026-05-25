@@ -2,7 +2,7 @@ export const runtime = 'edge';
 
 import { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';
-import PageHero from '@/components/PageHero';
+import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
 
 export const metadata: Metadata = {
@@ -62,16 +62,15 @@ export default async function NewsPage() {
     <main style={{ minHeight: '100vh' }}>
       <PageHero
         breadcrumbs={[{ label: 'ホーム', href: '/' }, { label: 'ニュース' }]}
-        label="AI NEWS"
         watermark="NEWS"
         theme={theme}
       >
-        <h1 style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: 'clamp(2rem, 5vw, 2.8rem)', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1.1, letterSpacing: '0.01em', textTransform: 'uppercase', marginBottom: '10px' }}>
-          最新ニュース
-        </h1>
-        <p style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0 }}>
-          新機能・アップデート・価格改定に関する最新情報
-        </p>
+        <PageHeroTitle
+          en="AI News"
+          ja="最新ニュース"
+          theme={theme}
+          subtitle="新機能・アップデート・価格改定に関する最新情報"
+        />
       </PageHero>
 
       <div style={{ background: 'var(--color-page-gradient)' }}>
