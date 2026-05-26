@@ -293,12 +293,6 @@ async function processTool(
       } catch { /* ignore */ }
     }
 
-    // ChatGPT GPTs・カスタムGPTはスキップ
-    if (post.website?.includes('chatgpt.com/g/')) {
-      console.log(`  ⏭️ スキップ: ChatGPT GPTs（${post.name}）`);
-      return { success: true, skipped: true };
-    }
-
     // Gemini: 情報抽出
     await sleep(CONFIG.AI_REQUEST_INTERVAL_MS);
     const extracted = await extractToolData(post, pageText);
