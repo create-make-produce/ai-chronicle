@@ -336,7 +336,7 @@ async function main() {
           aiCount++;
         } else if (parsed.result === 'not_ai') {
           await db.execute(
-            `UPDATE tools SET is_published=0, updated_at=datetime('now') WHERE id=?`,
+            `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
             [tool.id]
           );
           notAiCount++;
