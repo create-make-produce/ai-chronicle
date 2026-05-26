@@ -376,17 +376,17 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
     const isChromeStore = officialUrl ? officialUrl.includes('chromewebstore.google.com') : false;
-    const { isPublished, unpublishCondition, reasons } = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore });
+    const judgeResult = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore });
+    const { isPublished, unpublishCondition, reasons } = judgeResult;
     if (isChromeStore) console.log(`  ⚠ Chrome拡張機能のため保留: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;
 
     const hasAppUrl = !!(post.ios_url ?? post.android_url);
     
-    const toolStatus = (isChromeStore || (hasAppUrl && !unpublishCondition)) ? 'pending' : 'active';
+    const toolStatus = (isChromeStore || (hasAppUrl && !unpublishCondition)) ? 'pending' : judgeResult.status;
     if (reasons.length > 0) console.log(`  ⚠ 非公開理由: ${reasons.join(', ')}`);
     const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
-    if (isChromeStore) console.log(`  ⚠ Chrome拡張機能のため保留: ${slug}`);
-    else if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);
+    if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);
 
     if (!hasOfficialUrl) {
       console.log(`  ⚠️ 公式URLなし → 非公開で登録: ${post.name}`);

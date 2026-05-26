@@ -14,6 +14,7 @@ export interface PublishJudgeInput {
 
 export interface PublishJudgeResult {
   isPublished:       0 | 1;
+  status:            'active' | 'inactive' | 'pending';
   unpublishCondition: boolean;
   reasons:           string[];
 }
@@ -58,6 +59,7 @@ export function judgePublish(input: PublishJudgeInput): PublishJudgeResult {
 
   const unpublishCondition = !hasOfficialUrl || isGithubOnly || isStoreOnly || isChromeStore || !confidenceOk || !hasLogo;
   const isPublished        = unpublishCondition ? 0 : 1;
+  const status             = isChromeStore ? 'pending' : isPublished ? 'active' : 'inactive';
 
-  return { isPublished, unpublishCondition, reasons };
+  return { isPublished, status, unpublishCondition, reasons };
 }

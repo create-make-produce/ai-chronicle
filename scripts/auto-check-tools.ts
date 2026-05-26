@@ -258,7 +258,7 @@ async function main() {
   const tools = await db.query<ToolRow>(
     `SELECT id, name_en, official_url, category_id, company_name
      FROM tools
-     WHERE is_published = 1 AND admin_checked = 0
+     WHERE is_published = 1 AND admin_checked = 0 AND status = 'active'
      ORDER BY created_at ASC`
   );
 
@@ -319,7 +319,7 @@ async function main() {
           } else if (!tool.company_name && !parsed.company_name) {
             console.log('  ❌ 会社名取得失敗 → 非公開');
             await db.execute(
-              `UPDATE tools SET is_published=0, updated_at=datetime('now') WHERE id=?`,
+              `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
               [tool.id]
             );
             notAiCount++;

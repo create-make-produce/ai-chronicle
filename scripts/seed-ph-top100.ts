@@ -332,12 +332,13 @@ async function processTool(
     const officialUrl = post.website ?? null;
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
-    const { isPublished, unpublishCondition, reasons } = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl });
+    const judgeResult = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl });
+    const { isPublished, unpublishCondition, reasons } = judgeResult;
 
 
     const hasAppUrl = !!(iosUrl ?? androidUrl);
     
-    const toolStatus = (hasAppUrl && !unpublishCondition) ? 'pending' : 'active';
+    const toolStatus = (hasAppUrl && !unpublishCondition) ? 'pending' : judgeResult.status;
     if (reasons.length > 0) console.log(`  ⚠ 非公開理由: ${reasons.join(', ')}`);
     const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
     if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);
