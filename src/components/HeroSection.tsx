@@ -100,7 +100,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             <motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.06 }}
               style={{
                 fontFamily:'var(--font-fira), system-ui', fontWeight:900,
-                fontSize:'clamp(3.5rem, 8vw, 8rem)', lineHeight:0.88,
+                fontSize:'clamp(3.5rem, 8vw, 8rem)', lineHeight:1.0,
                 letterSpacing:'-0.04em', textTransform:'uppercase', margin:0,
                 background:'linear-gradient(135deg, #0A2040 0%, #004A8F 100%)',
                 WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
@@ -108,7 +108,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             <motion.h2 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.12 }}
               style={{
                 fontFamily:'var(--font-fira), system-ui', fontWeight:900,
-                fontSize:'clamp(3rem, 7vw, 7rem)', lineHeight:0.9,
+                fontSize:'clamp(3rem, 7vw, 7rem)', lineHeight:1.0,
                 letterSpacing:'-0.03em', margin:'6px 0 0',
                 background:'linear-gradient(135deg, #0070CC 0%, #00AAFF 100%)',
                 WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
@@ -159,18 +159,6 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           }}>{line}</p>
         ))}
       </motion.div>
-
-      {/* 下部アクセントライン：左から青・右へ薄く（写真と被らないよう） */}
-      <div style={{
-        position:   'absolute',
-        bottom:     0,
-        left:       0,
-        right:      0,
-        height:     '2px',
-        zIndex:     4,
-        background: 'linear-gradient(to right, #008CED 0%, rgba(0,140,237,0.2) 60%, transparent 100%)',
-        pointerEvents: 'none',
-      }} />
 
     </section>
   );

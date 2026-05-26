@@ -72,7 +72,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       className="news-row"
       style={{
         display: 'grid',
-        gridTemplateColumns: 'auto 145px 1fr',
+        gridTemplateColumns: '72px 145px 1fr',
         alignItems: 'center',
         gap: '1rem',
         padding: '0.85rem 1.25rem',

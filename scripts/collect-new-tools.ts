@@ -9,6 +9,7 @@ import { resolve } from 'node:path';
 const envLocalPath = resolve(process.cwd(), '.env.local');
 if (existsSync(envLocalPath)) { loadEnv({ path: envLocalPath }); } else { loadEnv(); }
 
+import { judgePublish } from '../src/lib/tool-publish';
 import { CONFIG } from '../src/config';
 import { D1Client } from '../src/lib/d1-rest';
 import { callAI, parseJsonResponse } from '../src/lib/ai';
@@ -374,22 +375,18 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const officialUrl = post.website ?? null;
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
-    const isGithubOnly = officialUrl ? officialUrl.includes('github.com') : false;
-    const isStoreOnly = officialUrl ? (officialUrl.includes('apps.apple.com') || officialUrl.includes('play.google.com')) : false;
     const isChromeStore = officialUrl ? officialUrl.includes('chromewebstore.google.com') : false;
-    const hasCompany = !!(extracted.company_name ?? null);
-    const hasLogo = !!logoUrl;
-    const isPublished = hasOfficialUrl && confidenceOk && !isGithubOnly && !isStoreOnly && !isChromeStore && hasCompany && hasLogo ? 1 : 0;
+    const { isPublished, unpublishCondition, reasons } = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore });
     if (isGithubOnly) console.log(`  ⚠ GitHub URLのため非公開: ${slug}`);
     if (isStoreOnly) console.log(`  ⚠ App Store/Google Play URLのため非公開: ${slug}`);
     if (isChromeStore) console.log(`  ⚠ Chrome拡張機能のため保留: ${slug}`);
-    if (!hasCompany) console.log(`  ⚠ 会社名なしのため非公開: ${slug}`);
     if (!hasLogo) console.log(`  ⚠ ロゴなしのため非公開: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;
 
     const hasAppUrl = !!(post.ios_url ?? post.android_url);
-    const unpublishCondition = isGithubOnly || isStoreOnly || !hasCompany || !hasLogo;
+    
     const toolStatus = (isChromeStore || (hasAppUrl && !unpublishCondition)) ? 'pending' : 'active';
+    if (reasons.length > 0) console.log(`  ⚠ 非公開理由: ${reasons.join(', ')}`);
     const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
     if (isChromeStore) console.log(`  ⚠ Chrome拡張機能のため保留: ${slug}`);
     else if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);

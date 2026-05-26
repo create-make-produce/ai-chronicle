@@ -81,21 +81,21 @@ async function queryD1<T = Record<string, unknown>>(
 
 export async function getPublishedTools(limit = 30, offset = 0): Promise<Tool[]>{
     return queryD1<Tool>(
-      `SELECT * FROM tools WHERE is_published = 1 ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      `SELECT * FROM tools WHERE is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL) ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       [limit, offset],
     );
 }
 
 export async function getToolCount(): Promise<number>{
     const rows = await queryD1<{ c: number }>(
-      `SELECT COUNT(*) AS c FROM tools WHERE is_published = 1`,
+      `SELECT COUNT(*) AS c FROM tools WHERE is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL)`,
     );
     return rows[0]?.c ?? 0;
 }
 
 export async function getToolBySlug(slug: string): Promise<Tool | null>{
     const rows = await queryD1<Tool>(
-      `SELECT * FROM tools WHERE slug = ? AND is_published = 1 LIMIT 1`,
+      `SELECT * FROM tools WHERE slug = ? AND is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL) LIMIT 1`,
       [slug],
     );
     return rows[0] ?? null;
@@ -103,14 +103,14 @@ export async function getToolBySlug(slug: string): Promise<Tool | null>{
 
 export async function getAllToolSlugs(): Promise<string[]>{
     const rows = await queryD1<{ slug: string }>(
-      `SELECT slug FROM tools WHERE is_published = 1`,
+      `SELECT slug FROM tools WHERE is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL)`,
     );
     return rows.map((r) => r.slug);
 }
 
 export async function getToolById(id: string): Promise<Tool | null>{
     const rows = await queryD1<Tool>(
-      `SELECT * FROM tools WHERE id = ? AND is_published = 1 LIMIT 1`,
+      `SELECT * FROM tools WHERE id = ? AND is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL) LIMIT 1`,
       [id],
     );
     return rows[0] ?? null;
@@ -120,7 +120,7 @@ export async function getToolsByCategory(categorySlug: string, limit = 30, offse
     return queryD1<Tool>(
       `SELECT t.* FROM tools t
        JOIN categories c ON t.category_id = c.id
-       WHERE c.slug = ? AND t.is_published = 1
+       WHERE c.slug = ? AND t.is_published = 1 AND (t.needs_logo = 0 OR t.needs_logo IS NULL)
        ORDER BY t.created_at DESC
        LIMIT ? OFFSET ?`,
       [categorySlug, limit, offset],
@@ -131,7 +131,7 @@ export async function getToolCountByCategory(categorySlug: string): Promise<numb
     const rows = await queryD1<{ c: number }>(
       `SELECT COUNT(*) AS c FROM tools t
        JOIN categories c ON t.category_id = c.id
-       WHERE c.slug = ? AND t.is_published = 1`,
+       WHERE c.slug = ? AND t.is_published = 1 AND (t.needs_logo = 0 OR t.needs_logo IS NULL)`,
       [categorySlug],
     );
     return rows[0]?.c ?? 0;
@@ -141,7 +141,7 @@ export async function getNewToolsSince(hoursAgo: number, limit = 10): Promise<To
     const since = new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
     return queryD1<Tool>(
       `SELECT * FROM tools
-       WHERE is_published = 1 AND created_at >= ?
+       WHERE is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL) AND created_at >= ?
        ORDER BY created_at DESC
        LIMIT ?`,
       [since, limit],
@@ -151,7 +151,7 @@ export async function getNewToolsSince(hoursAgo: number, limit = 10): Promise<To
 export async function getRecentlyUpdatedTools(limit = 9): Promise<Tool[]>{
     return queryD1<Tool>(
       `SELECT * FROM tools
-       WHERE is_published = 1
+       WHERE is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL)
        ORDER BY updated_at DESC
        LIMIT ?`,
       [limit],
@@ -161,7 +161,7 @@ export async function getRecentlyUpdatedTools(limit = 9): Promise<Tool[]>{
 export async function getFreeTools(limit = 12): Promise<Tool[]>{
     return queryD1<Tool>(
       `SELECT * FROM tools
-       WHERE is_published = 1 AND has_free_plan = 1
+       WHERE is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL) AND has_free_plan = 1
        ORDER BY created_at DESC
        LIMIT ?`,
       [limit],
@@ -172,7 +172,7 @@ export async function getRelatedTools(categoryId: string | null, excludeId: stri
     if (!categoryId) return [];
     return queryD1<Tool>(
       `SELECT * FROM tools
-       WHERE is_published = 1 AND category_id = ? AND id != ?
+       WHERE is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL) AND category_id = ? AND id != ?
        ORDER BY created_at DESC
        LIMIT ?`,
       [categoryId, excludeId, limit],
@@ -200,7 +200,7 @@ export async function getRecentPriceChanges(days: number, limit = 5){
       `SELECT p.*, t.name_ja AS tool_name_ja, t.name_en AS tool_name_en, t.slug AS tool_slug
        FROM pricing_plans p
        JOIN tools t ON p.tool_id = t.id
-       WHERE t.is_published = 1
+       WHERE t.is_published = 1 AND (t.needs_logo = 0 OR t.needs_logo IS NULL)
          AND p.price_changed_at IS NOT NULL
          AND p.price_changed_at >= ?
        ORDER BY p.price_changed_at DESC
@@ -243,7 +243,7 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]>{
     return queryD1<CategoryWithCount>(
       `SELECT c.*, COUNT(t.id) AS tool_count
        FROM categories c
-       LEFT JOIN tools t ON t.category_id = c.id AND t.is_published = 1
+       LEFT JOIN tools t ON t.category_id = c.id AND t.is_published = 1 AND (t.needs_logo = 0 OR t.needs_logo IS NULL)
        GROUP BY c.id
        ORDER BY c.sort_order ASC, c.name_ja ASC`,
     );
@@ -259,7 +259,7 @@ export async function getLatestNews(limit = 5): Promise<News[]>{
        FROM news n
        LEFT JOIN tools t ON n.tool_id = t.id
        WHERE n.is_published = 1
-         AND (n.tool_id IS NULL OR t.is_published = 1)
+         AND (n.tool_id IS NULL OR (t.is_published = 1 AND (t.needs_logo = 0 OR t.needs_logo IS NULL)))
        ORDER BY n.published_at DESC LIMIT ?`,
       [limit],
     );
@@ -274,7 +274,7 @@ export async function getAllNews(limit = 200): Promise<News[]>{
 
 export async function getNewsBySlug(slug: string): Promise<News | null>{
     const rows = await queryD1<News>(
-      `SELECT * FROM news WHERE slug = ? AND is_published = 1 LIMIT 1`,
+      `SELECT * FROM news WHERE slug = ? AND is_published = 1 AND (needs_logo = 0 OR needs_logo IS NULL) LIMIT 1`,
       [slug],
     );
     return rows[0] ?? null;
@@ -334,7 +334,7 @@ export async function getTopNoteArticlesByCategory(limitPerCategory = 10): Promi
      FROM tool_note_articles na
      JOIN tools t ON na.tool_id = t.id
      JOIN categories c ON t.category_id = c.id
-     WHERE t.is_published = 1
+     WHERE t.is_published = 1 AND (t.needs_logo = 0 OR t.needs_logo IS NULL)
        AND na.thumbnail_url IS NOT NULL
        AND na.thumbnail_url != ''
        AND na.published_at >= ?

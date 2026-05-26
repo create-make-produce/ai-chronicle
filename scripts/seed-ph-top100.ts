@@ -11,6 +11,7 @@ import { resolve } from 'node:path';
 const envLocalPath = resolve(process.cwd(), '.env.local');
 if (existsSync(envLocalPath)) { loadEnv({ path: envLocalPath }); } else { loadEnv(); }
 
+import { judgePublish } from '../src/lib/tool-publish';
 import { CONFIG } from '../src/config';
 import { D1Client } from '../src/lib/d1-rest';
 import { callAI, parseJsonResponse } from '../src/lib/ai';
@@ -331,19 +332,16 @@ async function processTool(
     const officialUrl = post.website ?? null;
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
-    const isGithubOnly = officialUrl ? officialUrl.includes('github.com') : false;
-    const hasCompany = !!(extracted.company_name ?? null);
-    const hasLogo = !!logoUrl;
-    const isPublished = hasOfficialUrl && confidenceOk && !isGithubOnly && hasCompany && hasLogo ? 1 : 0;
+    const { isPublished, unpublishCondition, reasons } = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl });
     if (isGithubOnly) console.log(`  ⚠ GitHub URLのため非公開: ${slug}`);
-    if (!hasCompany) console.log(`  ⚠ 会社名なしのため非公開: ${slug}`);
     if (!hasLogo) console.log(`  ⚠ ロゴなしのため非公開: ${slug}`);
 
     if (!hasOfficialUrl) console.log(`  ⚠️ 公式URLなし → 非公開`);
 
     const hasAppUrl = !!(iosUrl ?? androidUrl);
-    const unpublishCondition = isGithubOnly || !hasCompany || !hasLogo;
+    
     const toolStatus = (hasAppUrl && !unpublishCondition) ? 'pending' : 'active';
+    if (reasons.length > 0) console.log(`  ⚠ 非公開理由: ${reasons.join(', ')}`);
     const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
     if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);
 

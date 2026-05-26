@@ -33,7 +33,7 @@ export default function ToolsListContent({
       >
         <PageHeroTitle
           en="AI Tools"
-          ja={locale === 'ja' ? 'ツール一覧' : 'All Tools'}
+          ja={locale === 'ja' ? 'AIツール一覧' : 'All Tools'}
           theme={theme}
           subtitle={description || (locale === 'ja' ? 'すべてのAIツールを一覧で確認' : 'Browse all AI tools in one place')}
         />
