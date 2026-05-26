@@ -377,10 +377,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
     const isChromeStore = officialUrl ? officialUrl.includes('chromewebstore.google.com') : false;
     const { isPublished, unpublishCondition, reasons } = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore });
-    if (isGithubOnly) console.log(`  ⚠ GitHub URLのため非公開: ${slug}`);
-    if (isStoreOnly) console.log(`  ⚠ App Store/Google Play URLのため非公開: ${slug}`);
     if (isChromeStore) console.log(`  ⚠ Chrome拡張機能のため保留: ${slug}`);
-    if (!hasLogo) console.log(`  ⚠ ロゴなしのため非公開: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;
 
     const hasAppUrl = !!(post.ios_url ?? post.android_url);

@@ -333,10 +333,7 @@ async function processTool(
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
     const { isPublished, unpublishCondition, reasons } = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl });
-    if (isGithubOnly) console.log(`  ⚠ GitHub URLのため非公開: ${slug}`);
-    if (!hasLogo) console.log(`  ⚠ ロゴなしのため非公開: ${slug}`);
 
-    if (!hasOfficialUrl) console.log(`  ⚠️ 公式URLなし → 非公開`);
 
     const hasAppUrl = !!(iosUrl ?? androidUrl);
     
