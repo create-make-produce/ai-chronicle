@@ -27,7 +27,7 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category, subject, email, body }),
       });
-      const data = await res.json();
+      const data = await res.json() as { ok: boolean; error?: string };
       if (data.ok) { setDone(true); }
       else setError(data.error ?? '送信に失敗しました');
     } catch {

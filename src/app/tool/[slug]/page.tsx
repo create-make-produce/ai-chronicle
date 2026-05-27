@@ -22,7 +22,7 @@ async function queryD1(sql: string, params: (string | number | null)[] = []) {
       body: JSON.stringify({ sql, params }),
     }
   );
-  const data = await res.json();
+  const data = await res.json() as any;
   return data.result?.[0]?.results ?? [];
 }
 

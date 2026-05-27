@@ -20,7 +20,12 @@ async function d1(sql: string, params: (string | number | null)[] = []) {
 }
 
 export async function POST(req: NextRequest) {
-  const { category, subject, email, body } = await req.json();
+  const { category, subject, email, body } = await req.json() as {
+    category: string;
+    subject: string;
+    email?: string;
+    body: string;
+  };
 
   if (!category || !subject || !body) {
     return NextResponse.json({ error: '必須項目が未入力です' }, { status: 400 });
@@ -31,7 +36,6 @@ export async function POST(req: NextRequest) {
   }
 
   const id = crypto.randomUUID();
-  // チェック済みから7日後に削除するdelete_atを設定しない（チェック時にセット）
 
   await d1(
     `INSERT INTO contacts (id, category, subject, email, body, created_at)
