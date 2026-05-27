@@ -274,7 +274,7 @@ function NewsCardTop({ item, href, lang }: {
           border: `1px solid ${badge.border}`,
           padding:'2px 8px', borderRadius:'3px',
         }}>{badge.label}</span>
-        <span style={{ fontSize:'0.75rem', color:'var(--color-text-timestamp)', fontFamily:'Fira Sans, monospace' }}>
+        <span style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--color-text-timestamp)', fontFamily:'Fira Sans, monospace' }}>
           {date}
         </span>
       </div>
@@ -284,9 +284,9 @@ function NewsCardTop({ item, href, lang }: {
           {logoUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logoUrl} alt={toolName}
-              style={{ width:'18px', height:'18px', borderRadius:'3px', objectFit:'contain' }} />
+              style={{ width:'24px', height:'24px', borderRadius:'4px', objectFit:'contain' }} />
           )}
-          <span style={{ fontSize:'0.82rem', color:'var(--color-text-sub)', fontWeight:600 }}>{toolName}</span>
+          <span style={{ fontSize:'0.92rem', color:'var(--color-text-sub)', fontWeight:700 }}>{toolName}</span>
         </div>
       )}
       {/* タイトル */}
@@ -391,7 +391,7 @@ function SectionHeadWithTime({ label, isoTime, locale }: { label: string; isoTim
           {label}
         </h2>
         {timestamp && (
-          <span className="text-xs font-mono" style={{ color:'var(--color-text-timestamp)' }}>
+          <span className="text-sm font-mono" style={{ color:'var(--color-text-timestamp)', fontWeight: 600 }}>
             {timestamp}
           </span>
         )}

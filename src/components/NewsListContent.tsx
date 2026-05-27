@@ -74,7 +74,7 @@ function NewsListRow({ item, locale, isLast, tt }: { item: News; locale: Locale;
       onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-row-hover)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
-      <time style={{ flexShrink: 0, fontFamily: 'Fira Sans, monospace', fontSize: '0.75rem', color: 'var(--color-text-timestamp)' }}>
+      <time style={{ flexShrink: 0, fontFamily: 'Fira Sans, monospace', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-timestamp)' }}>
         {formatDateShort(item.published_at)}
       </time>
       <span style={{
