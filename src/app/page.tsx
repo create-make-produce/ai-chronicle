@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 // src/app/page.tsx
 import HomeContent from '@/components/HomeContent';
 import {

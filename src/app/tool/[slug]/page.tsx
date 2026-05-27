@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 // src/app/tool/[slug]/page.tsx
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';

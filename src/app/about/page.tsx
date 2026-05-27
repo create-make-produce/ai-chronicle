@@ -1,5 +1,4 @@
 // src/app/about/page.tsx
-export const runtime = 'edge';
 
 export const metadata = {
   title: '運営について | AI Chronicle',

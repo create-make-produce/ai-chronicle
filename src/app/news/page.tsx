@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';

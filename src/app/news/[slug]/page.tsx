@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 // src/app/news/[slug]/page.tsx
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -19,7 +17,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: (news.body_ja || '').slice(0, 120),
     alternates: {
       canonical: `/news/${news.slug}`,
-      languages: { ja: `/news/${news.slug}`, en: `/en/news/${news.slug}` },
     },
   };
 }

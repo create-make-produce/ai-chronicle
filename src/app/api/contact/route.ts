@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 import { NextRequest, NextResponse } from 'next/server';
 
 async function d1(sql: string, params: (string | number | null)[] = []) {

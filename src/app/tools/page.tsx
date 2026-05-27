@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import ToolsListContent from '@/components/ToolsListContent';
 
 export const metadata = {
