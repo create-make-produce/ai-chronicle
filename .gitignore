@@ -55,8 +55,6 @@ next-env.d.ts
 Thumbs.db
 
 # Note収集スクリプト（ローカルのみ・GitHubに上げない）
-scripts/collect-note-articles.ts
-scripts/collect-note-hot.ts
 scripts/collect-note-tools.ts
 scripts/collect-news-bulk.ts
 
@@ -73,18 +71,12 @@ src/app/api/admin/
 # Product Hunt トークンキャッシュ（ローカルのみ）
 .ph-token-cache.json
 # ツール概要一括更新スクリプト（ローカルのみ・GitHubに上げない）
-scripts/update-tool-descriptions.ts
 .desc-update-done.json
 # ツール判定スクリプト（ローカルのみ・GitHubに上げない）
 scripts/extract-unchecked.ts
 scripts/apply-check-results.ts
 unchecked-tools.csv
 check-results.csv
-
-# キーワード管理スクリプト（ローカルのみ・GitHubに上げない）
-scripts/cleanup-keywords.ts
-scripts/list-katakana-keywords.ts
-scripts/list-all-keywords.ts
 
 # Noteいいね数更新スクリプト（ローカルのみ・GitHubに上げない）
 scripts/update-note-likes.ts

@@ -49,10 +49,10 @@ export default function PageHero({
         aria-hidden="true"
         style={{
           position:      'absolute',
-          right:         '-8px',
+          left:          '-8px',
           bottom:        '-24px',
           fontFamily:    'Orbitron, Fira Sans, sans-serif',
-          fontSize:      'clamp(4.5rem, 14vw, 12rem)',
+          fontSize:      wm.length > 16 ? 'clamp(3rem, 8vw, 7rem)' : wm.length > 10 ? 'clamp(4rem, 11vw, 9rem)' : 'clamp(4.5rem, 14vw, 12rem)',
           fontWeight:    900,
           color:         theme.accent,
           opacity:       0.055,
@@ -137,18 +137,15 @@ export function PageHeroTitle({
 }) {
   return (
     <div>
-      {/* 英語ライン：テーマカラー→濃紺グラデ */}
+      {/* 英語ライン */}
       <div style={{
-        fontFamily:             'var(--font-fira), system-ui',
-        fontWeight:             900,
-        fontSize:               'clamp(2rem, 5.5vw, 3.6rem)',
-        lineHeight:             0.95,
-        letterSpacing:          '-0.02em',
-        background:             `linear-gradient(135deg, ${theme.accent} 0%, var(--color-text) 100%)`,
-        WebkitBackgroundClip:   'text',
-        WebkitTextFillColor:    'transparent',
-        backgroundClip:         'text',
-        marginBottom:           '6px',
+        fontFamily:    'var(--font-fira), system-ui',
+        fontWeight:    900,
+        fontSize:      'clamp(2rem, 5.5vw, 3.6rem)',
+        lineHeight:    0.95,
+        letterSpacing: '-0.02em',
+        color:         theme.accent,
+        marginBottom:  '6px',
       }}>
         {en}
       </div>
@@ -165,8 +162,8 @@ export function PageHeroTitle({
           fontWeight:   700,
           fontSize:     'clamp(1.5rem, 3.5vw, 2.2rem)',
           lineHeight:   1.15,
-          color:        'var(--color-text)',
           marginBottom: subtitle ? '10px' : 0,
+          color:        'var(--color-text)',
         }}>
           {ja}
         </div>
@@ -177,10 +174,11 @@ export function PageHeroTitle({
       {subtitle && (
         <p style={{
           fontFamily: 'var(--font-noto), sans-serif',
-          fontSize:   '0.9rem',
-          color:      'var(--color-text-muted)',
+          fontSize:   'clamp(1rem, 1.8vw, 1.25rem)',
+          fontWeight: 600,
           margin:     0,
           lineHeight: 1.6,
+          color:      'var(--color-text)',
         }}>
           {subtitle}
         </p>
