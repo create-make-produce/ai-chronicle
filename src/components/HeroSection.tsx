@@ -18,11 +18,13 @@ interface HeroSectionProps {
 
 export default function HeroSection({ locale }: HeroSectionProps) {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [firstLoaded, setFirstLoaded] = useState(false);
 
   useEffect(() => {
+    if (!firstLoaded) return;
     const t = setInterval(() => setActiveIdx(i => (i + 1) % HERO_PHOTOS.length), 3500);
     return () => clearInterval(t);
-  }, []);
+  }, [firstLoaded]);
 
   const BORDER_GRADIENT = [
     'conic-gradient(from 0deg,',
@@ -79,10 +81,12 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             width: '100%', height: '100%',
             borderRadius: '50%', overflow: 'hidden',
             position: 'relative', background: '#EBF5FF',
+            opacity: firstLoaded ? 1 : 0,
+            transition: 'opacity 0.8s ease',
           }}>
             {HERO_PHOTOS.map((photo, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={i} src={photo} alt="" style={{
+              <img key={i} src={photo} alt="" onLoad={i === 0 ? () => setFirstLoaded(true) : undefined} style={{
                 position: 'absolute', inset: 0,
                 width: '100%', height: '100%', objectFit: 'cover',
                 opacity: i === activeIdx ? 1 : 0, transition: 'opacity 1.4s ease',
