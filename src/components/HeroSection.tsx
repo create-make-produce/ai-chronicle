@@ -1,6 +1,6 @@
 // src/components/HeroSection.tsx
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Locale } from '@/types';
 
@@ -19,6 +19,14 @@ interface HeroSectionProps {
 export default function HeroSection({ locale }: HeroSectionProps) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [firstLoaded, setFirstLoaded] = useState(false);
+  const firstImgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    // キャッシュ済みの場合はcompleteが既にtrue
+    if (firstImgRef.current?.complete) {
+      setFirstLoaded(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!firstLoaded) return;
@@ -71,6 +79,8 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         position: 'absolute', right: '-140px', top: '50%',
         transform: 'translateY(-50%)', zIndex: 1,
         width: '760px', height: '760px',
+        opacity: firstLoaded ? 1 : 0,
+        transition: 'opacity 0.8s ease',
       }}>
         <div className="circle-outer" style={{
           width: '100%', height: '100%',
@@ -81,12 +91,12 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             width: '100%', height: '100%',
             borderRadius: '50%', overflow: 'hidden',
             position: 'relative', background: '#EBF5FF',
-            opacity: firstLoaded ? 1 : 0,
-            transition: 'opacity 0.8s ease',
           }}>
             {HERO_PHOTOS.map((photo, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={i} src={photo} alt="" onLoad={i === 0 ? () => setFirstLoaded(true) : undefined} style={{
+              <img key={i} ref={i === 0 ? firstImgRef : undefined} src={photo} alt=""
+                onLoad={i === 0 ? () => setFirstLoaded(true) : undefined}
+                style={{
                 position: 'absolute', inset: 0,
                 width: '100%', height: '100%', objectFit: 'cover',
                 opacity: i === activeIdx ? 1 : 0, transition: 'opacity 1.4s ease',
