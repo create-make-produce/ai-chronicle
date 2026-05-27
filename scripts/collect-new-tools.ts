@@ -472,7 +472,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       }
     }
 
-    if (finalPublished) {
+    if (finalPublished || toolStatus === 'pending') {
       // 24時間以内に同ツールのニュースが既にある場合はスキップ
       const recentNews = await db.first<{ id: string }>(
         `SELECT id FROM news WHERE tool_id = ? AND published_at > datetime('now', '-24 hours') LIMIT 1`,

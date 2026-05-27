@@ -296,6 +296,18 @@ async function main() {
       if (pageText) {
         console.log(`  🌐 サイト取得: ${pageText.length.toLocaleString()}文字`);
       } else {
+        // サイト取得失敗 + 会社名なし → 非公開（Gemini不要）
+        if (!tool.company_name) {
+          console.log('  ⚠ サイト取得失敗 + 会社名なし → 非公開');
+          if (!isDryRun) {
+            await db.execute(
+              `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
+              [tool.id]
+            );
+          }
+          notAiCount++;
+          continue;
+        }
         console.log('  ⚠ サイト取得失敗 → 名前+URLのみで判定');
       }
 
@@ -336,16 +348,34 @@ async function main() {
           aiCount++;
         } else if (parsed.result === 'not_ai') {
           await db.execute(
-            `UPDATE tools SET is_published=0, updated_at=datetime('now') WHERE id=?`,
+            `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
             [tool.id]
           );
           notAiCount++;
         } else {
-          await db.execute(
-            `UPDATE tools SET status='pending', is_published=0, updated_at=datetime('now') WHERE id=?`,
-            [tool.id]
-          );
-          reviewCount++;
+          // review判定：会社名が空なら非公開・あれば保留
+          if (!tool.company_name && !parsed.company_name) {
+            console.log('  ❌ review + 会社名なし → 非公開');
+            await db.execute(
+              `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
+              [tool.id]
+            );
+            notAiCount++;
+          } else {
+            if (!tool.company_name && parsed.company_name) {
+              console.log(`  🏢 会社名取得: ${parsed.company_name}`);
+              await db.execute(
+                `UPDATE tools SET status='pending', is_published=0, company_name=?, updated_at=datetime('now') WHERE id=?`,
+                [parsed.company_name, tool.id]
+              );
+            } else {
+              await db.execute(
+                `UPDATE tools SET status='pending', is_published=0, updated_at=datetime('now') WHERE id=?`,
+                [tool.id]
+              );
+            }
+            reviewCount++;
+          }
         }
       } else {
         if (parsed.result === 'ai') aiCount++;
