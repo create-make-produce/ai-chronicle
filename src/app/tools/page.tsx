@@ -1,43 +1,12 @@
 export const runtime = 'edge';
 
 import ToolsListContent from '@/components/ToolsListContent';
+import { batchQueryD1 } from '@/lib/db';
 
 export const metadata = {
-  title: 'すべてのAIツール一覧 | AI Chronicle',
+  title:       'すべてのAIツール一覧 | AI Chronicle',
   description: '登録済みのAIツールをすべて一覧表示。カテゴリ・機能で絞り込み可能。',
 };
-
-async function queryD1(sql: string, params: (string | number | null)[] = []) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const dbId      = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const token     = process.env.CLOUDFLARE_API_TOKEN;
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
-    {
-      method:  'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ sql, params }),
-    }
-  );
-  const data = await res.json();
-  return data.result?.[0]?.results ?? [];
-}
-
-async function getTools() {
-  return queryD1(
-    `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug
-     FROM tools t LEFT JOIN categories c ON t.category_id = c.id
-     WHERE t.is_published = 1
-     ORDER BY t.created_at DESC
-     LIMIT 200`
-  );
-}
-
-async function getCategories() {
-  return queryD1(
-    `SELECT id, slug, name_ja, name_en FROM categories ORDER BY sort_order ASC`
-  );
-}
 
 export default async function AllToolsPage({
   searchParams,
@@ -45,7 +14,12 @@ export default async function AllToolsPage({
   searchParams: Promise<{ cat?: string; q?: string }>;
 }) {
   const sp = await searchParams;
-  const [tools, categories] = await Promise.all([getTools(), getCategories()]);
+
+  // 2クエリ → 1HTTPリクエスト
+  const [tools, categories] = await batchQueryD1([
+    { sql: `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 ORDER BY t.created_at DESC LIMIT 200` },
+    { sql: `SELECT id, slug, name_ja, name_en FROM categories ORDER BY sort_order ASC` },
+  ]);
 
   return (
     <ToolsListContent

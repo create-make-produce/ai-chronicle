@@ -5,50 +5,32 @@ import PageSelect from '@/components/PageSelect';
 import ToolCard from '@/components/ToolCard';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
+import { batchQueryD1 } from '@/lib/db';
 
 export const metadata: Metadata = {
-  title: '月刊AIアップデート | AI Chronicle',
+  title:       '月刊AIアップデート | AI Chronicle',
   description: '最新アップデートされたAIツールをまとめてチェック。',
 };
 
 const PER_PAGE = 12;
 const theme    = PAGE_THEMES.monthly;
 
-async function queryD1(sql: string, params: (string | number | null)[] = []) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const dbId      = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const token     = process.env.CLOUDFLARE_API_TOKEN;
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
-    { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }) }
-  );
-  const data = await res.json();
-  return data.result?.[0]?.results ?? [];
-}
-
-async function getAllTools() {
-  return queryD1(
-    `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug
-     FROM tools t LEFT JOIN categories c ON t.category_id = c.id
-     WHERE t.is_published = 1 ORDER BY t.updated_at DESC`
-  );
-}
-
-async function getThisMonthCount() {
-  const now = new Date();
-  const ym  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const rows = await queryD1(`SELECT COUNT(*) as count FROM tools WHERE is_published = 1 AND strftime('%Y-%m', updated_at) = ?`, [ym]);
-  return (rows[0]?.count as number) ?? 0;
-}
-
 export default async function MonthlyPage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const sp = await searchParams;
-  const [allTools, thisMonthCount] = await Promise.all([getAllTools(), getThisMonthCount()]);
+
+  // 2クエリ → 1HTTPリクエスト
+  const [allTools] = await batchQueryD1([
+    { sql: `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 ORDER BY t.updated_at DESC` },
+  ]);
+
+  // 今月件数をJSで計算（SQLの追加クエリ不要）
+  const now          = new Date();
+  const ym           = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const thisMonthCount = (allTools as any[]).filter(t => (t.updated_at as string)?.startsWith(ym)).length;
 
   const totalPages  = Math.max(1, Math.ceil(allTools.length / PER_PAGE));
   const currentPage = Math.min(Math.max(1, parseInt(sp.p ?? '1', 10)), totalPages);
   const tools       = allTools.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
-  const now         = new Date();
 
   return (
     <main style={{ minHeight: '100vh' }}>
@@ -74,7 +56,7 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
           ) : (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem 1.25rem' }}>
-                {tools.map((tool: Record<string, unknown>, i: number) => (
+                {(tools as any[]).map((tool: Record<string, unknown>, i: number) => (
                   <ToolCard key={tool.id as string} tool={tool as any} locale="ja" index={i}
                     categoryName={tool.category_name_ja as string | undefined}
                     categorySlug={tool.category_slug as string | undefined} />
