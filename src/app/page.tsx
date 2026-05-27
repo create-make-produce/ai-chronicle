@@ -1,4 +1,6 @@
 // src/app/page.tsx
+export const dynamic = 'force-dynamic';
+
 import HomeContent from '@/components/HomeContent';
 import {
   getToolCount,

@@ -6,8 +6,12 @@ name = "ai-chronicle"
 compatibility_date = "2024-11-01"
 compatibility_flags = ["nodejs_compat"]
 
-# OpenNext用（旧: .vercel/output/static）
-pages_build_output_dir = ".open-next/assets"
+# OpenNext Workers用
+main = ".open-next/worker.js"
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
 
 # D1データベースバインディング
 [[d1_databases]]
@@ -17,8 +21,8 @@ database_id = "f6fecbd5-d72c-4b80-b4ae-42746a527583"
 
 # R2バケット（Phase 2以降に有効化）
 # [[r2_buckets]]
-# binding = "ASSETS"
-# bucket_name = "ai-chronicle-assets"
+# binding = "NEXT_INC_CACHE_R2_BUCKET"
+# bucket_name = "ai-chronicle-cache"
 
 # 環境変数（公開しても問題ないもののみ）
 [vars]
