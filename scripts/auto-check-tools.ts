@@ -336,7 +336,7 @@ async function main() {
           aiCount++;
         } else if (parsed.result === 'not_ai') {
           await db.execute(
-            `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
+            `UPDATE tools SET is_published=0, updated_at=datetime('now') WHERE id=?`,
             [tool.id]
           );
           notAiCount++;
@@ -411,11 +411,22 @@ async function sendNotificationIfNeeded(db: D1Client): Promise<void> {
       return;
     }
 
+    // お問い合わせ未確認件数チェック
+    interface ContactRow { cnt: number }
+    const contactRows = await db.query<ContactRow>(
+      `SELECT COUNT(*) as cnt FROM contacts WHERE checked = 0`
+    );
+    const uncheckedContacts = contactRows[0]?.cnt ?? 0;
+
     let body = `AI Chronicle - 保留ツール通知\n`;
     body += `実行日時: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}\n`;
     body += `保留件数: ${pendingTools.length}件\n\n`;
     for (const t of pendingTools) {
       body += `  - ${t.name_en}  ${t.official_url ?? 'URLなし'}\n`;
+    }
+    if (uncheckedContacts > 0) {
+      body += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      body += `📨 未確認お問い合わせ: ${uncheckedContacts}件\n`;
     }
     body += `\n管理画面で確認してください。\nhttp://localhost:3000/admin/dashboard?tab=tools\n`;
 
@@ -427,11 +438,11 @@ async function sendNotificationIfNeeded(db: D1Client): Promise<void> {
     await transporter.sendMail({
       from: gmailUser,
       to: notifyTo,
-      subject: `[AI Chronicle] 保留ツール通知 ${pendingTools.length}件`,
+      subject: `[AI Chronicle] 保留ツール${pendingTools.length}件${uncheckedContacts > 0 ? ` / お問い合わせ${uncheckedContacts}件` : ''}`,
       text: body,
     });
 
-    console.log(`📧 メール送信完了 → ${notifyTo}（保留${pendingTools.length}件）`);
+    console.log(`📧 メール送信完了 → ${notifyTo}（保留${pendingTools.length}件・お問い合わせ${uncheckedContacts}件）`);
   } catch (err: any) {
     console.warn(`📧 メール送信失敗（処理には影響なし）: ${err?.message ?? err}`);
   }

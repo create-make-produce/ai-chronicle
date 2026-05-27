@@ -274,7 +274,7 @@ export async function getAllNews(limit = 200): Promise<News[]>{
 
 export async function getNewsBySlug(slug: string): Promise<News | null>{
     const rows = await queryD1<News>(
-      `SELECT * FROM news WHERE slug = ? AND is_published = 1 AND status != 'archived' LIMIT 1`,
+      `SELECT * FROM news WHERE slug = ? AND is_published = 1 LIMIT 1`,
       [slug],
     );
     return rows[0] ?? null;
