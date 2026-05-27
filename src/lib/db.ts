@@ -370,38 +370,6 @@ export async function getTopNoteArticlesByCategory(limitPerCategory = 10): Promi
 }
 
 // =============================================
-// バッチクエリ（複数SQLを1HTTPリクエストで実行）
-// =============================================
-export async function batchQueryD1(
-  queries: Array<{ sql: string; params?: unknown[] }>
-): Promise<Record<string, unknown>[][]> {
-  const accountId  = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const databaseId = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const apiToken   = process.env.CLOUDFLARE_API_TOKEN;
-
-  if (!accountId || !databaseId || !apiToken) return queries.map(() => []);
-
-  const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/batch`;
-
-  try {
-    const res = await fetch(url, {
-      method:  'POST',
-      headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
-      body:    JSON.stringify(queries.map(q => ({ sql: q.sql, params: q.params ?? [] }))),
-    });
-    if (!res.ok) { console.error('[db] batch HTTP error:', res.status); return queries.map(() => []); }
-    const text = await res.text();
-    let data: { success: boolean; result?: Array<{ results?: Record<string, unknown>[] }>; errors?: unknown[] };
-    try { data = JSON.parse(text); } catch { console.error('[db] batch JSON parse error'); return queries.map(() => []); }
-    if (!data.success) { console.error('[db] batch failed:', JSON.stringify(data.errors)); return queries.map(() => []); }
-    return (data.result ?? []).map(r => r.results ?? []);
-  } catch (e) {
-    console.error('[db] batch exception:', e);
-    return queries.map(() => []);
-  }
-}
-
-// =============================================
 // 集約（ツール詳細ページ用）
 // =============================================
 
