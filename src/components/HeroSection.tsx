@@ -22,7 +22,6 @@ export default function HeroSection({ locale }: HeroSectionProps) {
   const firstImgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    // キャッシュ済みの場合はcompleteが既にtrue
     if (firstImgRef.current?.complete) {
       setFirstLoaded(true);
     }
