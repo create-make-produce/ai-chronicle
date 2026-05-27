@@ -13,14 +13,16 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
     "framer-motion": "^11.15.0",
-    "next": "^15.1.0",
+    "next": "^15.5.18",
+    "nodemailer": "^6.9.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "nodemailer": "^6.9.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.0",
+    "@types/nodemailer": "^6.4.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "dotenv": "^16.4.7",
@@ -30,8 +32,7 @@
     "puppeteer": "^24.42.0",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.0",
-    "@types/nodemailer": "^6.4.0"
+    "typescript": "^5.7.0"
   },
   "engines": {
     "node": ">=20.0.0"
