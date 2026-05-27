@@ -35,9 +35,20 @@ export default function HeroSection({ locale }: HeroSectionProps) {
       position:     'relative',
       overflow:     'hidden',
       background:   'var(--color-bg)',
-      borderBottom: '1px solid var(--color-border)',
+      borderBottom: '1px solid var(--color-border-mid)',
       height:       '560px',
     }}>
+
+      {/* ヒーロー下部：アクセントライン */}
+      <div style={{
+        position:   'absolute',
+        bottom:     0,
+        left:       0,
+        right:      0,
+        height:     '2px',
+        background: 'linear-gradient(to right, #008CED 0%, rgba(0,140,237,0.2) 60%, transparent 100%)',
+        zIndex:     10,
+      }} />
 
       <div style={{
         position:        'absolute', inset: 0, pointerEvents: 'none',
