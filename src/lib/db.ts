@@ -1,9 +1,9 @@
 // src/lib/db.ts
-// Cloudflare D1 クライアント（REST API 経由）
-// キャッシュ戦略：unstable_cache でクエリ結果をオブジェクトレベルでキャッシュ
-// → fetch 自体は cache:'no-store'（JSONエラー回避）
-// → 結果の JavaScript オブジェクトを unstable_cache で TTL 管理
+// Cloudflare D1 クライアント
+// 本番（Cloudflare Pages）: Direct Binding（env.DB）経由で高速アクセス
+// ローカル（next dev）: getRequestContext が失敗するためREST APIにフォールバック
 
+import { getRequestContext } from '@cloudflare/next-on-pages';
 import type {
   Tool,
   PricingPlan,
@@ -14,7 +14,7 @@ import type {
 import { CONFIG } from '@/config';
 
 // =============================================
-// D1 クエリ実行（基本ラッパー・キャッシュなし）
+// D1 REST API fallback（ローカル開発用）
 // =============================================
 
 interface D1QueryResult<T> {
@@ -23,7 +23,7 @@ interface D1QueryResult<T> {
   errors?: Array<{ message: string }>;
 }
 
-async function queryD1<T = Record<string, unknown>>(
+async function queryD1Rest<T = Record<string, unknown>>(
   sql: string,
   params: unknown[] = [],
 ): Promise<T[]> {
@@ -51,7 +51,7 @@ async function queryD1<T = Record<string, unknown>>(
     });
 
     if (!res.ok) {
-      console.error('[db] D1 HTTP error:', res.status);
+      console.error('[db] D1 REST HTTP error:', res.status);
       return [];
     }
 
@@ -60,19 +60,43 @@ async function queryD1<T = Record<string, unknown>>(
     try {
       data = JSON.parse(text) as D1QueryResult<T>;
     } catch {
-      console.error('[db] D1 JSON parse error. First 200 chars:', text.slice(0, 200));
+      console.error('[db] D1 REST JSON parse error. First 200 chars:', text.slice(0, 200));
       return [];
     }
 
     if (!data.success) {
-      console.error('[db] D1 query failed:', JSON.stringify(data.errors));
+      console.error('[db] D1 REST query failed:', JSON.stringify(data.errors));
       return [];
     }
     return data.result?.[0]?.results ?? [];
   } catch (e) {
-    console.error('[db] D1 query exception:', e);
+    console.error('[db] D1 REST query exception:', e);
     return [];
   }
+}
+
+// =============================================
+// D1 クエリ実行（Direct Binding優先・REST APIフォールバック）
+// =============================================
+
+async function queryD1<T = Record<string, unknown>>(
+  sql: string,
+  params: unknown[] = [],
+): Promise<T[]> {
+  // Direct Binding（本番Cloudflare Pages・高速）
+  try {
+    const ctx = getRequestContext<{ DB: D1Database }>();
+    if (ctx?.env?.DB) {
+      const stmt = ctx.env.DB.prepare(sql);
+      const bound = params.length > 0 ? stmt.bind(...params) : stmt;
+      const result = await bound.all<T>();
+      return result.results ?? [];
+    }
+  } catch {
+    // ローカル開発（next dev）ではgetRequestContextが失敗するためREST APIで継続
+  }
+
+  return queryD1Rest<T>(sql, params);
 }
 
 // =============================================
