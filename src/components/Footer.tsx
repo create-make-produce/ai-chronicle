@@ -133,7 +133,7 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
             <Link key={item.href} href={item.href} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
               gap: '2px', textDecoration: 'none', flex: 1,
-              color:   active ? itemTheme.accent : '#6B7280',
+              color:   active ? itemTheme.accent : '#B8C4D0',
               padding: '6px 0',
             }}>
               {item.icon}
