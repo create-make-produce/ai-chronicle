@@ -71,12 +71,13 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
             <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#8A9BB0', margin: 0, lineHeight: 1.7 }}>
               {isEn
                 ? 'AI information database: Stay up to date with the latest news and updates in one place.'
-                : <>AIクロニクル（AI Chronicle）は、AIツールの最新情報をお届けするデータベースです。<br />最新・正確な情報は各ツールの公式ページをご確認ください。</>}
+                : <>AIクロニクル（AI Chronicle）<br />AI最新情報データベース：最新ニュース・アップデート情報を一つの場所で確認<br />（※）最新・正確な情報は各ツールの公式ページをご確認ください。</>}
             </p>
           </div>
 
           {/* 右：ナビ2列グリッド */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(100px, 1fr))', gap: '1rem 2rem' }}>
+          <div className="footer-nav-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(100px, 1fr))', gap: '1rem 2rem' }}>
+            <style>{`@media (max-width: 767px) { .footer-nav-grid { grid-template-columns: repeat(2, 1fr) !important; } }`}</style>
             {[
               { href: '/',        en: 'TOP',      ja: 'トップ' },
               { href: '/news',    en: 'NEWS',      ja: 'ニュース' },
