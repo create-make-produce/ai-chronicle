@@ -66,6 +66,19 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         opacity:         0.6,
       }} />
 
+      {/* モバイル背景画像（スマホのみ表示） */}
+      <div className="hero-bg-mobile" style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        {HERO_PHOTOS.map((photo, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={i} src={photo} alt="" style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%', objectFit: 'cover',
+            opacity: i === activeIdx ? 0.22 : 0,
+            transition: 'opacity 1.4s ease',
+          }} />
+        ))}
+      </div>
+
       <style>{`
         @media (max-width: 960px) { .hero-circle-area { display: none !important; } }
         @keyframes border-spin    { from { transform: rotate(0deg); }   to { transform: rotate(360deg); }  }
@@ -73,9 +86,11 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         .circle-outer { animation: border-spin    5s linear infinite; }
         .circle-inner { animation: border-counter 5s linear infinite; }
         .hero-copy-sp { display: none; }
+        .hero-bg-mobile { display: none; }
         @media (max-width: 767px) {
           .hero-copy-pc { display: none; }
           .hero-copy-sp { display: inline; }
+          .hero-bg-mobile { display: block; }
           .hero-section    { height: auto !important; padding-bottom: 28px; }
           .hero-title-wrap { padding-top: 28px !important; }
           .hero-h1         { font-size: clamp(2.6rem, 14vw, 3.5rem) !important; }
