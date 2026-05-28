@@ -44,14 +44,14 @@ export default function PageHero({
         pointerEvents: 'none',
       }} />
 
-      {/* ウォーターマーク */}
+      {/* ウォーターマーク（動的・装飾のみ → システムフォント） */}
       <div
         aria-hidden="true"
         style={{
           position:      'absolute',
           left:          '-8px',
           bottom:        '-24px',
-          fontFamily:    'Orbitron, Fira Sans, sans-serif',
+          fontFamily:    'var(--font-system)',
           fontSize:      wm.length > 16 ? 'clamp(3rem, 8vw, 7rem)' : wm.length > 10 ? 'clamp(4rem, 11vw, 9rem)' : 'clamp(4.5rem, 14vw, 12rem)',
           fontWeight:    900,
           color:         theme.accent,
@@ -97,7 +97,7 @@ export default function PageHero({
           ))}
         </nav>
 
-        {/* セクションラベル（theme色でインライン描画） */}
+        {/* セクションラベル（固定テキスト → Fira Sans / Noto Sans JP サブセット） */}
         {label && <div style={{
           display:       'inline-flex',
           alignItems:    'center',
@@ -107,6 +107,7 @@ export default function PageHero({
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
           color:         theme.accent,
+          fontFamily:    'var(--font-fira), system-ui',
         }}>
           <span style={{ width: '20px', height: '2px', background: theme.accent, flexShrink: 0 }} />
           {label}
@@ -123,7 +124,7 @@ export default function PageHero({
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 全ページ共通：2段タイトルコンポーネント
-// 上段：英語大文字（テーマカラーグラデ）
+// 上段：英語大文字（テーマカラー）
 // 下段：日本語（濃紺ソリッド）
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export function PageHeroTitle({
@@ -133,11 +134,11 @@ export function PageHeroTitle({
   ja: string;
   theme: PageTheme;
   subtitle?: string;
-  extra?: React.ReactNode;  // 月ラベル等の追加要素
+  extra?: React.ReactNode;
 }) {
   return (
     <div>
-      {/* 英語ライン */}
+      {/* 英語ライン（固定ページタイトル → Fira Sans サブセット） */}
       <div style={{
         fontFamily:    'var(--font-fira), system-ui',
         fontWeight:    900,
@@ -150,7 +151,7 @@ export function PageHeroTitle({
         {en}
       </div>
 
-      {/* 日本語ライン */}
+      {/* 日本語ライン（固定ページタイトル → Noto Sans JP サブセット） */}
       <div style={{
         display:    'flex',
         alignItems: 'baseline',
@@ -170,10 +171,10 @@ export function PageHeroTitle({
         {extra}
       </div>
 
-      {/* サブタイトル */}
+      {/* サブタイトル（動的コンテンツ → システムフォント） */}
       {subtitle && (
         <p style={{
-          fontFamily: 'var(--font-noto), sans-serif',
+          fontFamily: 'var(--font-system)',
           fontSize:   'clamp(1rem, 1.8vw, 1.25rem)',
           fontWeight: 600,
           margin:     0,

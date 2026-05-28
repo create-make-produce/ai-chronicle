@@ -35,7 +35,8 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
             {grouped.map(({ month, items }) => (
               <section key={month}>
-                <h2 style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-sub)', marginBottom: '0.75rem' }}>
+                {/* 月見出し（動的コンテンツ → システムフォント） */}
+                <h2 style={{ fontFamily: 'var(--font-system)', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-sub)', marginBottom: '0.75rem' }}>
                   {month}
                 </h2>
                 <div style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-border)', borderRadius: '2px', overflow: 'hidden' }}>
@@ -74,9 +75,11 @@ function NewsListRow({ item, locale, isLast, tt }: { item: News; locale: Locale;
       onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-row-hover)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
-      <time style={{ flexShrink: 0, fontFamily: 'Fira Sans, monospace', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-timestamp)' }}>
+      {/* 日付（固定文字セット → Fira Sans サブセット） */}
+      <time style={{ flexShrink: 0, fontFamily: 'var(--font-fira), system-ui', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-timestamp)' }}>
         {formatDateShort(item.published_at)}
       </time>
+      {/* バッジ（固定テキスト → Fira Sans / Noto Sans JP サブセット） */}
       <span style={{
         flexShrink: 0, fontSize: '0.65rem', fontWeight: 700,
         color: badge.color, background: badge.bg,
@@ -85,7 +88,8 @@ function NewsListRow({ item, locale, isLast, tt }: { item: News; locale: Locale;
       }}>
         {locale === 'ja' ? badge.ja : badge.en}
       </span>
-      <span style={{ flex: 1, fontSize: '0.88rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      {/* タイトル（動的コンテンツ → システムフォント） */}
+      <span style={{ flex: 1, fontFamily: 'var(--font-system)', fontSize: '0.88rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {locale === 'ja' ? item.title_ja : item.title_en || item.title_ja}
       </span>
     </Link>
@@ -104,13 +108,4 @@ function groupByMonth(items: News[]): Array<{ month: string; items: News[] }> {
   return Array.from(map.entries())
     .sort((a, b) => (a[0] < b[0] ? 1 : -1))
     .map(([month, items]) => ({ month, items }));
-}
-
-function newsTypeLabel(type: string, tt: TDict): string {
-  switch (type) {
-    case 'price_change': return tt.newsTypePriceChange;
-    case 'new_tool':     return tt.newsTypeNewTool;
-    case 'new_feature':  return tt.newsTypeNewFeature;
-    default:             return tt.newsTypeOther;
-  }
 }

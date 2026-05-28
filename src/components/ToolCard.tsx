@@ -5,8 +5,6 @@ import { motion } from 'framer-motion';
 import type { Locale, Tool } from '@/types';
 import { t, localizedPath } from '@/lib/i18n';
 
-// bg/border/color  : 装飾用（背景・ボーダー・ロゴ枠）
-// text             : テキスト用（バッジ文字・リンク文字）← 濃い版で可読性確保
 const CAT_PASTEL: Record<string, { bg: string; color: string; border: string; text: string }> = {
   'text-generation':  { bg: 'rgba(139,184,255,0.12)', color: '#8BB8FF', border: 'rgba(139,184,255,0.5)', text: '#2B5FA8' },
   'image-generation': { bg: 'rgba(255,182,200,0.12)', color: '#FFB6C8', border: 'rgba(255,182,200,0.5)', text: '#A03050' },
@@ -93,17 +91,19 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
               <img src={tool.logo_url} alt={name}
                 style={{ width:'36px', height:'36px', objectFit:'contain', padding:'2px' }} />
             ) : (
+              /* イニシャルは動的（ツール名由来） → システムフォント */
               <span style={{
-                fontFamily: 'var(--font-fira), system-ui',
+                fontFamily: 'var(--font-system)',
                 fontSize: '0.85rem', fontWeight: 700,
                 color: pastel.text,
               }}>{initials}</span>
             )}
           </div>
 
-          {/* カテゴリバッジ：枠はパステル・文字は濃い版 */}
+          {/* カテゴリバッジ（固定テキスト → Noto Sans JP サブセット） */}
           {categoryName && (
             <span style={{
+              fontFamily:    'var(--font-noto), sans-serif',
               fontSize:      '0.68rem',
               fontWeight:    700,
               letterSpacing: '0.05em',
@@ -117,9 +117,9 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
           )}
         </div>
 
-        {/* ツール名 */}
+        {/* ツール名（動的コンテンツ → システムフォント） */}
         <h3 style={{
-          fontFamily:    locale === 'ja' ? 'var(--font-noto), sans-serif' : 'var(--font-fira), system-ui',
+          fontFamily:    'var(--font-system)',
           fontSize:      'clamp(0.95rem, 2vw, 1.1rem)',
           fontWeight:    700,
           color:         'var(--color-text)',
@@ -132,10 +132,10 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
           whiteSpace:    'nowrap',
         }}>{name}</h3>
 
-        {/* タグライン */}
+        {/* タグライン（動的コンテンツ → システムフォント） */}
         {tagline && (
           <p style={{
-            fontFamily:      'var(--font-noto), sans-serif',
+            fontFamily:      'var(--font-system)',
             fontSize:        '0.75rem',
             color:           'var(--color-text-sub)',
             lineHeight:      1.55,
@@ -148,7 +148,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
           }}>{tagline}</p>
         )}
 
-        {/* 詳しく見る：濃い版カラーで可読性確保 */}
+        {/* 詳しく見る（固定テキスト → Fira Sans サブセット） */}
         <div style={{
           display:    'flex',
           alignItems: 'center',

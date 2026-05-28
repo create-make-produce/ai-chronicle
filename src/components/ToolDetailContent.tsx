@@ -54,8 +54,10 @@ function LinkBadge({ href, icon, topLabel, bottomLabel }: { href: string; icon: 
       style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#000', color: '#fff', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '8px', padding: '6px 14px', textDecoration: 'none', lineHeight: 1.3, minWidth: '130px' }}>
       {icon}
       <span style={{ display: 'flex', flexDirection: 'column' }}>
-        <span style={{ fontSize: '0.6rem', opacity: 0.7, letterSpacing: '0.03em' }}>{topLabel}</span>
-        <span style={{ fontWeight: 700, fontSize: '0.82rem', fontFamily: 'Inter, sans-serif' }}>{bottomLabel}</span>
+        {/* topLabel は固定テキスト → Noto Sans JP サブセット */}
+        <span style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.6rem', opacity: 0.7, letterSpacing: '0.03em' }}>{topLabel}</span>
+        {/* bottomLabel は動的（ドメイン名等） → システムフォント */}
+        <span style={{ fontFamily: 'var(--font-system)', fontWeight: 700, fontSize: '0.82rem' }}>{bottomLabel}</span>
       </span>
     </a>
   );
@@ -105,26 +107,30 @@ export default function ToolDetailContent({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={tool.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 800, fontSize: '1.4rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>{initials}</span>
+                /* イニシャルは動的 → システムフォント */
+                <span style={{ fontFamily: 'var(--font-system)', fontWeight: 800, fontSize: '1.4rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>{initials}</span>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
+              {/* ツール名（動的 → システムフォント） */}
               <h1 style={{
-                fontFamily: 'Fira Sans, sans-serif', fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+                fontFamily: 'var(--font-system)',
+                fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
                 fontWeight: 800, color: 'var(--color-text)', lineHeight: 1.1,
                 letterSpacing: '0.01em', marginBottom: '0.5rem', textTransform: 'none',
               }}>
                 {name}
               </h1>
+              {/* タグライン（動的 → システムフォント） */}
               {tagline && (() => {
                 const parts = tagline.split('。').map((s: string) => s.trim()).filter(Boolean);
                 return parts.length > 1 ? (
                   <div>
-                    <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: 'var(--color-text-sub)', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
-                    <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0', lineHeight: 1.6 }}>{parts[1]}</p>
+                    <p style={{ fontFamily: 'var(--font-system)', fontSize: '1rem', color: 'var(--color-text-sub)', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
+                    <p style={{ fontFamily: 'var(--font-system)', fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0', lineHeight: 1.6 }}>{parts[1]}</p>
                   </div>
                 ) : (
-                  <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '1rem', color: 'var(--color-text-muted)', margin: 0 }}>{tagline.replace(/。/g, '')}</p>
+                  <p style={{ fontFamily: 'var(--font-system)', fontSize: '1rem', color: 'var(--color-text-muted)', margin: 0 }}>{tagline.replace(/。/g, '')}</p>
                 );
               })()}
             </div>
@@ -138,7 +144,9 @@ export default function ToolDetailContent({
             <section style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-accent)', borderRadius: '4px', padding: '1.5rem' }}>
               {description && (
                 <div className="mb-5">
+                  {/* 「概要」は固定テキスト → .font-display クラス（Fira Sans サブセット） */}
                   <h2 className="font-display text-2xl tracking-tight mb-4" style={{ color: 'var(--color-text)' }}>概要</h2>
+                  {/* 説明文（動的 → システムフォント・body継承） */}
                   <div style={{ fontSize: '0.95rem', lineHeight: 1.8, color: 'var(--color-text)', whiteSpace: 'pre-wrap' }}>
                     {description.replace(/<br\s*\/?>/gi, '\n')}
                   </div>
@@ -146,6 +154,7 @@ export default function ToolDetailContent({
               )}
               {hasLinks && (
                 <div>
+                  {/* 「リンク」は固定テキスト → .section-label クラス */}
                   <h2 className="section-label mb-3">リンク</h2>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center' }}>
                     {officialUrl && <LinkBadge href={officialUrl} icon={<GlobeIcon />} topLabel="Webサイト" bottomLabel={officialDomain || 'Visit'} />}

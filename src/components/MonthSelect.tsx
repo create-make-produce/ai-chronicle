@@ -25,9 +25,11 @@ export default function MonthSelect({ months, selectedMonth, basePath, lang = 'j
 
   return (
     <div style={{ marginBottom: '2rem' }}>
-      <label style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.78rem', color: 'var(--color-text-sub)', marginRight: '0.75rem' }}>
+      {/* ラベル（固定テキスト → Fira Sans サブセット） */}
+      <label style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: '0.78rem', color: 'var(--color-text-sub)', marginRight: '0.75rem' }}>
         {lang === 'ja' ? '期間を選択：' : 'Select period:'}
       </label>
+      {/* 選択肢は動的（年月名）→ システムフォント */}
       <select
         value={value}
         onChange={(e) => {
@@ -35,7 +37,7 @@ export default function MonthSelect({ months, selectedMonth, basePath, lang = 'j
           router.push(`${basePath}?m=${e.target.value}`);
         }}
         style={{
-          fontFamily: 'Fira Sans, sans-serif',
+          fontFamily: 'var(--font-system)',
           fontSize: '0.85rem',
           color: 'var(--color-text)',
           background: 'var(--color-select-bg)',

@@ -83,9 +83,9 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         transition: 'background 0.12s',
       }}
     >
-      {/* バッジ */}
+      {/* バッジ（固定テキスト → Fira Sans サブセット） */}
       <span style={{
-        fontFamily:    'Fira Sans, sans-serif',
+        fontFamily:    'var(--font-fira), system-ui',
         fontSize:      '0.7rem',
         fontWeight:    700,
         color:         badge.color,
@@ -98,9 +98,9 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         {badgeLabel}
       </span>
 
-      {/* 日時 */}
+      {/* 日時（固定文字セット → Fira Sans サブセット） */}
       <span className="news-date" style={{
-        fontFamily:    'Fira Sans, monospace',
+        fontFamily:    'var(--font-fira), system-ui',
         fontSize:      '0.78rem',
         color:         'var(--color-text-timestamp)',
         letterSpacing: '0.02em',
@@ -108,9 +108,9 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         {date}
       </span>
 
-      {/* タイトル + ツール名 */}
+      {/* タイトル + ツール名（動的コンテンツ → システムフォント） */}
       <span className="news-title" style={{
-        fontFamily:   lang === 'en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif',
+        fontFamily:   'var(--font-system)',
         fontSize:     '0.88rem',
         color:        'var(--color-text)',
         overflow:     'hidden',
