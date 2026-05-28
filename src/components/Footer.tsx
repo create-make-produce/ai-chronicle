@@ -67,19 +67,16 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
               <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.06em', color: '#FFFFFF' }}>
                 AI<span style={{ color: theme.accent, transition: 'color 0.3s' }}>/</span>CHRONICLE
               </span>
-              <div style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.68rem', color: '#6B7A8D', letterSpacing: '0.1em', marginTop: '2px' }}>
-                AIクロニクル
-              </div>
             </Link>
-            <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#8A9BB0', margin: 0, lineHeight: 1.7, maxWidth: '260px' }}>
+            <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#8A9BB0', margin: 0, lineHeight: 1.7 }}>
               {isEn
                 ? 'AI information database: Stay up to date with the latest news and updates in one place.'
-                : '海外AIツールの最新ニュース・アップデート情報を、日本語でいち早くお届けします。'}
+                : <>AIクロニクル（AI Chronicle）は、AIツールの最新情報をお届けするデータベースです。<br />最新・正確な情報は各ツールの公式ページをご確認ください。</>}
             </p>
           </div>
 
           {/* 右：ナビ2列グリッド */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', gap: '1rem 2.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(100px, 1fr))', gap: '1rem 2rem' }}>
             {[
               { href: '/',        en: 'TOP',      ja: 'トップ' },
               { href: '/news',    en: 'NEWS',      ja: 'ニュース' },
@@ -113,9 +110,6 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
         </div>
 
         {/* 免責 */}
-        <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.7rem', color: '#4A5A6D', lineHeight: 1.6, margin: '0.75rem 0 0' }}>
-          {isEn ? '※ Please verify current details on each tool\'s official website.' : '（※）最新・正確な情報は各ツールの公式ページをご確認ください。'}
-        </p>
       </div>
 
       {/* スマホ用ボトムナビ */}
