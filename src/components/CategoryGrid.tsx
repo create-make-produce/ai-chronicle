@@ -62,16 +62,9 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       <style>{`
         @media (max-width: 767px) {
-          .cat-card {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            justify-content: flex-start !important;
-            height: 90px !important;
-            padding: 10px 12px !important;
-            gap: 3px !important;
-          }
-          .cat-icon     { width: 28px !important; height: 28px !important; margin-bottom: 1px; }
-          .cat-icon img { width: 26px !important; height: 26px !important; }
+          .cat-card     { height: 68px !important; padding: 10px 12px !important; }
+          .cat-icon     { width: 32px !important; height: 32px !important; }
+          .cat-icon img { width: 28px !important; height: 28px !important; }
           .cat-text-area {
             font-size: 0.88rem !important;
             white-space: nowrap !important;
@@ -79,11 +72,11 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
             text-overflow: ellipsis !important;
           }
           .cat-en-text {
-            font-size: 0.58rem !important;
+            font-size: 0.56rem !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
-            margin-top: 0 !important;
+            margin-top: 2px !important;
           }
         }
       `}</style>
@@ -129,18 +122,40 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
                 (e.currentTarget as HTMLElement).style.borderColor = pastel.border;
               }}
             >
-              {/* テキスト */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p className="cat-text-area" style={{
-                  fontFamily: 'var(--font-noto), sans-serif',
-                  fontSize:   dispName.length > 7 ? '0.95rem' : '1.05rem',
-                  fontWeight: 700,
-                  color:      'var(--color-text)',
-                  lineHeight: 1.2,
-                  margin:     0,
-                }}>
-                  {dispName}
-                </p>
+              {/* テキスト＋アイコン */}
+              <div className="cat-text-wrapper" style={{ flex: 1, minWidth: 0 }}>
+                <div className="cat-top-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <p className="cat-text-area" style={{
+                    fontFamily: 'var(--font-noto), sans-serif',
+                    fontSize:   dispName.length > 7 ? '0.95rem' : '1.05rem',
+                    fontWeight: 700,
+                    color:      'var(--color-text)',
+                    lineHeight: 1.2,
+                    margin:     0,
+                  }}>
+                    {dispName}
+                  </p>
+                  {/* アイコン（top-row内） */}
+                  <div className="cat-icon" style={{
+                    flexShrink:  0,
+                    width:       44,
+                    height:      44,
+                    display:     'flex',
+                    alignItems:  'center',
+                    justifyContent: 'center',
+                  }}>
+                    {iconFile ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={`/icons/${iconFile}`}
+                        alt={cat.name_en}
+                        style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                      />
+                    ) : (
+                      <FallbackIcon slug={cat.slug} color={pastel.iconColor} />
+                    )}
+                  </div>
+                </div>
                 {locale === 'ja' && (
                   <p className="cat-en-text" style={{
                     fontFamily:    'var(--font-fira), system-ui',
@@ -152,27 +167,6 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
                   }}>
                     {cat.name_en}
                   </p>
-                )}
-              </div>
-
-              {/* アイコン */}
-              <div className="cat-icon" style={{
-                flexShrink:  0,
-                width:       44,
-                height:      44,
-                display:     'flex',
-                alignItems:  'center',
-                justifyContent: 'center',
-              }}>
-                {iconFile ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={`/icons/${iconFile}`}
-                    alt={cat.name_en}
-                    style={{ width: '40px', height: '40px', objectFit: 'contain' }}
-                  />
-                ) : (
-                  <FallbackIcon slug={cat.slug} color={pastel.iconColor} />
                 )}
               </div>
             </Link>
