@@ -59,11 +59,10 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         zIndex:     10,
       }} />
 
-      <div style={{
+      <div className="hero-dots" style={{
         position:        'absolute', inset: 0, pointerEvents: 'none',
         backgroundImage: 'radial-gradient(circle, #C0C8D4 1.3px, transparent 1.3px)',
         backgroundSize:  '32px 32px',
-        opacity:         0.6,
       }} />
 
       {/* モバイル背景画像（スマホのみ表示） */}
@@ -88,10 +87,12 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         .circle-inner { animation: border-counter 5s linear infinite; }
         .hero-copy-sp { display: none; }
         .hero-bg-mobile { display: none; }
+        .hero-dots { opacity: 0.6; }
         @media (max-width: 767px) {
           .hero-copy-pc { display: none; }
           .hero-copy-sp { display: inline; }
           .hero-bg-mobile { display: block; }
+          .hero-dots { display: none; }
           .hero-section    { height: auto !important; padding-bottom: 28px; }
           .hero-title-wrap { padding-top: 28px !important; }
           .hero-h1         { font-size: clamp(2.6rem, 14vw, 3.5rem) !important; }
