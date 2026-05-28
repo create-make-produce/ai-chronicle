@@ -2,26 +2,10 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import ToolDetailContent from '@/components/ToolDetailContent';
-import { getToolDetailBySlug, getRelatedTools } from '@/lib/db';
+import { getToolDetailBySlug, getRelatedTools, queryD1 } from '@/lib/db';
 
 interface Params {
   params: Promise<{ slug: string }>;
-}
-
-async function queryD1(sql: string, params: (string | number | null)[] = []) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const dbId = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const token = process.env.CLOUDFLARE_API_TOKEN;
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sql, params }),
-    }
-  );
-  const data = await res.json() as any;
-  return data.result?.[0]?.results ?? [];
 }
 
 async function getToolNews(toolId: string) {

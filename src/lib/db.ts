@@ -79,7 +79,7 @@ async function queryD1Rest<T = Record<string, unknown>>(
 // D1 クエリ実行（Direct Binding優先・REST APIフォールバック）
 // =============================================
 
-async function queryD1<T = Record<string, unknown>>(
+export async function queryD1<T = Record<string, unknown>>(
   sql: string,
   params: unknown[] = [],
 ): Promise<T[]> {

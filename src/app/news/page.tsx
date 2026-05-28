@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
-import { getAllNews } from '@/lib/db';
+import { getLatestNews } from '@/lib/db';
 
 export const metadata: Metadata = {
   title: 'AIツール最新ニュース | AI Chronicle',
@@ -34,7 +34,7 @@ function groupByMonth(items: NewsItem[]): Array<{ monthKey: string; monthLabel: 
 const theme = PAGE_THEMES.news;
 
 export default async function NewsPage() {
-  const newsItems = await getAllNews(200);
+  const newsItems = await getLatestNews(200);
   const grouped   = groupByMonth(newsItems as NewsItem[]);
 
   return (
