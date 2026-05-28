@@ -60,6 +60,13 @@ interface CategoryGridProps {
 export default function CategoryGrid({ categories, locale }: CategoryGridProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <style>{`
+        @media (max-width: 767px) {
+          .cat-en-text  { display: none; }
+          .cat-card     { align-items: flex-start !important; padding-top: 12px !important; min-height: 64px; height: auto !important; }
+          .cat-icon     { align-self: center; }
+        }
+      `}</style>
       {categories.map((cat, i) => {
         const dispName = locale === 'ja' ? cat.name_ja : cat.name_en;
         const href     = locale === 'ja' ? `/tools?cat=${cat.slug}` : `/en/tools?cat=${cat.slug}`;
@@ -75,6 +82,7 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
           >
             <Link
               href={href}
+              className="cat-card"
               style={{
                 display:         'flex',
                 alignItems:      'center',
@@ -114,7 +122,7 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
                   {dispName}
                 </p>
                 {locale === 'ja' && (
-                  <p style={{
+                  <p className="cat-en-text" style={{
                     fontFamily:    'var(--font-fira), system-ui',
                     fontSize:      '0.58rem',
                     letterSpacing: '0.08em',
