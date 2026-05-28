@@ -173,11 +173,10 @@ async function saveExistingToolLaunches(db: D1Client, posts: ProductHuntPost[]):
       [post.id]
     );
     if (existingByPostId) continue;
-    // フォールバック: tool_id + 同日チェック
-    const today = new Date().toISOString().slice(0, 10);
+    // フォールバック: tool_id + 24時間チェック
     const existingByDate = await db.first<{ id: string }>(
-      `SELECT id FROM news WHERE tool_id = ? AND date(published_at) = ? LIMIT 1`,
-      [tool.id, today]
+      `SELECT id FROM news WHERE tool_id = ? AND published_at > datetime('now', '-24 hours') LIMIT 1`,
+      [tool.id]
     );
     if (existingByDate) continue;
 
