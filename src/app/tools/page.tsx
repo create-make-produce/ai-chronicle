@@ -1,21 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import ToolsListContent from '@/components/ToolsListContent';
+import { getPublishedTools, getAllCategories } from '@/lib/db';
 
 export const metadata = {
   title: 'すべてのAIツール一覧 | AI Chronicle',
   description: '登録済みのAIツールをすべて一覧表示。カテゴリ・機能で絞り込み可能。',
 };
-
-async function queryD1(sql: string, params: (string | number | null)[] = []) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const dbId      = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const token     = process.env.CLOUDFLARE_API_TOKEN;
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
-    { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }) }
-  );
-  const data = await res.json() as any;
-  return data.result?.[0]?.results ?? [];
-}
 
 export default async function AllToolsPage({
   searchParams,
@@ -24,8 +15,8 @@ export default async function AllToolsPage({
 }) {
   const sp = await searchParams;
   const [tools, categories] = await Promise.all([
-    queryD1(`SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 ORDER BY t.created_at DESC LIMIT 200`),
-    queryD1(`SELECT id, slug, name_ja, name_en FROM categories ORDER BY sort_order ASC`),
+    getPublishedTools(200, 0),
+    getAllCategories(),
   ]);
 
   return (

@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import PageSelect from '@/components/PageSelect';
 import ToolCard from '@/components/ToolCard';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
+import { getPublishedTools } from '@/lib/db';
 
 export const metadata: Metadata = {
   title: '月刊AIアップデート | AI Chronicle',
@@ -12,33 +15,26 @@ export const metadata: Metadata = {
 const PER_PAGE = 12;
 const theme    = PAGE_THEMES.monthly;
 
-async function queryD1(sql: string, params: (string | number | null)[] = []) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const dbId      = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const token     = process.env.CLOUDFLARE_API_TOKEN;
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
-    { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }) }
-  );
-  const data = await res.json() as any;
-  return data.result?.[0]?.results ?? [];
-}
-
 export default async function MonthlyPage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const sp = await searchParams;
 
   const now = new Date();
   const ym  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-  const [allTools, countRows] = await Promise.all([
-    queryD1(`SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 ORDER BY t.updated_at DESC`),
-    queryD1(`SELECT COUNT(*) as count FROM tools WHERE is_published = 1 AND status = 'active' AND admin_checked = 1 AND strftime('%Y-%m', updated_at) = ?`, [ym]),
-  ]);
+  const allTools = await getPublishedTools(1000, 0);
 
-  const thisMonthCount = (countRows[0] as any)?.count ?? 0;
-  const totalPages  = Math.max(1, Math.ceil(allTools.length / PER_PAGE));
+  const thisMonthCount = allTools.filter((t: any) => {
+    const d = t.updated_at ?? t.created_at;
+    return d && d.slice(0, 7) === ym;
+  }).length;
+
+  const sortedTools = [...allTools].sort((a: any, b: any) =>
+    (b.updated_at ?? b.created_at ?? '').localeCompare(a.updated_at ?? a.created_at ?? '')
+  );
+
+  const totalPages  = Math.max(1, Math.ceil(sortedTools.length / PER_PAGE));
   const currentPage = Math.min(Math.max(1, parseInt(sp.p ?? '1', 10)), totalPages);
-  const tools       = allTools.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+  const tools       = sortedTools.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
 
   return (
     <main style={{ minHeight: '100vh' }}>
@@ -57,7 +53,7 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
 
       <div style={{ background: 'var(--color-page-gradient)' }}>
         <div className="max-w-7xl mx-auto section-px" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-          {allTools.length === 0 ? (
+          {sortedTools.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--color-text-muted)', border: '1px dashed var(--color-border)', borderRadius: '4px' }}>
               アップデート情報はまだありません。
             </div>

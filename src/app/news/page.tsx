@@ -4,33 +4,12 @@ import { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
+import { getAllNews } from '@/lib/db';
 
 export const metadata: Metadata = {
   title: 'AIツール最新ニュース | AI Chronicle',
   description: '新機能・アップデート・価格改定に関する最新情報。',
 };
-
-async function queryD1(sql: string, params: (string | number | null)[] = []) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const dbId      = process.env.CLOUDFLARE_D1_DATABASE_ID;
-  const token     = process.env.CLOUDFLARE_API_TOKEN;
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${dbId}/query`,
-    { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }) }
-  );
-  const data = await res.json() as any;
-  return data.result?.[0]?.results ?? [];
-}
-
-async function getLatestNews() {
-  return queryD1(
-    `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en,
-            t.slug as tool_slug, t.logo_url as tool_logo_url
-     FROM news n LEFT JOIN tools t ON n.tool_id = t.id
-     WHERE n.is_published = 1 AND (n.tool_id IS NULL OR t.is_published = 1)
-     ORDER BY n.published_at DESC LIMIT 50`
-  );
-}
 
 type NewsItem = Record<string, unknown>;
 
@@ -55,7 +34,7 @@ function groupByMonth(items: NewsItem[]): Array<{ monthKey: string; monthLabel: 
 const theme = PAGE_THEMES.news;
 
 export default async function NewsPage() {
-  const newsItems = await getLatestNews();
+  const newsItems = await getAllNews(200);
   const grouped   = groupByMonth(newsItems as NewsItem[]);
 
   return (
