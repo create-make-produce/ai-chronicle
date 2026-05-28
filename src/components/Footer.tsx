@@ -56,38 +56,66 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
         transition: 'background 0.3s ease',
       }} />
 
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem 1.5rem 1.25rem' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2.5rem 1.5rem 1.5rem' }}>
 
-        {/* ロゴ＋説明＋リンク */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.75rem' }}>
-          <div>
-            <Link href={isEn ? '/en' : '/'} style={{ textDecoration: 'none' }}>
-              <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '1.1rem', fontWeight: 900, letterSpacing: '0.06em', color: '#F0EBE1' }}>
+        {/* ━━ メインエリア：ロゴ左・ナビ右 ━━ */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2.5rem', marginBottom: '2rem', justifyContent: 'space-between' }}>
+
+          {/* 左：ロゴ＋説明 */}
+          <div style={{ minWidth: '200px' }}>
+            <Link href={isEn ? '/en' : '/'} style={{ textDecoration: 'none', display: 'inline-block', marginBottom: '0.75rem' }}>
+              <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.06em', color: '#FFFFFF' }}>
                 AI<span style={{ color: theme.accent, transition: 'color 0.3s' }}>/</span>CHRONICLE
               </span>
+              <div style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.68rem', color: '#6B7A8D', letterSpacing: '0.1em', marginTop: '2px' }}>
+                AIクロニクル
+              </div>
             </Link>
-            <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.8rem', color: '#8A9BB0', marginTop: '0.4rem', marginBottom: 0, lineHeight: 1.6 }}>
+            <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#8A9BB0', margin: 0, lineHeight: 1.7, maxWidth: '260px' }}>
               {isEn
                 ? 'AI information database: Stay up to date with the latest news and updates in one place.'
-                : 'AI最新情報データベース：最新ニュース・アップデート情報を一つの場所で確認'}
+                : '海外AIツールの最新ニュース・アップデート情報を、日本語でいち早くお届けします。'}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <Link href="/about"   style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.82rem', color: '#8A9BB0', textDecoration: 'none' }}>{isEn ? 'About' : '運営について'}</Link>
-            <Link href="/privacy" style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.82rem', color: '#8A9BB0', textDecoration: 'none' }}>{isEn ? 'Privacy Policy' : 'プライバシーポリシー'}</Link>
-            <Link href="/contact" style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.82rem', color: '#8A9BB0', textDecoration: 'none' }}>{isEn ? 'Contact' : 'お問い合わせ'}</Link>
+
+          {/* 右：ナビ2列グリッド */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', gap: '1rem 2.5rem' }}>
+            {[
+              { href: '/',        en: 'TOP',      ja: 'トップ' },
+              { href: '/news',    en: 'NEWS',      ja: 'ニュース' },
+              { href: '/monthly', en: 'MONTHLY',   ja: '月刊AI' },
+              { href: '/tools',   en: 'TOOLS',     ja: 'AIツール一覧' },
+            ].map(item => (
+              <Link key={item.href} href={item.href} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: theme.accent, flexShrink: 0, display: 'inline-block' }} />
+                <span>
+                  <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 700, fontSize: '0.9rem', color: '#FFFFFF', letterSpacing: '0.05em', display: 'block' }}>{item.en}</span>
+                  <span style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.7rem', color: '#8A9BB0' }}>{item.ja}</span>
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* 免責＋著作権 */}
-        <div>
-          <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.72rem', color: '#6B7A8D', lineHeight: 1.6, margin: '0 0 0.2rem 0' }}>
-            {isEn ? '※ Please verify current details on each tool\'s official website.' : '（※）最新・正確な情報は各ツールの公式ページをご確認ください。'}
-          </p>
+        {/* ━━ 区切り線 ━━ */}
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '1.25rem' }} />
+
+        {/* ━━ サブリンク＋免責＋Copyright ━━ */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <Link href="/about"   style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#B8C4D0', textDecoration: 'none' }}>運営について</Link>
+            <Link href="/privacy" style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#B8C4D0', textDecoration: 'none' }}>プライバシーポリシー</Link>
+            <Link href="/contact" style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#B8C4D0', textDecoration: 'none' }}>お問い合わせ</Link>
+          </div>
           <p style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.72rem', color: '#5A6A7D', margin: 0 }}>
             © {year} AI Chronicle. All rights reserved.
           </p>
         </div>
+
+        {/* 免責 */}
+        <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.7rem', color: '#4A5A6D', lineHeight: 1.6, margin: '0.75rem 0 0' }}>
+          {isEn ? '※ Please verify current details on each tool\'s official website.' : '（※）最新・正確な情報は各ツールの公式ページをご確認ください。'}
+        </p>
       </div>
 
       {/* スマホ用ボトムナビ */}
