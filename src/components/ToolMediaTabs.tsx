@@ -105,7 +105,7 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                   }
                 `}</style>
                 {/* 記事が少ない場合のブルーオーシャン提案 */}
-                {noteArticles.length <= 5 && (
+                {noteArticles.length <= 3 && (
                   <div style={{ marginBottom: '1rem', padding: '10px 14px', background: 'rgba(0,140,237,0.06)', border: '1px solid rgba(0,140,237,0.25)', borderRadius: '6px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ fontSize: '1rem', flexShrink: 0 }}>🎯</span>
                     <div>
@@ -113,7 +113,7 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                         ブルーオーシャンチャンス
                       </p>
                       <p style={{ fontSize: '0.73rem', color: 'var(--color-text-sub)', lineHeight: 1.7, margin: 0 }}>
-                        このツールに関する日本語のNote記事はまだ{noteArticles.length}件しかありません。いち早く紹介記事を書くことで、検索での先行者利益を狙えるかもしれません。
+                        このツールに関する日本語のNote記事はまだほとんどありません。いち早く紹介記事を書くことで、検索での先行者利益を狙えるかもしれません。
                       </p>
                     </div>
                   </div>
