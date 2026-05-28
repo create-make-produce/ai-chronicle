@@ -72,7 +72,10 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         @keyframes border-counter { from { transform: rotate(0deg); }   to { transform: rotate(-360deg); } }
         .circle-outer { animation: border-spin    5s linear infinite; }
         .circle-inner { animation: border-counter 5s linear infinite; }
+        .hero-copy-sp { display: none; }
         @media (max-width: 767px) {
+          .hero-copy-pc { display: none; }
+          .hero-copy-sp { display: inline; }
           .hero-section    { height: auto !important; padding-bottom: 28px; }
           .hero-title-wrap { padding-top: 28px !important; }
           .hero-h1         { font-size: clamp(2.6rem, 14vw, 3.5rem) !important; }
@@ -178,7 +181,9 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
           filter:'drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 6px rgba(255,255,255,0.95))',
         }}>
-          {locale === 'ja' ? 'AIの世界は、毎日動いている' : 'The AI world moves every day'}
+          {locale === 'ja'
+            ? <><span className="hero-copy-pc">AIの世界は、毎日動いている</span><span className="hero-copy-sp">AIの世界は<br />　毎日動いている</span></>
+            : 'The AI world moves every day'}
         </p>
         {(locale === 'ja' ? [
           '海外発の最新ツールを日本語でいち早く',
