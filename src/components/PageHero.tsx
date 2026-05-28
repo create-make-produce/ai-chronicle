@@ -45,8 +45,10 @@ export default function PageHero({
       }} />
 
       {/* ウォーターマーク（動的・装飾のみ → システムフォント） */}
+      <style>{`@media (max-width: 767px) { .page-hero-wm { bottom: 0px !important; font-size: clamp(3rem, 20vw, 5rem) !important; } }`}</style>
       <div
         aria-hidden="true"
+        className="page-hero-wm"
         style={{
           position:      'absolute',
           left:          '-8px',

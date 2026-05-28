@@ -15,7 +15,7 @@ export default async function AllToolsPage({
 }) {
   const sp = await searchParams;
   const [tools, categories] = await Promise.all([
-    queryD1(`SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 ORDER BY t.created_at DESC LIMIT 200`),
+    queryD1(`SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 ORDER BY t.created_at DESC`),
     queryD1(`SELECT id, slug, name_ja, name_en FROM categories ORDER BY sort_order ASC`),
   ]);
 

@@ -49,7 +49,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
     if (query) {
       const q = query.toLowerCase();
       r = r.filter(tool => {
-        const fields = [tool.name_ja, tool.name_en, tool.tagline_ja, tool.tagline_en, tool.description_ja, tool.description_en].filter(Boolean).join(' ').toLowerCase();
+        const fields = [tool.name_ja, tool.name_en, tool.tagline_ja, tool.description_ja, tool.search_keywords].filter(Boolean).join(' ').toLowerCase();
         return fields.includes(q);
       });
     }
