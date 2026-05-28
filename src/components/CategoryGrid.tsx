@@ -63,8 +63,22 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
       <style>{`
         @media (max-width: 767px) {
           .cat-en-text  { display: none; }
-          .cat-card     { align-items: flex-start !important; padding-top: 12px !important; min-height: 64px; height: auto !important; }
-          .cat-icon     { align-self: center; }
+          .cat-card     {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            height: 78px !important;
+            padding: 10px 12px !important;
+            gap: 4px !important;
+          }
+          .cat-icon     { width: 28px !important; height: 28px !important; }
+          .cat-icon img { width: 26px !important; height: 26px !important; }
+          .cat-text-area {
+            font-size: 0.92rem !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
         }
       `}</style>
       {categories.map((cat, i) => {
