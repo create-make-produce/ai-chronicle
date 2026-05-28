@@ -75,6 +75,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             width: '100%', height: '100%', objectFit: 'cover',
             opacity: i === activeIdx ? 0.22 : 0,
             transition: 'opacity 1.4s ease',
+            filter: 'grayscale(100%)',
           }} />
         ))}
       </div>
