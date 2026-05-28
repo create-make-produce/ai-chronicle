@@ -55,9 +55,9 @@ function LinkBadge({ href, icon, topLabel, bottomLabel }: { href: string; icon: 
       {icon}
       <span style={{ display: 'flex', flexDirection: 'column' }}>
         {/* topLabel は固定テキスト → Noto Sans JP サブセット */}
-        <span style={{ fontFamily: 'var(--font-noto), sans-serif', fontSize: '0.6rem', opacity: 0.7, letterSpacing: '0.03em' }}>{topLabel}</span>
+        <span style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.6rem', opacity: 0.7, letterSpacing: '0.03em' }}>{topLabel}</span>
         {/* bottomLabel は動的（ドメイン名等） → システムフォント */}
-        <span style={{ fontFamily: 'var(--font-system)', fontWeight: 700, fontSize: '0.82rem' }}>{bottomLabel}</span>
+        <span style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 700, fontSize: '0.82rem' }}>{bottomLabel}</span>
       </span>
     </a>
   );
@@ -108,13 +108,13 @@ export default function ToolDetailContent({
                 <img src={tool.logo_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 /* イニシャルは動的 → システムフォント */
-                <span style={{ fontFamily: 'var(--font-system)', fontWeight: 800, fontSize: '1.4rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>{initials}</span>
+                <span style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 800, fontSize: '1.4rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>{initials}</span>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               {/* ツール名（動的 → システムフォント） */}
               <h1 style={{
-                fontFamily: 'var(--font-system)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
                 fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
                 fontWeight: 800, color: 'var(--color-text)', lineHeight: 1.1,
                 letterSpacing: '0.01em', marginBottom: '0.5rem', textTransform: 'none',
@@ -126,11 +126,11 @@ export default function ToolDetailContent({
                 const parts = tagline.split('。').map((s: string) => s.trim()).filter(Boolean);
                 return parts.length > 1 ? (
                   <div>
-                    <p style={{ fontFamily: 'var(--font-system)', fontSize: '1rem', color: 'var(--color-text-sub)', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
-                    <p style={{ fontFamily: 'var(--font-system)', fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0', lineHeight: 1.6 }}>{parts[1]}</p>
+                    <p style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontSize: '1rem', color: 'var(--color-text-sub)', margin: 0, lineHeight: 1.6 }}>{parts[0]}</p>
+                    <p style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0', lineHeight: 1.6 }}>{parts[1]}</p>
                   </div>
                 ) : (
-                  <p style={{ fontFamily: 'var(--font-system)', fontSize: '1rem', color: 'var(--color-text-muted)', margin: 0 }}>{tagline.replace(/。/g, '')}</p>
+                  <p style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontSize: '1rem', color: 'var(--color-text-muted)', margin: 0 }}>{tagline.replace(/。/g, '')}</p>
                 );
               })()}
             </div>

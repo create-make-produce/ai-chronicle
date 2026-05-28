@@ -36,7 +36,7 @@ export default function NewsListContent({ news, locale }: NewsListContentProps) 
             {grouped.map(({ month, items }) => (
               <section key={month}>
                 {/* 月見出し（動的コンテンツ → システムフォント） */}
-                <h2 style={{ fontFamily: 'var(--font-system)', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-sub)', marginBottom: '0.75rem' }}>
+                <h2 style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-sub)', marginBottom: '0.75rem' }}>
                   {month}
                 </h2>
                 <div style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-border)', borderRadius: '2px', overflow: 'hidden' }}>
@@ -76,7 +76,7 @@ function NewsListRow({ item, locale, isLast, tt }: { item: News; locale: Locale;
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
       {/* 日付（固定文字セット → Fira Sans サブセット） */}
-      <time style={{ flexShrink: 0, fontFamily: 'var(--font-fira), system-ui', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-timestamp)' }}>
+      <time style={{ flexShrink: 0, fontFamily: 'Fira Sans, system-ui', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-timestamp)' }}>
         {formatDateShort(item.published_at)}
       </time>
       {/* バッジ（固定テキスト → Fira Sans / Noto Sans JP サブセット） */}
@@ -89,7 +89,7 @@ function NewsListRow({ item, locale, isLast, tt }: { item: News; locale: Locale;
         {locale === 'ja' ? badge.ja : badge.en}
       </span>
       {/* タイトル（動的コンテンツ → システムフォント） */}
-      <span style={{ flex: 1, fontFamily: 'var(--font-system)', fontSize: '0.88rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span style={{ flex: 1, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontSize: '0.88rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {locale === 'ja' ? item.title_ja : item.title_en || item.title_ja}
       </span>
     </Link>

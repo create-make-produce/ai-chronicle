@@ -114,7 +114,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
                 display:'inline-flex', alignItems:'center', gap:'10px',
                 fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.3em',
                 textTransform:'uppercase', color:'var(--color-accent)',
-                fontFamily:'var(--font-orbitron), system-ui',
+                fontFamily:'Orbitron, system-ui',
               }}>
                 <span style={{ width:24, height:2, background:'var(--color-accent)', display:'inline-block', borderRadius:1 }} />
                 AI CHRONICLE
@@ -123,7 +123,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             </motion.div>
             <motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.06 }}
               style={{
-                fontFamily:'var(--font-fira), system-ui', fontWeight:900,
+                fontFamily:'Fira Sans, system-ui', fontWeight:900,
                 fontSize:'clamp(3.5rem, 8vw, 8rem)', lineHeight:1.0,
                 letterSpacing:'-0.04em', textTransform:'uppercase', margin:0,
                 background:'linear-gradient(135deg, #0A2040 0%, #004A8F 100%)',
@@ -131,7 +131,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
               }}>AI TOOLS</motion.h1>
             <motion.h2 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.12 }}
               style={{
-                fontFamily:'var(--font-fira), system-ui', fontWeight:900,
+                fontFamily:'Fira Sans, system-ui', fontWeight:900,
                 fontSize:'clamp(3rem, 7vw, 7rem)', lineHeight:1.0,
                 letterSpacing:'-0.03em', margin:'6px 0 0',
                 background:'linear-gradient(135deg, #0070CC 0%, #00AAFF 100%)',
@@ -156,7 +156,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           maxWidth: '80%',
         }}>
         <p style={{
-          fontFamily:'var(--font-noto-serif), serif',
+          fontFamily:'Noto Serif JP, serif',
           fontSize:  'clamp(2rem, 3.5vw, 2.8rem)',
           fontWeight:700, margin:'0 0 10px', lineHeight:1.3,
           background:'linear-gradient(135deg, #0A2040 0%, #0070CC 100%)',
@@ -175,7 +175,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           'Stay ahead. Miss nothing',
         ]).map((line, i) => (
           <p key={i} style={{
-            fontFamily:'var(--font-noto-serif), serif',
+            fontFamily:'Noto Serif JP, serif',
             fontSize:  'clamp(1rem, 1.6vw, 1.2rem)',
             fontWeight:700, color:'#1A5A9C',
             margin:'0 0 2px', lineHeight:1.8,

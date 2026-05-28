@@ -132,7 +132,7 @@ export default function Header() {
                     transition:   'background 0.15s',
                   }} />
                   <span style={{
-                    fontFamily:    'var(--font-fira), system-ui',
+                    fontFamily:    'Fira Sans, system-ui',
                     fontSize:      '0.8rem',
                     fontWeight:    700,
                     letterSpacing: '0.08em',
@@ -142,7 +142,7 @@ export default function Header() {
                 </span>
                 {/* 日本語サブ */}
                 <span style={{
-                  fontFamily: 'var(--font-noto), sans-serif',
+                  fontFamily: 'Noto Sans JP, sans-serif',
                   fontSize:   '0.58rem',
                   color:      active ? itemAccent : 'var(--color-text-muted)',
                   transition: 'color 0.15s',
@@ -155,7 +155,7 @@ export default function Header() {
           <Link
             href="/about"
             style={{
-              fontFamily:     'var(--font-fira), system-ui',
+              fontFamily:     'Fira Sans, system-ui',
               fontSize:       '0.75rem',
               fontWeight:     700,
               letterSpacing:  '0.1em',

@@ -85,7 +85,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
     >
       {/* バッジ（固定テキスト → Fira Sans サブセット） */}
       <span style={{
-        fontFamily:    'var(--font-fira), system-ui',
+        fontFamily:    'Fira Sans, system-ui',
         fontSize:      '0.7rem',
         fontWeight:    700,
         color:         badge.color,
@@ -100,7 +100,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
 
       {/* 日時（固定文字セット → Fira Sans サブセット） */}
       <span className="news-date" style={{
-        fontFamily:    'var(--font-fira), system-ui',
+        fontFamily:    'Fira Sans, system-ui',
         fontSize:      '0.78rem',
         color:         'var(--color-text-timestamp)',
         letterSpacing: '0.02em',
@@ -110,7 +110,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
 
       {/* タイトル + ツール名（動的コンテンツ → システムフォント） */}
       <span className="news-title" style={{
-        fontFamily:   'var(--font-system)',
+        fontFamily:   '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
         fontSize:     '0.88rem',
         color:        'var(--color-text)',
         overflow:     'hidden',

@@ -66,7 +66,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
           {/* バッジ（固定テキスト → Fira Sans サブセット） */}
           <span style={{
-            fontFamily:    'var(--font-fira), system-ui',
+            fontFamily:    'Fira Sans, system-ui',
             fontSize:      '0.72rem',
             fontWeight:    700,
             color:         badge.color,
@@ -79,14 +79,14 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
             {badgeLabel}
           </span>
           {/* 日時（固定文字セット → Fira Sans サブセット） */}
-          <time style={{ fontFamily: 'var(--font-fira), system-ui', fontSize: '0.82rem', color: 'var(--color-text-timestamp)', letterSpacing: '0.02em' }}>
+          <time style={{ fontFamily: 'Fira Sans, system-ui', fontSize: '0.82rem', color: 'var(--color-text-timestamp)', letterSpacing: '0.02em' }}>
             {dateTime}
           </time>
         </div>
 
         {/* タイトル（動的コンテンツ → システムフォント） */}
         <h1 style={{
-          fontFamily: 'var(--font-system)',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
           fontSize:   'clamp(1.5rem, 3vw, 2.25rem)',
           fontWeight: 900,
           lineHeight: 1.35,
@@ -117,18 +117,18 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
                     <img src={relatedTool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     /* イニシャルは動的 → システムフォント */
-                    <span style={{ fontFamily: 'var(--font-system)', fontWeight: 800, fontSize: '0.9rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>
+                    <span style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 800, fontSize: '0.9rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>
                       {(locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en).slice(0, 2).toUpperCase()}
                     </span>
                   )}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {/* ツール名（動的 → システムフォント） */}
-                  <p style={{ fontFamily: 'var(--font-system)', fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', margin: 0 }}>
+                  <p style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', margin: 0 }}>
                     {locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en}
                   </p>
                   {(locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en) && (
-                    <p style={{ fontFamily: 'var(--font-system)', fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
+                    <p style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '3px 0 0' }}>
                       {locale === 'ja' ? relatedTool.tagline_ja : relatedTool.tagline_en}
                     </p>
                   )}
@@ -136,7 +136,7 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
               </div>
               <div style={{ textAlign: 'right' }}>
                 {/* 固定テキスト → Fira Sans サブセット */}
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-noto), sans-serif', letterSpacing: '0.05em' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'Noto Sans JP, sans-serif', letterSpacing: '0.05em' }}>
                   ツール情報確認
                 </span>
               </div>
@@ -165,14 +165,14 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
                     {/* 日付（固定文字セット → Fira Sans サブセット） */}
-                    <time style={{ flexShrink: 0, fontFamily: 'var(--font-fira), system-ui', fontSize: '0.75rem', color: 'var(--color-text-timestamp)' }}>
+                    <time style={{ flexShrink: 0, fontFamily: 'Fira Sans, system-ui', fontSize: '0.75rem', color: 'var(--color-text-timestamp)' }}>
                       {formatDateShort(item.published_at)}
                     </time>
                     <span style={{ flexShrink: 0, fontSize: '0.65rem', fontWeight: 700, color: itemBadge.color, background: itemBadge.bg, padding: '2px 7px', borderRadius: '3px', border: `1px solid ${itemBadge.border}` }}>
                       {locale === 'ja' ? itemBadge.ja : itemBadge.en}
                     </span>
                     {/* タイトル（動的 → システムフォント） */}
-                    <span style={{ flex: 1, fontFamily: 'var(--font-system)', fontSize: '0.85rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ flex: 1, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontSize: '0.85rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {locale === 'ja' ? item.title_ja : item.title_en || item.title_ja}
                     </span>
                   </Link>

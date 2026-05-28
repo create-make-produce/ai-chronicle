@@ -51,7 +51,7 @@ export default function PageHero({
           position:      'absolute',
           left:          '-8px',
           bottom:        '-24px',
-          fontFamily:    'var(--font-system)',
+          fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
           fontSize:      wm.length > 16 ? 'clamp(3rem, 8vw, 7rem)' : wm.length > 10 ? 'clamp(4rem, 11vw, 9rem)' : 'clamp(4.5rem, 14vw, 12rem)',
           fontWeight:    900,
           color:         theme.accent,
@@ -107,7 +107,7 @@ export default function PageHero({
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
           color:         theme.accent,
-          fontFamily:    'var(--font-fira), system-ui',
+          fontFamily:    'Fira Sans, system-ui',
         }}>
           <span style={{ width: '20px', height: '2px', background: theme.accent, flexShrink: 0 }} />
           {label}
@@ -140,7 +140,7 @@ export function PageHeroTitle({
     <div>
       {/* 英語ライン（固定ページタイトル → Fira Sans サブセット） */}
       <div style={{
-        fontFamily:    'var(--font-fira), system-ui',
+        fontFamily:    'Fira Sans, system-ui',
         fontWeight:    900,
         fontSize:      'clamp(2rem, 5.5vw, 3.6rem)',
         lineHeight:    0.95,
@@ -159,7 +159,7 @@ export function PageHeroTitle({
         flexWrap:   'wrap',
       }}>
         <div style={{
-          fontFamily:   'var(--font-noto), sans-serif',
+          fontFamily:   'Noto Sans JP, sans-serif',
           fontWeight:   700,
           fontSize:     'clamp(1.5rem, 3.5vw, 2.2rem)',
           lineHeight:   1.15,
@@ -174,7 +174,7 @@ export function PageHeroTitle({
       {/* サブタイトル（動的コンテンツ → システムフォント） */}
       {subtitle && (
         <p style={{
-          fontFamily: 'var(--font-system)',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
           fontSize:   'clamp(1rem, 1.8vw, 1.25rem)',
           fontWeight: 600,
           margin:     0,

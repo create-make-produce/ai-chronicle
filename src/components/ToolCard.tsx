@@ -93,7 +93,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
             ) : (
               /* イニシャルは動的（ツール名由来） → システムフォント */
               <span style={{
-                fontFamily: 'var(--font-system)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
                 fontSize: '0.85rem', fontWeight: 700,
                 color: pastel.text,
               }}>{initials}</span>
@@ -103,7 +103,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
           {/* カテゴリバッジ（固定テキスト → Noto Sans JP サブセット） */}
           {categoryName && (
             <span style={{
-              fontFamily:    'var(--font-noto), sans-serif',
+              fontFamily:    'Noto Sans JP, sans-serif',
               fontSize:      '0.68rem',
               fontWeight:    700,
               letterSpacing: '0.05em',
@@ -119,7 +119,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
 
         {/* ツール名（動的コンテンツ → システムフォント） */}
         <h3 style={{
-          fontFamily:    'var(--font-system)',
+          fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
           fontSize:      'clamp(0.95rem, 2vw, 1.1rem)',
           fontWeight:    700,
           color:         'var(--color-text)',
@@ -135,7 +135,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
         {/* タグライン（動的コンテンツ → システムフォント） */}
         {tagline && (
           <p style={{
-            fontFamily:      'var(--font-system)',
+            fontFamily:      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
             fontSize:        '0.75rem',
             color:           'var(--color-text-sub)',
             lineHeight:      1.55,
@@ -159,7 +159,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
           flexShrink: 0,
         }}>
           <span style={{
-            fontFamily:          'var(--font-fira), system-ui',
+            fontFamily:          'Fira Sans, system-ui',
             fontSize:            '0.7rem',
             fontWeight:          700,
             letterSpacing:       '0.1em',
