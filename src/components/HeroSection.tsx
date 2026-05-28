@@ -40,7 +40,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
   ].join(' ');
 
   return (
-    <section style={{
+    <section className="hero-section" style={{
       position:     'relative',
       overflow:     'hidden',
       background:   'var(--color-bg)',
@@ -72,6 +72,20 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         @keyframes border-counter { from { transform: rotate(0deg); }   to { transform: rotate(-360deg); } }
         .circle-outer { animation: border-spin    5s linear infinite; }
         .circle-inner { animation: border-counter 5s linear infinite; }
+        @media (max-width: 767px) {
+          .hero-section    { height: auto !important; padding-bottom: 28px; }
+          .hero-title-wrap { padding-top: 28px !important; }
+          .hero-h1         { font-size: clamp(2.6rem, 14vw, 3.5rem) !important; }
+          .hero-h2         { font-size: clamp(2.2rem, 12vw, 3rem) !important; }
+          .hero-catchcopy  {
+            position: relative !important;
+            top: auto !important; left: auto !important;
+            transform: none !important;
+            margin: 12px 0 0 0 !important;
+            padding: 0 16px;
+            max-width: 100% !important;
+          }
+        }
       `}</style>
 
       <div className="hero-circle-area" style={{
@@ -105,7 +119,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
         </div>
       </div>
 
-      <div style={{ position: 'relative', zIndex: 2, paddingTop: '64px' }}>
+      <div className="hero-title-wrap" style={{ position: 'relative', zIndex: 2, paddingTop: '64px' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div style={{ maxWidth: '520px' }}>
             <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.3 }}
@@ -121,7 +135,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
                 <span style={{ width:24, height:2, background:'var(--color-accent)', display:'inline-block', borderRadius:1 }} />
               </span>
             </motion.div>
-            <motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.06 }}
+            <motion.h1 className="hero-h1" initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.06 }}
               style={{
                 fontFamily:'Fira Sans, system-ui', fontWeight:900,
                 fontSize:'clamp(3.5rem, 8vw, 8rem)', lineHeight:1.0,
@@ -129,7 +143,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
                 background:'linear-gradient(135deg, #0A2040 0%, #004A8F 100%)',
                 WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
               }}>AI TOOLS</motion.h1>
-            <motion.h2 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.12 }}
+            <motion.h2 className="hero-h2" initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45, delay:0.12 }}
               style={{
                 fontFamily:'Fira Sans, system-ui', fontWeight:900,
                 fontSize:'clamp(3rem, 7vw, 7rem)', lineHeight:1.0,
@@ -142,6 +156,7 @@ export default function HeroSection({ locale }: HeroSectionProps) {
       </div>
 
       <motion.div
+        className="hero-catchcopy"
         initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
         transition={{ duration:0.5, delay:0.25 }}
         style={{
