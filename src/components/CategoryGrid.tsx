@@ -62,9 +62,10 @@ export default function CategoryGrid({ categories, locale }: CategoryGridProps) 
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       <style>{`
         @media (max-width: 767px) {
-          .cat-card     { height: 68px !important; padding: 10px 12px !important; }
-          .cat-icon     { width: 32px !important; height: 32px !important; }
+          .cat-card     { height: 68px !important; padding: 10px 12px !important; position: relative !important; }
+          .cat-icon     { position: absolute !important; right: 12px !important; top: 50% !important; transform: translateY(-50%) !important; width: 32px !important; height: 32px !important; }
           .cat-icon img { width: 28px !important; height: 28px !important; }
+          .cat-top-row  { justify-content: flex-start !important; padding-right: 44px; }
           .cat-text-area {
             font-size: 0.88rem !important;
             white-space: nowrap !important;
