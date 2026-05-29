@@ -465,3 +465,19 @@ export async function getFeaturesByToolId(toolId: string): Promise<Feature[]> {
     [toolId]
   )
 }
+
+export async function getRecentFeatures(days = 30): Promise<Feature[]> {
+  try {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
+    return queryD1<Feature>(
+      `SELECT id, slug, title, thumbnail_url, published_at
+       FROM features
+       WHERE is_published = 1 AND published_at >= ?
+       ORDER BY published_at DESC
+       LIMIT 5`,
+      [since]
+    )
+  } catch {
+    return []
+  }
+}

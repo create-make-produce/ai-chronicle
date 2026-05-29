@@ -12,14 +12,47 @@ const HERO_PHOTOS = [
   '/hero/hero5.webp',
 ];
 
-interface HeroSectionProps {
-  locale: Locale;
+interface FeatureItem {
+  id: string;
+  slug: string;
+  title: string;
+  thumbnail_url: string | null;
+  published_at: string;
 }
 
-export default function HeroSection({ locale }: HeroSectionProps) {
+interface HeroSectionProps {
+  locale: Locale;
+  recentFeatures?: FeatureItem[];
+}
+
+export default function HeroSection({ locale, recentFeatures = [] }: HeroSectionProps) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [firstLoaded, setFirstLoaded] = useState(false);
   const firstImgRef = useRef<HTMLImageElement>(null);
+  const [featureItem, setFeatureItem] = useState<FeatureItem | null>(null);
+  const [featureIdx, setFeatureIdx] = useState(0);
+  const [featureOrder, setFeatureOrder] = useState<FeatureItem[]>([]);
+
+  useEffect(() => {
+    if (recentFeatures.length === 0) return;
+    // ランダム順にシャッフル
+    const shuffled = [...recentFeatures].sort(() => Math.random() - 0.5);
+    setFeatureOrder(shuffled);
+    setFeatureItem(shuffled[0]);
+    setFeatureIdx(0);
+  }, []);
+
+  useEffect(() => {
+    if (featureOrder.length <= 1) return;
+    const t = setInterval(() => {
+      setFeatureIdx(i => {
+        const next = (i + 1) % featureOrder.length;
+        setFeatureItem(featureOrder[next]);
+        return next;
+      });
+    }, 5000);
+    return () => clearInterval(t);
+  }, [featureOrder]);
 
   useEffect(() => {
     if (firstImgRef.current?.complete) {
@@ -105,6 +138,21 @@ export default function HeroSection({ locale }: HeroSectionProps) {
             padding: 0 16px;
             max-width: 100% !important;
           }
+          .hero-feature-card { display: none !important; }
+        }
+        .hero-feature-card {
+          transition: box-shadow 0.18s, transform 0.18s;
+        }
+        .hero-feature-card:hover {
+          box-shadow: 0 6px 24px rgba(124,58,237,0.18) !important;
+          transform: translateY(-1px);
+        }
+        @keyframes feature-dot-pulse {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.4); }
+        }
+        .feature-live-dot {
+          animation: feature-dot-pulse 2s ease-in-out infinite;
         }
       `}</style>
 
@@ -138,6 +186,120 @@ export default function HeroSection({ locale }: HeroSectionProps) {
           </div>
         </div>
       </div>
+
+      {/* 特集カード（直近1ヶ月・ランダム1件） */}
+      {featureItem && (
+        <a href={`/feature/${featureItem.slug}`} className="hero-feature-card" style={{
+          position:        'absolute',
+          bottom:          featureOrder.length > 1 ? '36px' : '28px',
+          left:            '28px',
+          zIndex:          4,
+          width:           featureItem.thumbnail_url ? '310px' : '268px',
+          background:      'rgba(255,255,255,0.92)',
+          border:          '0.5px solid rgba(124,58,237,0.3)',
+          borderRadius:    '10px',
+          padding:         '10px 12px',
+          display:         'flex',
+          gap:             '10px',
+          alignItems:      'flex-start',
+          backdropFilter:  'blur(6px)',
+          boxShadow:       '0 2px 12px rgba(124,58,237,0.08)',
+          textDecoration:  'none',
+          cursor:          'pointer',
+        }}>
+          {/* 左：サムネ or バッジ+縦ライン */}
+          {featureItem.thumbnail_url ? (
+            <div style={{ position:'relative', flexShrink:0 }}>
+              <img src={featureItem.thumbnail_url} alt="" style={{
+                width:'120px', height:'68px', borderRadius:'6px',
+                objectFit:'cover', display:'block',
+                border:'0.5px solid rgba(124,58,237,0.2)',
+              }} />
+              <span style={{
+                position:'absolute', top:'-6px', left:'-4px',
+                fontSize:'8px', fontWeight:700, letterSpacing:'0.06em',
+                color:'#7C3AED',
+                background:'rgba(255,255,255,0.95)',
+                border:'0.5px solid rgba(124,58,237,0.35)',
+                borderRadius:'4px',
+                padding:'1px 4px',
+                fontFamily:'Orbitron, system-ui',
+              }}>特集</span>
+            </div>
+          ) : (
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', paddingTop:'2px' }}>
+              <span style={{
+                fontSize:'9px', fontWeight:700, letterSpacing:'0.06em',
+                color:'#7C3AED',
+                background:'rgba(124,58,237,0.08)',
+                border:'0.5px solid rgba(124,58,237,0.25)',
+                borderRadius:'4px',
+                padding:'2px 5px',
+                whiteSpace:'nowrap',
+                fontFamily:'Orbitron, system-ui',
+              }}>特集</span>
+              <div style={{
+                width:'1px', flex:1, minHeight:'20px',
+                background:'linear-gradient(to bottom, rgba(124,58,237,0.25), transparent)',
+              }} />
+            </div>
+          )}
+          {/* 右：タイトル＋日付 */}
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{
+              fontSize:'10px', color:'#3A5A78', marginBottom:'4px',
+              display:'flex', alignItems:'center', gap:'5px',
+            }}>
+              <span className="feature-live-dot" style={{
+                width:'5px', height:'5px', borderRadius:'50%',
+                background:'#7C3AED', flexShrink:0,
+                display:'inline-block',
+              }} />
+              {featureItem.published_at
+                ? new Date(featureItem.published_at).toLocaleDateString('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit' }).replace(/\//g, '/')
+                : ''}
+            </div>
+            <div style={{
+              fontSize:'12px', fontWeight:500, lineHeight:1.45,
+              color:'#0A2040',
+              display:'-webkit-box',
+              WebkitLineClamp:2,
+              WebkitBoxOrient:'vertical',
+              overflow:'hidden',
+            }}>{featureItem.title}</div>
+          </div>
+          {/* 右端余白 */}
+        </a>
+      )}
+
+      {/* ドットナビ（2件以上の場合のみ） */}
+      {featureOrder.length > 1 && (
+        <div style={{
+          position: 'absolute',
+          bottom: '10px',
+          left: '28px',
+          zIndex: 4,
+          display: 'flex',
+          gap: '5px',
+          alignItems: 'center',
+        }}>
+          {featureOrder.map((_, i) => (
+            <button key={i} onClick={() => {
+              setFeatureIdx(i);
+              setFeatureItem(featureOrder[i]);
+            }} style={{
+              width: i === featureIdx ? '16px' : '6px',
+              height: '6px',
+              borderRadius: '3px',
+              background: i === featureIdx ? '#7C3AED' : 'rgba(124,58,237,0.25)',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              transition: 'width 0.3s, background 0.3s',
+            }} />
+          ))}
+        </div>
+      )}
 
       <div className="hero-title-wrap" style={{ position: 'relative', zIndex: 2, paddingTop: '64px' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

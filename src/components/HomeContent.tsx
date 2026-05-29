@@ -21,6 +21,7 @@ interface HomeContentProps {
   categories: CategoryWithCount[];
   categoryNotes?: CategoryNoteArticles[];
   topFeatures?: Array<{ id: string; slug: string; title: string; thumbnail_url: string | null; published_at: string; tool_name_en?: string | null; tool_slug?: string | null; }>;
+  recentFeatures?: Array<{ id: string; slug: string; title: string; thumbnail_url: string | null; published_at: string; }>;
   priceChanges: Array<{
     tool_slug: string; tool_name_ja: string; tool_name_en: string;
     plan_name: string; price_usd: number | null; previous_price_usd: number | null;
@@ -29,12 +30,12 @@ interface HomeContentProps {
 }
 
 export default function HomeContent(p: HomeContentProps) {
-  const { locale, latestNews, newTools, categories, categoryNotes = [], topFeatures = [] } = p;
+  const { locale, latestNews, newTools, categories, categoryNotes = [], topFeatures = [], recentFeatures = [] } = p;
   const tt = t[locale];
 
   return (
     <main className="flex-1">
-      <HeroSection locale={locale} />
+      <HeroSection locale={locale} recentFeatures={recentFeatures} />
       <AdSlot slot="header" />
 
       {/* 最新ニュース */}
@@ -70,7 +71,7 @@ export default function HomeContent(p: HomeContentProps) {
       <SectionDivider direction="right" />
 
       {/* 特集（記事がある場合のみ） */}
-      {topFeatures.length > 0 && (
+      {topFeatures.length >= 4 && (
         <Sec>
           <SectionHead label="特集" />
           <style>{`

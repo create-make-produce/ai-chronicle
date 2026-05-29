@@ -10,11 +10,12 @@ import {
   getRecentPriceChanges,
   getTopNoteArticlesByCategory,
   getAllFeatures,
+  getRecentFeatures,
 } from '@/lib/db';
 import { CONFIG } from '@/config';
 
 export default async function HomePage() {
-  const [toolCount, latestNews, newTools, categories, priceChangesRaw, categoryNotes, allFeatures] = await Promise.all([
+  const [toolCount, latestNews, newTools, categories, priceChangesRaw, categoryNotes, allFeatures, recentFeatures] = await Promise.all([
     getToolCount(),
     getLatestNews(CONFIG.NEWS_TOP_DISPLAY_COUNT),
     getRecentlyUpdatedTools(9),
@@ -22,6 +23,7 @@ export default async function HomePage() {
     getRecentPriceChanges(CONFIG.PRICE_CHANGE_ALERT_DAYS, 5),
     getTopNoteArticlesByCategory(10),
     getAllFeatures().catch(() => []),
+    getRecentFeatures(30).catch(() => []),
   ]);
 
   const priceChanges = priceChangesRaw.map((p) => ({
@@ -49,6 +51,7 @@ export default async function HomePage() {
       priceChanges={priceChanges}
       categoryNotes={categoryNotes}
       topFeatures={allFeatures.slice(0, 4) as any}
+      recentFeatures={recentFeatures as any}
     />
   );
 }

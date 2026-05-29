@@ -137,15 +137,32 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
           <p style={{
             fontFamily:      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
             fontSize:        '0.75rem',
-            color:           'var(--color-text-sub)',
+            fontWeight:      700,
+            color:           'var(--color-text)',
             lineHeight:      1.55,
+            margin:          '0 0 4px',
+            overflow:        'hidden',
+            display:         '-webkit-box',
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: 'vertical' as const,
+            flexShrink:      0,
+          }}>{tagline}</p>
+        )}
+
+        {/* 概要（動的コンテンツ → システムフォント） */}
+        {(locale === 'ja' ? tool.description_ja : tool.description_en) && (
+          <p style={{
+            fontFamily:      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
+            fontSize:        '0.72rem',
+            color:           'var(--color-text-sub)',
+            lineHeight:      1.6,
             margin:          0,
             flex:            1,
             overflow:        'hidden',
             display:         '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical' as const,
-          }}>{tagline}</p>
+          }}>{locale === 'ja' ? tool.description_ja : tool.description_en}</p>
         )}
 
         {/* 詳しく見る（固定テキスト → Fira Sans サブセット） */}

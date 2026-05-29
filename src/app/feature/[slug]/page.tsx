@@ -51,6 +51,25 @@ export default async function FeatureDetailPage({ params }: { params: Promise<{ 
       <div style={{ background: 'var(--color-bg)' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
 
+          {/* サムネ（1280×720px推奨） */}
+          {(feature as any).thumbnail_url && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={(feature as any).thumbnail_url}
+                alt={feature.title}
+                style={{
+                  width: '100%',
+                  aspectRatio: '16/9',
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  border: '1px solid var(--color-border)',
+                  display: 'block',
+                }}
+              />
+            </div>
+          )}
+
           {/* 記事カード */}
           <div style={{
             background: 'var(--color-bg-card)',
