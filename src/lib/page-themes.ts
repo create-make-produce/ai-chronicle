@@ -46,10 +46,10 @@ export const PAGE_THEMES = {
   },
   /** /features, /feature/[slug] */
   features: {
-    accent:      '#9F1239',
-    accentHover: '#881337',
-    accentBg:    '#FFF1F2',
-    rgb:         '159,18,57',
+    accent:      '#7C3AED',
+    accentHover: '#6D28D9',
+    accentBg:    '#F5F3FF',
+    rgb:         '124,58,237',
   },
 } as const satisfies Record<string, PageTheme>;
 

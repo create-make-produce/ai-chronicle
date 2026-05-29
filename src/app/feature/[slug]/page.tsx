@@ -51,23 +51,69 @@ export default async function FeatureDetailPage({ params }: { params: Promise<{ 
       <div style={{ background: 'var(--color-bg)' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
 
+          {/* 記事カード */}
+          <div style={{
+            background: 'var(--color-bg-card)',
+            border: '1px solid var(--color-border)',
+            borderTop: '3px solid #7C3AED',
+            borderRadius: '0 0 8px 8px',
+            padding: '2rem 2.5rem',
+            marginBottom: '2rem',
+            boxShadow: '0 2px 12px rgba(124,58,237,0.06)',
+          }}>
+
           {/* 本文 */}
           <style>{`
-            .feature-body h2 { font-size: 1rem; font-weight: 700; margin: 1.2rem 0 0.4rem; padding: 4px 10px; border-left: 4px solid #0056B3; color: var(--color-text); }
-            .feature-body h3 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.4rem; padding: 4px 10px; border-left: 3px solid #60A5FA; color: var(--color-text); }
+            .feature-body h2 { font-size: 1rem; font-weight: 700; margin: 1.2rem 0 0.4rem; padding: 4px 10px; border-left: 4px solid #7C3AED; color: var(--color-text); }
+            .feature-body h3 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.4rem; padding: 4px 10px; border-left: 3px solid #DDD6FE; color: var(--color-text); }
             .feature-body a { color: #008CED; text-decoration: underline; }
             .feature-body a::before { content: '🔗 '; font-size: 0.85em; }
+            .feature-body [data-yt-row] { margin: 0.5rem 0; font-size: 0; }
             .feature-body p  { margin: 0 0 0.8em; }
+            .feature-body img { cursor: zoom-in; border-radius: 4px; }
+            #feature-lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:9999; align-items:center; justify-content:center; cursor:zoom-out; }
+            #feature-lightbox.open { display:flex; }
+            #feature-lightbox img { max-width:90vw; max-height:90vh; border-radius:8px; object-fit:contain; }
+            #feature-lightbox-close { position:fixed; top:16px; right:20px; color:#fff; font-size:2rem; cursor:pointer; line-height:1; }
           `}</style>
+          <div id="feature-lightbox">
+            <span id="feature-lightbox-close">×</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img id="feature-lightbox-img" src="data:," alt="" />
+          </div>
+          <script dangerouslySetInnerHTML={{ __html: `
+            (function() {
+              function initLightbox() {
+                document.addEventListener('click', function(e) {
+                  var t = e.target;
+                  if (t.tagName === 'IMG' && t.closest('.feature-body')) {
+                    var lb = document.getElementById('feature-lightbox');
+                    var lbImg = document.getElementById('feature-lightbox-img');
+                    if (lb && lbImg) { lbImg.src = t.src; lb.classList.add('open'); e.stopPropagation(); }
+                  } else if (t.id === 'feature-lightbox' || t.id === 'feature-lightbox-close') {
+                    var el = document.getElementById('feature-lightbox');
+                    if (el) el.classList.remove('open');
+                  }
+                });
+              }
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initLightbox);
+              } else {
+                initLightbox();
+              }
+            })();
+          `}} />
           <article
             className="feature-body"
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: '0.95rem', color: 'var(--color-text)', lineHeight: 1.9 }}
             dangerouslySetInnerHTML={{ __html: feature.body ?? '<p>本文がありません</p>' }}
           />
 
+          </div>{/* /記事カード */}
+
           {/* ツールリンク */}
           {(feature as any).tool_slug && (
-            <div style={{ marginTop: '3rem', padding: '16px 20px', background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', borderLeft: '3px solid #008CED', borderRadius: '6px' }}>
+            <div style={{ marginTop: '1.5rem', padding: '16px 20px', background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', borderLeft: '3px solid #008CED', borderRadius: '6px' }}>
               <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', margin: '0 0 8px' }}>この記事のAIツール</p>
               <Link href={`/tool/${(feature as any).tool_slug}`}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: '#008CED', fontWeight: 700, fontSize: '0.88rem' }}>
@@ -82,7 +128,7 @@ export default async function FeatureDetailPage({ params }: { params: Promise<{ 
 
           {/* 一覧に戻る */}
           <div style={{ marginTop: '2rem' }}>
-            <Link href="/features" style={{ fontSize: '0.82rem', color: '#008CED', textDecoration: 'none' }}>
+            <Link href="/features" style={{ fontSize: '0.82rem', color: '#7C3AED', textDecoration: 'none' }}>
               ← 特集一覧に戻る
             </Link>
           </div>
