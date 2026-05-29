@@ -272,6 +272,7 @@ async function main() {
   let notAiCount = 0;
   let reviewCount = 0;
   let errorCount = 0;
+  let consecutive503 = 0;
 
   for (let i = 0; i < tools.length; i++) {
     const tool = tools[i];
@@ -314,6 +315,7 @@ async function main() {
       // ━━ STEP2+3：Gemini判定（会社名取得 + AIツール判定を1回で実行） ━━
       const prompt = buildPrompt(tool.name_en, tool.official_url, pageText);
       const rawResponse = await callGeminiCheck(prompt);
+      consecutive503 = 0; // Gemini呼び出し成功でリセット
       console.log(`  🤖 Gemini応答: ${rawResponse.trim().slice(0, 200)}`);
       const parsed = parseResponse(rawResponse);
       console.log(`  → 判定: ${parsed.result}${parsed.category ? ` / カテゴリ: ${parsed.category}` : ''}`);
@@ -390,6 +392,18 @@ async function main() {
       if (msg.includes('429')) {
         console.error('  ❌ Gemini RPD上限（429）→ 中断（次回起動時に続きから再開）');
         break;
+      }
+
+      // 503は連続2回で中断（RPD節約）
+      if (msg.includes('503')) {
+        consecutive503++;
+        console.error(`  ⚠ Gemini 503エラー（${consecutive503}回連続）`);
+        if (consecutive503 >= 2) {
+          console.error('  ❌ 503エラー2回連続 → 中断（次回起動時に続きから再開）');
+          break;
+        }
+      } else {
+        consecutive503 = 0;
       }
 
       console.error(`  ⚠ エラー: ${msg}`);
