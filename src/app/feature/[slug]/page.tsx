@@ -13,25 +13,6 @@ export default async function FeatureDetailPage({ params }: { params: Promise<{ 
   if (!feature) notFound();
 
   // 本文のYouTube URLを埋め込みに変換
-  const renderBody = (body: string) => {
-    return body.split('\n').map((line, i) => {
-      const ytMatch = line.trim().match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-      if (ytMatch) {
-        return (
-          <div key={i} style={{ margin: '1.5rem 0', aspectRatio: '16/9', position: 'relative' }}>
-            <iframe
-              src={`https://www.youtube.com/embed/${ytMatch[1]}`}
-              style={{ width: '100%', height: '100%', border: 'none', borderRadius: '6px' }}
-              allowFullScreen
-            />
-          </div>
-        );
-      }
-      if (line === '') return <br key={i} />;
-      return <p key={i} style={{ margin: '0 0 0.8em', lineHeight: 1.9 }}>{line}</p>;
-    });
-  };
-
   return (
     <main className="flex-1" style={{ minHeight: '100vh' }}>
       <PageHero
@@ -71,16 +52,18 @@ export default async function FeatureDetailPage({ params }: { params: Promise<{ 
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
 
           {/* 本文 */}
-          <article style={{
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontSize: '0.95rem',
-            color: 'var(--color-text)',
-            lineHeight: 1.9,
-          }}>
-            {feature.body ? renderBody(feature.body) : (
-              <p style={{ color: 'var(--color-text-muted)' }}>本文がありません</p>
-            )}
-          </article>
+          <style>{`
+            .feature-body h2 { font-size: 1rem; font-weight: 700; margin: 1.2rem 0 0.4rem; padding: 4px 10px; border-left: 4px solid #0056B3; color: var(--color-text); }
+            .feature-body h3 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.4rem; padding: 4px 10px; border-left: 3px solid #60A5FA; color: var(--color-text); }
+            .feature-body a { color: #008CED; text-decoration: underline; }
+            .feature-body a::before { content: '🔗 '; font-size: 0.85em; }
+            .feature-body p  { margin: 0 0 0.8em; }
+          `}</style>
+          <article
+            className="feature-body"
+            style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: '0.95rem', color: 'var(--color-text)', lineHeight: 1.9 }}
+            dangerouslySetInnerHTML={{ __html: feature.body ?? '<p>本文がありません</p>' }}
+          />
 
           {/* ツールリンク */}
           {(feature as any).tool_slug && (
