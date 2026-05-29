@@ -73,9 +73,20 @@ export default function HomeContent(p: HomeContentProps) {
       {topFeatures.length > 0 && (
         <Sec>
           <SectionHead label="特集" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+          <style>{`
+            .feature-top-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+            @media (max-width: 767px) {
+              .feature-top-grid { display: flex; overflow-x: auto; gap: 0.75rem; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+              .feature-top-grid::-webkit-scrollbar { height: 4px; }
+              .feature-top-grid::-webkit-scrollbar-track { background: var(--color-border); border-radius: 2px; }
+              .feature-top-grid::-webkit-scrollbar-thumb { background: var(--color-border-mid); border-radius: 2px; }
+              .feature-top-item { flex: 0 0 72vw; max-width: 280px; scroll-snap-align: start; }
+            }
+          `}</style>
+          <div className="feature-top-grid">
             {topFeatures.map(f => (
               <a key={f.id} href={`/feature/${f.slug}`}
+                className="feature-top-item"
                 style={{ textDecoration: 'none', color: 'inherit', background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: '100%', aspectRatio: '16/9', background: 'var(--color-bg-sub)', overflow: 'hidden', flexShrink: 0 }}>
                   {f.thumbnail_url ? (
