@@ -5,6 +5,7 @@ import { t, localizedPath } from '@/lib/i18n';
 import AdSlot from './AdSlot';
 import ToolMediaTabs from './ToolMediaTabs';
 import ToolNewsSection from './ToolNewsSection';
+import ToolFeaturesSection from './ToolFeaturesSection';
 import PageHero from './PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
 
@@ -16,6 +17,7 @@ interface ToolDetailContentProps {
   toolLaunches?: ToolLaunch[];
   noteArticles?: NoteArticle[];
   relatedToolsFromRelations?: Array<{ id: string; slug: string; name_ja: string; name_en: string; tagline_ja: string | null; logo_url: string | null }>;
+  toolFeatures?: Array<{ id: string; slug: string; title: string; thumbnail_url: string | null; published_at: string; updated_at: string }>;
 }
 
 function isProductHuntUrl(url: string): boolean {
@@ -64,7 +66,7 @@ function LinkBadge({ href, icon, topLabel, bottomLabel }: { href: string; icon: 
 }
 
 export default function ToolDetailContent({
-  tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [], relatedToolsFromRelations = [],
+  tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [], relatedToolsFromRelations = [], toolFeatures = [],
 }: ToolDetailContentProps) {
   const tt          = t[locale];
   const name        = locale === 'ja' ? tool.name_ja : tool.name_en;
@@ -171,6 +173,8 @@ export default function ToolDetailContent({
               )}
             </section>
           )}
+
+          <ToolFeaturesSection features={toolFeatures} />
 
           <ToolMediaTabs
             noteArticles={noteArticles}

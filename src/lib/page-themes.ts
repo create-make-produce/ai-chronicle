@@ -44,6 +44,13 @@ export const PAGE_THEMES = {
     accentBg:    '#FFFBEB',
     rgb:         '217,119,6',
   },
+  /** /features, /feature/[slug] */
+  features: {
+    accent:      '#9F1239',
+    accentHover: '#881337',
+    accentBg:    '#FFF1F2',
+    rgb:         '159,18,57',
+  },
 } as const satisfies Record<string, PageTheme>;
 
 export type ThemeKey = keyof typeof PAGE_THEMES;
@@ -55,5 +62,6 @@ export function getThemeByPath(pathname: string): PageTheme {
   if (pathname.startsWith('/news'))                              return PAGE_THEMES.news;
   if (pathname.startsWith('/monthly'))                          return PAGE_THEMES.monthly;
   if (pathname.startsWith('/tools') || pathname.startsWith('/tool/')) return PAGE_THEMES.tools;
+  if (pathname.startsWith('/features') || pathname.startsWith('/feature/')) return PAGE_THEMES.features;
   return PAGE_THEMES.home;
 }

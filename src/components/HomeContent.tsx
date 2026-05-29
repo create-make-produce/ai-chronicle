@@ -20,6 +20,7 @@ interface HomeContentProps {
   newTools: Tool[];
   categories: CategoryWithCount[];
   categoryNotes?: CategoryNoteArticles[];
+  topFeatures?: Array<{ id: string; slug: string; title: string; thumbnail_url: string | null; published_at: string; tool_name_en?: string | null; tool_slug?: string | null; }>;
   priceChanges: Array<{
     tool_slug: string; tool_name_ja: string; tool_name_en: string;
     plan_name: string; price_usd: number | null; previous_price_usd: number | null;
@@ -28,7 +29,7 @@ interface HomeContentProps {
 }
 
 export default function HomeContent(p: HomeContentProps) {
-  const { locale, latestNews, newTools, categories, categoryNotes = [] } = p;
+  const { locale, latestNews, newTools, categories, categoryNotes = [], topFeatures = [] } = p;
   const tt = t[locale];
 
   return (
@@ -67,6 +68,46 @@ export default function HomeContent(p: HomeContentProps) {
       )}
 
       <SectionDivider direction="right" />
+
+      {/* 特集（記事がある場合のみ） */}
+      {topFeatures.length > 0 && (
+        <Sec>
+          <SectionHead label="特集" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+            {topFeatures.map(f => (
+              <a key={f.id} href={`/feature/${f.slug}`}
+                style={{ textDecoration: 'none', color: 'inherit', background: 'var(--color-bg-card)', border: '1px solid var(--color-border)', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ width: '100%', aspectRatio: '16/9', background: 'var(--color-bg-sub)', overflow: 'hidden', flexShrink: 0 }}>
+                  {f.thumbnail_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={f.thumbnail_url} alt={f.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-accent-bg)' }}>
+                      <span style={{ fontSize: '2rem' }}>📝</span>
+                    </div>
+                  )}
+                </div>
+                <div style={{ padding: '0.875rem' }}>
+                  {f.tool_name_en && (
+                    <span style={{ fontSize: '0.68rem', color: 'var(--color-accent)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>{f.tool_name_en}</span>
+                  )}
+                  <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text)', lineHeight: 1.5, margin: '0 0 6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>
+                    {f.title}
+                  </p>
+                  <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>{f.published_at?.slice(0, 10).replace(/-/g, '/')}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div style={{ textAlign: 'right', marginTop: '1rem' }}>
+            <a href="/features" style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.82rem', color: 'var(--color-accent)', textDecoration: 'none' }}>
+              特集をすべて見る
+            </a>
+          </div>
+        </Sec>
+      )}
+
+      <SectionDivider direction="left" />
 
       {/* カテゴリ */}
       {categories.length > 0 && (

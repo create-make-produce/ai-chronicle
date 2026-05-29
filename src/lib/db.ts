@@ -404,3 +404,64 @@ export async function getToolDetailBySlug(slug: string): Promise<ToolWithPlans |
   ])
   return { ...tool, plans, category }
 }
+
+// =============================================
+// Features（特集記事）
+// =============================================
+
+export interface Feature {
+  id: string
+  slug: string
+  title: string
+  body: string | null
+  tool_id: string | null
+  tool_name_en?: string | null
+  tool_name_ja?: string | null
+  tool_slug?: string | null
+  tool_logo_url?: string | null
+  is_published: number
+  published_at: string
+  updated_at: string
+  created_at: string
+}
+
+export async function getPublishedFeaturesCount(): Promise<number> {
+  try {
+    const rows = await queryD1<{ c: number }>(
+      `SELECT COUNT(*) AS c FROM features WHERE is_published = 1`
+    )
+    return rows[0]?.c ?? 0
+  } catch {
+    return 0
+  }
+}
+
+export async function getAllFeatures(): Promise<Feature[]> {
+  return queryD1<Feature>(
+    `SELECT f.*, t.name_en as tool_name_en, t.name_ja as tool_name_ja,
+            t.slug as tool_slug, t.logo_url as tool_logo_url
+     FROM features f
+     LEFT JOIN tools t ON f.tool_id = t.id
+     WHERE f.is_published = 1
+     ORDER BY f.published_at DESC`
+  )
+}
+
+export async function getFeatureBySlug(slug: string): Promise<Feature | null> {
+  const rows = await queryD1<Feature>(
+    `SELECT f.*, t.name_en as tool_name_en, t.name_ja as tool_name_ja,
+            t.slug as tool_slug, t.logo_url as tool_logo_url
+     FROM features f
+     LEFT JOIN tools t ON f.tool_id = t.id
+     WHERE f.slug = ? AND f.is_published = 1 LIMIT 1`,
+    [slug]
+  )
+  return rows[0] ?? null
+}
+
+export async function getFeaturesByToolId(toolId: string): Promise<Feature[]> {
+  return queryD1<Feature>(
+    `SELECT id, slug, title, thumbnail_url, published_at, updated_at FROM features WHERE tool_id = ? AND is_published = 1 ORDER BY published_at DESC`,
+    [toolId]
+  )
+}

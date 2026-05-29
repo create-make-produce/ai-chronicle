@@ -14,6 +14,14 @@ interface RelatedTool {
   logo_url: string | null;
 }
 
+interface Feature {
+  id: string;
+  slug: string;
+  title: string;
+  published_at: string;
+  updated_at: string;
+}
+
 interface ToolMediaTabsProps {
   noteArticles: NoteArticle[];
   launches: ToolLaunch[];
@@ -22,10 +30,11 @@ interface ToolMediaTabsProps {
   toolLogoUrl?: string | null;
   relatedTools?: RelatedTool[];
   currentToolId?: string;
+  features?: Feature[];
 }
 
-export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedTools = [], currentToolId }: ToolMediaTabsProps) {
-  const [activeTab, setActiveTab] = useState<'note' | 'related'>('note');
+export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedTools = [], currentToolId, features = [] }: ToolMediaTabsProps) {
+  const [activeTab, setActiveTab] = useState<'note' | 'features' | 'related'>('note');
   const [notePage, setNotePage] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -38,8 +47,9 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
 
   const tabs = [
     { id: 'note' as const, label: 'Note紹介' },
+    ...(features.length > 0 ? [{ id: 'features' as const, label: '特集' }] : []),
     ...(filteredRelated.length > 0 ? [{ id: 'related' as const, label: '関連AIツール' }] : []),
-  ] as { id: 'note' | 'related'; label: string }[];
+  ] as { id: 'note' | 'features' | 'related'; label: string }[];
 
   return (
     <section style={{ background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: '3px solid #008CED', borderRadius: '4px', overflow: 'hidden' }}>
@@ -174,6 +184,26 @@ export default function ToolMediaTabs({ noteArticles, locale, toolName, relatedT
                 )}
               </>
             )}
+          </div>
+        )}
+
+        {/* 特集タブ */}
+        {activeTab === 'features' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {features.map(f => (
+              <a key={f.id} href={`/feature/${f.slug}`}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block', background: 'var(--color-note-card-bg)', border: '1px solid var(--color-note-card-border)', borderRadius: '6px', padding: '14px 16px', transition: 'border-color 0.15s' }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(0,140,237,0.3)'}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--color-note-card-border)'}>
+                <div style={{ fontFamily: 'Noto Sans JP, sans-serif', fontWeight: 700, fontSize: '0.92rem', color: 'var(--color-text)', marginBottom: '6px' }}>{f.title}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
+                  {f.published_at?.slice(0, 10).replace(/-/g, '/')}
+                  {f.updated_at && f.updated_at !== f.published_at && (
+                    <span style={{ marginLeft: '8px' }}>更新: {f.updated_at.slice(0, 10).replace(/-/g, '/')}</span>
+                  )}
+                </div>
+              </a>
+            ))}
           </div>
         )}
 

@@ -27,7 +27,7 @@ const BOTTOM_NAV = [
   )},
 ];
 
-export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
+export default function Footer({ lang = 'ja', showFeatures = false }: { lang?: 'ja' | 'en'; showFeatures?: boolean }) {
   const isEn    = lang === 'en';
   const year    = new Date().getFullYear();
   const pathname = usePathname();
@@ -83,6 +83,7 @@ export default function Footer({ lang = 'ja' }: { lang?: 'ja' | 'en' }) {
               { href: '/news',    en: 'NEWS',      ja: 'ニュース' },
               { href: '/monthly', en: 'MONTHLY',   ja: '月刊AI' },
               { href: '/tools',   en: 'TOOLS',     ja: 'AIツール一覧' },
+              ...(showFeatures ? [{ href: '/features', en: 'FEATURES', ja: '特集' }] : []),
             ].map(item => (
               <Link key={item.href} href={item.href} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: theme.accent, flexShrink: 0, display: 'inline-block' }} />

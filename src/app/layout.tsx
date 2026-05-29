@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import FooterWrapper from '@/components/FooterWrapper';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { getPublishedFeaturesCount } from '@/lib/db';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chronicle-76h.pages.dev';
 
@@ -18,7 +19,9 @@ export const metadata: Metadata = {
   alternates: { canonical: '/', languages: { ja: '/', en: '/en', 'x-default': '/' } },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const featuresCount = await getPublishedFeaturesCount().catch(() => 0);
+  const hasFeatures = featuresCount > 0;
   return (
     <html lang="ja" data-theme="dark" suppressHydrationWarning>
       <head>
@@ -37,9 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col antialiased" style={{ background: 'var(--color-bg)', overflowX: 'hidden' }}>
         <ThemeProvider>
-          <Header />
+          <Header showFeatures={hasFeatures} />
           {children}
-          <FooterWrapper />
+          <FooterWrapper showFeatures={hasFeatures} />
         </ThemeProvider>
       </body>
     </html>

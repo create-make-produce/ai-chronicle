@@ -32,14 +32,21 @@ function MoonIcon() {
   );
 }
 
-export default function Header() {
+export default function Header({ showFeatures = false }: { showFeatures?: boolean }) {
   const pathname   = usePathname();
   const { theme, toggle } = useTheme();
 
-  // 現在ページのテーマカラー
   const pageTheme  = getThemeByPath(pathname);
   const accent     = pageTheme.accent;
   const accentRgb  = pageTheme.rgb;
+
+  const navItems = [
+    { href: '/',         en: 'TOP',      ja: 'トップ' },
+    { href: '/news',     en: 'NEWS',     ja: 'ニュース' },
+    { href: '/monthly',  en: 'MONTHLY',  ja: '月刊AI' },
+    ...(showFeatures ? [{ href: '/features', en: 'FEATURES', ja: '特集' }] : []),
+    { href: '/tools',    en: 'TOOLS',    ja: 'AIツール一覧' },
+  ];
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -92,7 +99,7 @@ export default function Header() {
         {/* デスクトップナビ */}
         <nav className="header-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
 
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active = isActive(item.href);
             // このナビ項目のテーマカラー（アクティブ時のみ使用）
             const itemTheme = getThemeByPath(item.href);

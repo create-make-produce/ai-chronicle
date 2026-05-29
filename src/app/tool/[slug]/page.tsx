@@ -2,7 +2,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import ToolDetailContent from '@/components/ToolDetailContent';
-import { getToolDetailBySlug, getRelatedTools, queryD1 } from '@/lib/db';
+import { getToolDetailBySlug, getRelatedTools, queryD1, getFeaturesByToolId } from '@/lib/db';
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -59,12 +59,13 @@ export default async function ToolDetailPage({ params }: Params) {
   const tool = await getToolDetailBySlug(slug);
   if (!tool) notFound();
 
-  const [related, toolNews, toolLaunches, noteArticles, relatedFromRelations] = await Promise.all([
+  const [related, toolNews, toolLaunches, noteArticles, relatedFromRelations, toolFeatures] = await Promise.all([
     getRelatedTools(tool.category_id, tool.id, 6),
     getToolNews(tool.id),
     getToolLaunches(tool.id),
     getNoteArticles(tool.id),
     getRelatedToolsFromRelations(tool.id),
+    getFeaturesByToolId(tool.id),
   ]);
 
   return (
@@ -76,6 +77,7 @@ export default async function ToolDetailPage({ params }: Params) {
       toolLaunches={toolLaunches}
       noteArticles={noteArticles}
       relatedToolsFromRelations={relatedFromRelations}
+      toolFeatures={toolFeatures as any}
     />
   );
 }
