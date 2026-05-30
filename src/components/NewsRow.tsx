@@ -1,33 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-
-const NEWS_TYPE_LABELS = {
-  price_change: {
-    ja: '料金改定', en: 'Price Change',
-    color:  'var(--color-news-price-change)',
-    bg:     'var(--color-news-price-change-bg)',
-    border: 'var(--color-news-price-change-border)',
-  },
-  new_tool: {
-    ja: '新ツール', en: 'New Tool',
-    color:  'var(--color-news-new-tool)',
-    bg:     'var(--color-news-new-tool-bg)',
-    border: 'var(--color-news-new-tool-border)',
-  },
-  new_feature: {
-    ja: '新機能', en: 'New Feature',
-    color:  'var(--color-news-new-feature)',
-    bg:     'var(--color-news-new-feature-bg)',
-    border: 'var(--color-news-new-feature-border)',
-  },
-  other: {
-    ja: 'その他', en: 'Other',
-    color:  'var(--color-news-other)',
-    bg:     'var(--color-news-other-bg)',
-    border: 'var(--color-news-other-border)',
-  },
-} as const;
+import { getCategoryColor } from '@/lib/category-colors';
 
 interface NewsRowProps {
   item: {
@@ -40,6 +14,8 @@ interface NewsRowProps {
     tool_name_ja?: string;
     tool_name_en?: string;
     tool_logo_url?: string;
+    category_slug?: string;
+    category_name_ja?: string;
   };
   href: string;
   lang: 'ja' | 'en';
@@ -48,11 +24,11 @@ interface NewsRowProps {
 
 export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
   const [hovered, setHovered] = useState(false);
-  const typeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
-  const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
+  const cat = getCategoryColor(item.category_slug);
   const title = lang === 'en' ? (item.title_en || item.title_ja) : item.title_ja;
   const toolName = lang === 'en' ? item.tool_name_en : item.tool_name_ja;
-  const badgeLabel = lang === 'en' ? badge.en : badge.ja;
+  const logoUrl = item.tool_logo_url ?? null;
+
   const date = (() => {
     try {
       const raw = item.published_at?.includes('Z') ? item.published_at : item.published_at?.replace(' ', 'T') + 'Z';
@@ -62,7 +38,6 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       return `${jst.getUTCFullYear()}/${pad(jst.getUTCMonth()+1)}/${pad(jst.getUTCDate())} ${pad(jst.getUTCHours())}:${pad(jst.getUTCMinutes())}`;
     } catch { return item.published_at?.substring(0, 10) ?? ''; }
   })();
-  const logoUrl = item.tool_logo_url ?? null;
 
   return (
     <Link
@@ -72,33 +47,37 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
       className="news-row"
       style={{
         display: 'grid',
-        gridTemplateColumns: '72px 145px 1fr',
+        gridTemplateColumns: '90px 145px 1fr',
         alignItems: 'center',
         gap: '1rem',
         padding: '0.85rem 1.25rem',
         borderBottom: isLast ? 'none' : '1px solid var(--color-border)',
-        borderLeft: `3px solid ${badge.color}`,
+        borderLeft: `3px solid ${cat.color}`,
         textDecoration: 'none',
         background: hovered ? 'var(--color-row-hover)' : 'transparent',
         transition: 'background 0.12s',
       }}
     >
-      {/* バッジ（固定テキスト → Fira Sans サブセット） */}
+      {/* カテゴリバッジ（固定幅・短縮名使用） */}
       <span style={{
-        fontFamily:    'Fira Sans, system-ui',
-        fontSize:      '0.7rem',
+        fontFamily:    'Noto Sans JP, system-ui',
+        fontSize:      '0.68rem',
         fontWeight:    700,
-        color:         badge.color,
-        background:    badge.bg,
-        padding:       '2px 8px',
+        color:         cat.text,
+        background:    cat.bg,
+        padding:       '2px 0',
         borderRadius:  '3px',
+        border:        `1px solid ${cat.border}`,
+        width:         '84px',
+        textAlign:     'center',
+        display:       'inline-block',
         whiteSpace:    'nowrap',
-        border:        `1px solid ${badge.border}`,
+        flexShrink:    0,
       }}>
-        {badgeLabel}
+        {cat.label}
       </span>
 
-      {/* 日時（固定文字セット → Fira Sans サブセット） */}
+      {/* 日時 */}
       <span className="news-date" style={{
         fontFamily:    'Fira Sans, system-ui',
         fontSize:      '0.78rem',
@@ -108,7 +87,7 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         {date}
       </span>
 
-      {/* タイトル + ツール名（動的コンテンツ → システムフォント） */}
+      {/* タイトル + ツール名 */}
       <span className="news-title" style={{
         fontFamily:   '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
         fontSize:     '0.88rem',
@@ -120,21 +99,18 @@ export default function NewsRow({ item, href, lang, isLast }: NewsRowProps) {
         {title}
         {toolName && (
           <span style={{
-            color:       'var(--color-text-muted)',
-            marginLeft:  '0.5rem',
-            fontSize:    '0.78rem',
-            display:     'inline-flex',
-            alignItems:  'center',
-            gap:         '4px',
+            color:      'var(--color-text-muted)',
+            marginLeft: '0.5rem',
+            fontSize:   '0.78rem',
+            display:    'inline-flex',
+            alignItems: 'center',
+            gap:        '4px',
           }}>
             —
             {logoUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={logoUrl}
-                alt={toolName}
-                style={{ width:'14px', height:'14px', borderRadius:'2px', objectFit:'contain', flexShrink:0 }}
-              />
+              <img src={logoUrl} alt={toolName}
+                style={{ width:'14px', height:'14px', borderRadius:'2px', objectFit:'contain', flexShrink:0 }} />
             )}
             {toolName}
           </span>

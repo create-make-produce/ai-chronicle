@@ -279,9 +279,11 @@ export async function getCategoriesWithCount(): Promise<CategoryWithCount[]> {
 
 export async function getLatestNews(limit = 5): Promise<News[]> {
   return queryD1<News>(
-    `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en, t.logo_url as tool_logo_url
+    `SELECT n.*, t.name_ja as tool_name_ja, t.name_en as tool_name_en, t.logo_url as tool_logo_url,
+            c.slug as category_slug, c.name_ja as category_name_ja
      FROM news n
      LEFT JOIN tools t ON n.tool_id = t.id
+     LEFT JOIN categories c ON t.category_id = c.id
      WHERE n.is_published = 1
        AND (n.tool_id IS NULL OR (t.is_published = 1 AND t.status != 'archived' AND t.admin_checked = 1))
      ORDER BY n.published_at DESC LIMIT ?`,

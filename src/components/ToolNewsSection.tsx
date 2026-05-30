@@ -3,13 +3,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { News, Locale } from '@/types';
 
-const NEWS_TYPE_LABELS = {
-  price_change: { ja: '価格改定', color: '#FCD34D', bg: 'rgba(252,211,77,0.12)', border: 'rgba(252,211,77,0.3)' },
-  new_tool:     { ja: '新機能',   color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
-  new_feature:  { ja: '新機能',   color: '#60A5FA', bg: 'rgba(96,165,250,0.12)', border: 'rgba(96,165,250,0.3)' },
-  other:        { ja: 'その他',   color: '#9CA3AF', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.3)' },
-} as const;
-
 const PER_PAGE = 4;
 
 interface ToolNewsSectionProps {
@@ -38,8 +31,6 @@ export default function ToolNewsSection({ news, locale }: ToolNewsSectionProps) 
       <h2 className="section-label mb-3">このツールのニュース</h2>
       <div style={{ overflow: 'hidden', borderRadius: '4px', border: '1px solid var(--color-note-card-border)' }}>
         {paged.map((item, i) => {
-          const typeKey = (item.news_type ?? 'other') as keyof typeof NEWS_TYPE_LABELS;
-          const badge = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
           return (
             <Link key={item.id} href={`/news/${item.slug}`}
               style={{ display: 'block', padding: '0.75rem 1rem', borderBottom: i < paged.length - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none', transition: 'background 0.15s' }}
@@ -50,9 +41,6 @@ export default function ToolNewsSection({ news, locale }: ToolNewsSectionProps) 
                 <time style={{ fontFamily: 'Fira Sans, monospace', fontSize: '0.78rem', color: 'var(--color-text-timestamp)', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   {item.published_at?.substring(0, 10)}
                 </time>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap', border: `1px solid ${badge.border}`, flexShrink: 0 }}>
-                  {badge.ja}
-                </span>
                 <span style={{ fontSize: '0.85rem', color: 'var(--color-text)', fontFamily: 'Noto Sans JP, sans-serif', lineHeight: 1.5, flex: '1 1 200px' }}>
                   {item.title_ja}
                 </span>

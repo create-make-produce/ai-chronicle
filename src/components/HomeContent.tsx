@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import type { Locale, Tool, News } from '@/types';
 import type { CategoryWithCount, CategoryNoteArticles } from '@/lib/db';
 import { t, type TDict, localizedPath } from '@/lib/i18n';
+import { getCategoryColor } from '@/lib/category-colors';
 import HeroSection from './HeroSection';
 import CategoryGrid from './CategoryGrid';
 import ToolCard from './ToolCard';
@@ -274,21 +275,13 @@ function NewsCardTop({ item, href, lang }: {
     id: string; slug: string; title_ja: string; title_en?: string;
     news_type: string; published_at: string;
     tool_name_ja?: string; tool_name_en?: string; tool_logo_url?: string;
+    category_slug?: string; category_name_ja?: string;
   };
   href: string;
   lang: 'ja' | 'en';
 }) {
   const [hovered, setHovered] = useState(false);
-
-  const NEWS_COLORS: Record<string, { color: string; bg: string; border: string; label: string }> = {
-    new_tool:     { color:'var(--color-news-new-tool)',     bg:'var(--color-news-new-tool-bg)',     border:'var(--color-news-new-tool-border)',     label: lang==='en'?'New Tool':'新ツール' },
-    new_feature:  { color:'var(--color-news-new-feature)',  bg:'var(--color-news-new-feature-bg)',  border:'var(--color-news-new-feature-border)',  label: lang==='en'?'New Feature':'新機能' },
-    price_change: { color:'var(--color-news-price-change)', bg:'var(--color-news-price-change-bg)', border:'var(--color-news-price-change-border)', label: lang==='en'?'Price Change':'料金改定' },
-    other:        { color:'var(--color-news-other)',        bg:'var(--color-news-other-bg)',        border:'var(--color-news-other-border)',        label: lang==='en'?'Other':'その他' },
-  };
-
-  const typeKey = item.news_type ?? 'other';
-  const badge = NEWS_COLORS[typeKey] ?? NEWS_COLORS.other;
+  const cat = getCategoryColor(item.category_slug);
   const title = lang === 'en' ? (item.title_en || item.title_ja) : item.title_ja;
   const toolName = lang === 'en' ? item.tool_name_en : item.tool_name_ja;
   const logoUrl = item.tool_logo_url ?? null;
@@ -313,20 +306,22 @@ function NewsCardTop({ item, href, lang }: {
         borderTop:      '1px solid var(--color-border)',
         borderRight:    '1px solid var(--color-border)',
         borderBottom:   '1px solid var(--color-border)',
-        borderLeft:     `4px solid ${badge.color}`,
+        borderLeft:     `4px solid ${cat.color}`,
         borderRadius:   '4px',
         padding:        '16px 20px',
         background:     hovered ? 'var(--color-row-hover)' : 'transparent',
         transition:     'all 0.15s',
       }}>
-      {/* バッジ＋日時 */}
+      {/* カテゴリバッジ＋日時 */}
       <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
         <span style={{
-          fontSize:'0.7rem', fontWeight:700,
-          color: badge.color, background: badge.bg,
-          border: `1px solid ${badge.border}`,
-          padding:'2px 8px', borderRadius:'3px',
-        }}>{badge.label}</span>
+          fontSize:'0.68rem', fontWeight:700,
+          color: cat.text, background: cat.bg,
+          border: `1px solid ${cat.border}`,
+          padding:'2px 0', borderRadius:'3px',
+          width:'84px', textAlign:'center', display:'inline-block', whiteSpace:'nowrap',
+          fontFamily:'Noto Sans JP, system-ui',
+        }}>{cat.label}</span>
         <span style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--color-text-timestamp)', fontFamily:'Fira Sans, monospace' }}>
           {date}
         </span>

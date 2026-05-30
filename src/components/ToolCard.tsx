@@ -4,19 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import type { Locale, Tool } from '@/types';
 import { t, localizedPath } from '@/lib/i18n';
-
-const CAT_PASTEL: Record<string, { bg: string; color: string; border: string; text: string }> = {
-  'text-generation':  { bg: 'rgba(139,184,255,0.12)', color: '#8BB8FF', border: 'rgba(139,184,255,0.5)', text: '#2B5FA8' },
-  'image-generation': { bg: 'rgba(255,182,200,0.12)', color: '#FFB6C8', border: 'rgba(255,182,200,0.5)', text: '#A03050' },
-  'audio':            { bg: 'rgba(192,168,255,0.12)', color: '#C0A8FF', border: 'rgba(192,168,255,0.5)', text: '#5E38B0' },
-  'coding':           { bg: 'rgba(168,240,212,0.12)', color: '#A8F0D4', border: 'rgba(168,240,212,0.5)', text: '#1E7A58' },
-  'productivity':     { bg: 'rgba(255,200,130,0.12)', color: '#FFC882', border: 'rgba(255,200,130,0.5)', text: '#8A5010' },
-  'research':         { bg: 'rgba(130,210,200,0.12)', color: '#82D2C8', border: 'rgba(130,210,200,0.5)', text: '#1E7A70' },
-  'marketing':        { bg: 'rgba(255,224,102,0.12)', color: '#FFE066', border: 'rgba(255,224,102,0.5)', text: '#7A5200' },
-  'other':            { bg: 'rgba(200,200,200,0.10)', color: '#AAAAAA', border: 'rgba(200,200,200,0.4)',  text: '#555555' },
-};
-
-const DEFAULT_PASTEL = { bg: 'rgba(200,200,200,0.10)', color: '#AAAAAA', border: 'rgba(200,200,200,0.4)', text: '#555555' };
+import { getCategoryColor } from '@/lib/category-colors';
 
 interface ToolCardProps {
   tool: Tool;
@@ -31,7 +19,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
   const name    = locale === 'ja' ? tool.name_ja    : tool.name_en;
   const tagline = locale === 'ja' ? tool.tagline_ja : tool.tagline_en;
   const initials = name.slice(0, 2).toUpperCase();
-  const pastel  = (categorySlug && CAT_PASTEL[categorySlug]) ? CAT_PASTEL[categorySlug] : DEFAULT_PASTEL;
+  const pastel  = getCategoryColor(categorySlug);
 
   return (
     <motion.div
