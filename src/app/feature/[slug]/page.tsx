@@ -34,6 +34,15 @@ export default async function FeatureDetailPage({ params }: { params: Promise<{ 
               <span style={{ fontSize: '0.78rem', color: '#008CED', fontWeight: 600 }}>{(feature as any).tool_name_en}</span>
             </Link>
           )}
+          {!(feature as any).tool_name_en && (feature as any).external_tool_name && (
+            <a href={(feature as any).external_tool_url ?? '#'} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none', marginBottom: '12px' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent((feature as any).external_tool_url ?? '')}&size=32`}
+                alt="" style={{ width: '20px', height: '20px', borderRadius: '3px', objectFit: 'contain' }} />
+              <span style={{ fontSize: '0.78rem', color: '#008CED', fontWeight: 600 }}>{(feature as any).external_tool_name}</span>
+            </a>
+          )}
         </div>
         <PageHeroTitle
           en="Feature"
