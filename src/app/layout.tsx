@@ -9,7 +9,7 @@ import { getPublishedFeaturesCount } from '@/lib/db';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chronicle-76h.pages.dev';
 
 export const metadata: Metadata = {
-  icons: { icon: '/icon.png', apple: '/icon.png' },
+  icons: { icon: [{ url: '/favicon.ico' }, { url: '/icon.png' }], shortcut: '/favicon.ico', apple: '/icon.png' },
   metadataBase: new URL(SITE_URL),
   title: { default: 'AI Chronicle - AIツール最新情報データベース', template: '%s | AI Chronicle' },
   description: 'AIツールの最新情報データベース。最新ニュース・価格・アップデートを一つの場所で確認。',
