@@ -5,11 +5,14 @@ import NewsRow from '@/components/NewsRow';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
 import { getLatestNews } from '@/lib/db';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'AIツール最新ニュース | AI Chronicle',
   description: '新機能・アップデート・価格改定に関する最新情報。',
 };
+
+const PER_PAGE = 50;
 
 type NewsItem = Record<string, unknown>;
 
@@ -33,9 +36,17 @@ function groupByMonth(items: NewsItem[]): Array<{ monthKey: string; monthLabel: 
 
 const theme = PAGE_THEMES.news;
 
-export default async function NewsPage() {
-  const newsItems = await getLatestNews(200);
-  const grouped   = groupByMonth(newsItems as NewsItem[]);
+export default async function NewsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page: pageParam } = await searchParams;
+  const page    = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
+  const offset  = (page - 1) * PER_PAGE;
+
+  // 全件取得してページネーション（総件数把握のため）
+  const allNews = await getLatestNews(1000);
+  const total   = allNews.length;
+  const totalPages = Math.ceil(total / PER_PAGE);
+  const newsItems  = allNews.slice(offset, offset + PER_PAGE);
+  const grouped    = groupByMonth(newsItems as NewsItem[]);
 
   return (
     <main style={{ minHeight: '100vh' }}>
@@ -54,6 +65,14 @@ export default async function NewsPage() {
 
       <div style={{ background: 'var(--color-page-gradient)' }}>
         <div className="max-w-7xl mx-auto section-px" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
+
+          {/* 件数・ページ表示 */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '8px' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+              全{total}件 / {page}ページ目（{totalPages}ページ中）
+            </span>
+          </div>
+
           {newsItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--color-text-muted)', border: '1px dashed var(--color-border)', borderRadius: '4px' }}>
               ニュースはまだありません。
@@ -78,6 +97,51 @@ export default async function NewsPage() {
               ))}
             </div>
           )}
+
+          {/* ページネーション */}
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '3rem', flexWrap: 'wrap' }}>
+              {/* 前へ */}
+              {page > 1 && (
+                <Link href={`/news?page=${page - 1}`} style={{
+                  padding: '8px 16px', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600,
+                  background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+                  color: 'var(--color-accent)', textDecoration: 'none',
+                }}>← 前へ</Link>
+              )}
+
+              {/* ページ番号 */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+                .reduce<(number | '...')[]>((acc, p, idx, arr) => {
+                  if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push('...');
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, idx) => p === '...' ? (
+                  <span key={`ellipsis-${idx}`} style={{ padding: '8px 4px', color: 'var(--color-text-muted)', fontSize: '0.82rem' }}>…</span>
+                ) : (
+                  <Link key={p} href={`/news?page=${p}`} style={{
+                    padding: '8px 14px', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600,
+                    textDecoration: 'none',
+                    background: p === page ? 'var(--color-accent)' : 'var(--color-bg)',
+                    border: `1px solid ${p === page ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                    color: p === page ? '#fff' : 'var(--color-text)',
+                  }}>{p}</Link>
+                ))
+              }
+
+              {/* 次へ */}
+              {page < totalPages && (
+                <Link href={`/news?page=${page + 1}`} style={{
+                  padding: '8px 16px', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600,
+                  background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+                  color: 'var(--color-accent)', textDecoration: 'none',
+                }}>次へ →</Link>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
     </main>
