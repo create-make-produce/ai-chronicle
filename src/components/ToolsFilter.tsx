@@ -1,6 +1,7 @@
 // src/components/ToolsFilter.tsx
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import type { PageTheme } from '@/lib/page-themes';
 import { PAGE_THEMES } from '@/lib/page-themes';
 import type { Locale, Tool } from '@/types';
@@ -22,58 +23,55 @@ interface ToolsFilterProps {
   categories?: Category[];
   initialCat?: string;
   initialQ?: string;
+  currentPage?: number;
+  totalPages?: number;
+  total?: number;
   theme?: PageTheme;
 }
 
-type SortKey = 'newest' | 'name';
-const PER_PAGE = 12;
-
-export default function ToolsFilter({ tools, locale, categorySlug, categoryName, categories = [], initialCat = '', initialQ = '', theme = PAGE_THEMES.tools }: ToolsFilterProps) {
-  const [query,       setQuery]       = useState(initialQ);
-  const [inputValue,  setInputValue]  = useState(initialQ);
+export default function ToolsFilter({
+  tools, locale, categorySlug, categoryName, categories = [],
+  initialCat = '', initialQ = '',
+  currentPage = 1, totalPages = 1, total = 0,
+  theme = PAGE_THEMES.tools,
+}: ToolsFilterProps) {
+  const router = useRouter();
+  const [inputValue, setInputValue] = useState(initialQ);
   const [selectedCat, setSelectedCat] = useState(initialCat || categorySlug || '');
-  const [sort,        setSort]        = useState<SortKey>('newest');
-  const [currentPage, setCurrentPage] = useState(1);
   const tt = t[locale];
 
-  const resetPage = () => setCurrentPage(1);
+  const buildUrl = (cat: string, q: string, page: number) => {
+    const params = new URLSearchParams();
+    if (cat) params.set('cat', cat);
+    if (q)   params.set('q', q);
+    if (page > 1) params.set('p', String(page));
+    const qs = params.toString();
+    return `/tools${qs ? '?' + qs : ''}`;
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setQuery(inputValue.trim());
-    resetPage();
+    router.push(buildUrl(selectedCat, inputValue.trim(), 1));
   };
 
-  const filtered = useMemo(() => {
-    let r = [...tools];
-    if (query) {
-      const q = query.toLowerCase();
-      r = r.filter(tool => {
-        const fields = [tool.name_ja, tool.name_en, tool.tagline_ja, tool.description_ja, tool.search_keywords].filter(Boolean).join(' ').toLowerCase();
-        return fields.includes(q);
-      });
-    }
-    if (selectedCat) r = r.filter(tool => (tool as any).category_slug === selectedCat);
-    if (sort === 'newest') r.sort((a, b) => b.created_at > a.created_at ? 1 : -1);
-    if (sort === 'name')   r.sort((a, b) => {
-      const an = locale === 'ja' ? a.name_ja : a.name_en;
-      const bn = locale === 'ja' ? b.name_ja : b.name_en;
-      return an.localeCompare(bn);
-    });
-    return r;
-  }, [tools, query, selectedCat, sort, locale]);
+  const handleCatChange = (cat: string) => {
+    setSelectedCat(cat);
+    router.push(buildUrl(cat, inputValue.trim(), 1));
+  };
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const safePage = Math.min(currentPage, totalPages);
-  const paged = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+  const handleClear = () => {
+    setInputValue('');
+    router.push(buildUrl(selectedCat, '', 1));
+  };
+
   const activeCatName = categories.find(c => c.slug === selectedCat)?.[locale === 'ja' ? 'name_ja' : 'name_en'] ?? null;
 
   const getPages = (): (number | '...')[] => {
     if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
     const pages: (number | '...')[] = [];
-    if (safePage <= 4) { pages.push(1, 2, 3, 4, 5, '...', totalPages); }
-    else if (safePage >= totalPages - 3) { pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages); }
-    else { pages.push(1, '...', safePage - 1, safePage, safePage + 1, '...', totalPages); }
+    if (currentPage <= 4) { pages.push(1, 2, 3, 4, 5, '...', totalPages); }
+    else if (currentPage >= totalPages - 3) { pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages); }
+    else { pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages); }
     return pages;
   };
 
@@ -93,7 +91,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
       {/* スマホ：カテゴリドロップダウン上表示 */}
       {categories.length > 0 && (
         <div className="tools-cat-mobile" style={{ marginBottom: '0.75rem' }}>
-          <select value={selectedCat} onChange={e => { setSelectedCat(e.target.value); resetPage(); }}
+          <select value={selectedCat} onChange={e => handleCatChange(e.target.value)}
             style={{ ...selectStyle, width: '100%', borderRadius: '2px' }}>
             <option value="">{locale === 'ja' ? 'すべてのカテゴリ' : 'All Categories'}</option>
             {categories.map(cat => (
@@ -107,7 +105,7 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
       <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
         {categories.length > 0 && (
           <div className="tools-cat-pc">
-            <select value={selectedCat} onChange={e => { setSelectedCat(e.target.value); resetPage(); }}
+            <select value={selectedCat} onChange={e => handleCatChange(e.target.value)}
               style={{ ...selectStyle, height: '100%', borderRadius: '2px', minWidth: '160px' }}>
               <option value="">{locale === 'ja' ? 'すべてのカテゴリ' : 'All Categories'}</option>
               {categories.map(cat => (
@@ -128,28 +126,29 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
             {locale === 'ja' ? '検索' : 'Search'}
           </button>
         </div>
-        {query && (
-          <button type="button" onClick={() => { setQuery(''); setInputValue(''); resetPage(); }}
+        {initialQ && (
+          <button type="button" onClick={handleClear}
             style={{ padding: '10px 12px', background: 'transparent', border: '1px solid var(--color-border-mid)', borderRadius: '2px', color: 'var(--color-text-muted)', fontSize: '0.78rem', cursor: 'pointer' }}>
             ✕
           </button>
         )}
       </form>
 
-      {query && (
+      {/* 件数表示 */}
+      {(initialQ || initialCat) && (
         <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-          {locale === 'ja' ? `「${query}」の検索結果：${filtered.length}件` : `Results for "${query}": ${filtered.length} tools`}
+          {locale === 'ja' ? `${total}件` : `${total} tools`}
         </p>
       )}
 
       {/* グリッド */}
-      {paged.length === 0 ? (
+      {tools.length === 0 ? (
         <div style={{ padding: '4rem 2rem', textAlign: 'center', border: '1px dashed var(--color-border)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-          {query ? (locale === 'ja' ? `「${query}」に一致するツールが見つかりませんでした。` : `No tools found for "${query}".`) : tt.emptyTools}
+          {initialQ ? (locale === 'ja' ? `「${initialQ}」に一致するツールが見つかりませんでした。` : `No tools found for "${initialQ}".`) : tt.emptyTools}
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-          {paged.map((tool, i) => (
+          {tools.map((tool, i) => (
             <ToolCard key={tool.id} tool={tool} locale={locale} index={i}
               categorySlug={(tool as any).category_slug ?? categorySlug}
               categoryName={activeCatName ?? (locale === 'ja' ? (tool as any).category_name_ja : (tool as any).category_name_en) ?? categoryName} />
@@ -164,11 +163,10 @@ export default function ToolsFilter({ tools, locale, categorySlug, categoryName,
             p === '...' ? (
               <span key={`e-${i}`} style={{ padding: '5px 10px', color: 'var(--color-text-muted)', fontSize: '0.82rem' }}>...</span>
             ) : (
-              <button type="button" key={p}
-                onClick={() => { setCurrentPage(p as number); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.82rem', fontWeight: 700, padding: '5px 10px', minWidth: '34px', border: `1px solid ${p === safePage ? theme.accent : 'var(--color-page-btn-border)'}`, borderRadius: '4px', background: p === safePage ? theme.accent : 'transparent', color: p === safePage ? '#FFFFFF' : 'var(--color-page-btn-text)', cursor: 'pointer' }}>
+              <a key={p} href={buildUrl(selectedCat, initialQ, p as number)}
+                style={{ fontFamily: 'Fira Sans, sans-serif', fontSize: '0.82rem', fontWeight: 700, padding: '5px 10px', minWidth: '34px', textAlign: 'center', textDecoration: 'none', border: `1px solid ${p === currentPage ? theme.accent : 'var(--color-page-btn-border)'}`, borderRadius: '4px', background: p === currentPage ? theme.accent : 'transparent', color: p === currentPage ? '#FFFFFF' : 'var(--color-page-btn-text)', display: 'inline-block' }}>
                 {p}
-              </button>
+              </a>
             )
           )}
         </div>

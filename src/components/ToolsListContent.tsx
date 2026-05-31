@@ -15,12 +15,16 @@ interface ToolsListContentProps {
   categories?: Category[];
   initialCat?: string;
   initialQ?: string;
+  currentPage?: number;
+  totalPages?: number;
+  total?: number;
 }
 
 const theme = PAGE_THEMES.tools;
 
 export default function ToolsListContent({
   tools, locale, title, description, categories = [], initialCat = '', initialQ = '',
+  currentPage = 1, totalPages = 1, total = 0,
 }: ToolsListContentProps) {
   const tt = t[locale];
 
@@ -42,7 +46,17 @@ export default function ToolsListContent({
       <div style={{ background: 'var(--color-page-gradient)' }}>
         <div className="max-w-7xl mx-auto section-px" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
           <AdSlot slot="header" className="mb-8" />
-          <ToolsFilter tools={tools} locale={locale} categories={categories} initialCat={initialCat} initialQ={initialQ} theme={theme} />
+          <ToolsFilter
+            tools={tools}
+            locale={locale}
+            categories={categories}
+            initialCat={initialCat}
+            initialQ={initialQ}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            total={total}
+            theme={theme}
+          />
         </div>
       </div>
     </main>
