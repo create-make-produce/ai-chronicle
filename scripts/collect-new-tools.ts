@@ -390,10 +390,9 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     const hasAppUrl = !!(post.ios_url ?? post.android_url);
     
-    const toolStatus = (isChromeStore || (hasAppUrl && !unpublishCondition)) ? 'pending' : judgeResult.status;
+    const toolStatus = isChromeStore ? 'pending' : judgeResult.status;
     if (reasons.length > 0) console.log(`  ⚠ 非公開理由: ${reasons.join(', ')}`);
     const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
-    if (hasAppUrl && !unpublishCondition) console.log(`  ⚠ App URL検出のため保留: ${slug}`);
 
     if (!hasOfficialUrl) {
       console.log(`  ⚠️ 公式URLなし → 非公開で登録: ${post.name}`);
@@ -449,7 +448,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     // 新規ツールの最初のローンチとしてPH投稿を保存
 
-    console.log(`  ✅ 登録完了: ${slug}（${finalPublished ? '公開' : hasAppUrl ? '保留' : '非公開'}）`);
+    console.log(`  ✅ 登録完了: ${slug}（${finalPublished ? '公開' : toolStatus === 'pending' ? '保留' : '非公開'}）`);
 
     // 同じ会社名の既存ツールと関連AIツール登録
     if (extracted.company_name) {
