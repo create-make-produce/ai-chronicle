@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
-import { getLatestNews } from '@/lib/db';
+import { getNewsCount, getNewsPaged } from '@/lib/db';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -41,11 +41,11 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   const page    = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
   const offset  = (page - 1) * PER_PAGE;
 
-  // 全件取得してページネーション（総件数把握のため）
-  const allNews = await getLatestNews(1000);
-  const total   = allNews.length;
+  const [total, newsItems] = await Promise.all([
+    getNewsCount(),
+    getNewsPaged(PER_PAGE, offset),
+  ]);
   const totalPages = Math.ceil(total / PER_PAGE);
-  const newsItems  = allNews.slice(offset, offset + PER_PAGE);
   const grouped    = groupByMonth(newsItems as NewsItem[]);
 
   return (

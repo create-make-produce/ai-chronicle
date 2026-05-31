@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { getAllFeatures } from '@/lib/db';
+import { getAllFeaturesLight } from '@/lib/db';
 import Link from 'next/link';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
@@ -12,7 +12,7 @@ export const metadata = {
 const theme = PAGE_THEMES.features;
 
 export default async function FeaturesPage() {
-  const features = await getAllFeatures();
+  const features = await getAllFeaturesLight();
 
   return (
     <main className="flex-1" style={{ minHeight: '100vh' }}>
