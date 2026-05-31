@@ -438,15 +438,14 @@ export async function getPublishedFeaturesCount(): Promise<number> {
   }
 }
 
-export async function getAllFeatures(): Promise<Feature[]> {
-  return queryD1<Feature>(
-    `SELECT f.*, t.name_en as tool_name_en, t.name_ja as tool_name_ja,
+export async function getAllFeatures(limit?: number): Promise<Feature[]> {
+  const sql = `SELECT f.*, t.name_en as tool_name_en, t.name_ja as tool_name_ja,
             t.slug as tool_slug, t.logo_url as tool_logo_url
      FROM features f
      LEFT JOIN tools t ON f.tool_id = t.id
      WHERE f.is_published = 1
-     ORDER BY f.published_at DESC`
-  )
+     ORDER BY f.published_at DESC${limit ? ' LIMIT ?' : ''}`
+  return queryD1<Feature>(sql, limit ? [limit] : [])
 }
 
 export async function getFeatureBySlug(slug: string): Promise<Feature | null> {
