@@ -71,7 +71,7 @@ export default function Footer({ lang = 'ja', showFeatures = false }: { lang?: '
             <p style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.78rem', color: '#8A9BB0', margin: 0, lineHeight: 1.7 }}>
               {isEn
                 ? 'AI information database: Stay up to date with the latest news and updates in one place.'
-                : <>AIクロニクル（AI Chronicle）<br />AI最新情報データベース：最新ニュース・アップデート情報を一つの場所で確認<br />（※）最新・正確な情報は各ツールの公式ページをご確認ください。</>}
+                : <>AI Chronicle（AIクロニクル）<br />AI最新情報データベース：最新ニュース・アップデート情報を一つの場所で確認<br />（※）最新・正確な情報は各ツールの公式ページをご確認ください。</>}
             </p>
           </div>
 
