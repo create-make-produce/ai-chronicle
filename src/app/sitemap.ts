@@ -1,6 +1,6 @@
 // src/app/sitemap.ts
 import type { MetadataRoute } from 'next';
-import { getAllToolSlugs, getAllNewsSlugs, getAllCategories } from '@/lib/db';
+import { getAllToolSlugs, getAllNewsSlugs, getAllCategories, getAllFeaturesLight } from '@/lib/db';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chronicle-76h.pages.dev';
 
@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/tools',
     '/news',
     '/monthly',
+    '/features',
     '/about',
     '/privacy',
     '/contact',
@@ -29,12 +30,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let toolEntries: MetadataRoute.Sitemap = [];
   let categoryEntries: MetadataRoute.Sitemap = [];
   let newsEntries: MetadataRoute.Sitemap = [];
+  let featureEntries: MetadataRoute.Sitemap = [];
 
   try {
-    const [toolSlugs, categories, newsSlugs] = await Promise.all([
+    const [toolSlugs, categories, newsSlugs, features] = await Promise.all([
       getAllToolSlugs(),
       getAllCategories(),
       getAllNewsSlugs(),
+      getAllFeaturesLight().catch(() => []),
     ]);
 
     toolEntries = toolSlugs.map((slug) => ({
@@ -57,9 +60,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.5,
     }));
+
+    featureEntries = features.map((f) => ({
+      url: `${SITE_URL}/feature/${f.slug}`,
+      lastModified: new Date(f.updated_at),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
   } catch (e) {
     console.error('[sitemap] failed to fetch dynamic entries:', e);
   }
 
-  return [...staticEntries, ...toolEntries, ...categoryEntries, ...newsEntries];
+  return [...staticEntries, ...toolEntries, ...categoryEntries, ...newsEntries, ...featureEntries];
 }

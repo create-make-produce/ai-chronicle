@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import FooterWrapper from '@/components/FooterWrapper';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { getPublishedFeaturesCount } from '@/lib/db';
+import CookieBanner from '@/components/CookieBanner';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chronicle-76h.pages.dev';
 
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header showFeatures={hasFeatures} />
           {children}
           <FooterWrapper showFeatures={hasFeatures} />
+          <CookieBanner />
         </ThemeProvider>
       </body>
     </html>
