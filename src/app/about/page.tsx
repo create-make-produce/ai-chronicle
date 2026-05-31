@@ -67,7 +67,7 @@ export default function AboutPage() {
               </p>
               <p>
                 <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>日本語コンテンツ：</span>
-                ツールの説明文・ニュース本文は、AIを活用して生成した後、運営担当が内容を確認・監修しています。誤情報・不適切な表現が含まれていると判断した場合は修正または非公開とします。
+                ツールの説明文・ニュース本文は、運営担当が一次情報源をもとに編集・監修しています。誤情報・不適切な表現が含まれていると判断した場合は修正または非公開とします。
               </p>
               <p>
                 <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>更新頻度：</span>
