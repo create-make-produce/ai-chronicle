@@ -41,7 +41,7 @@ export const CONFIG = {
   // =============================================
   AI_PROVIDER: 'gemini' as 'gemini' | 'openai' | 'claude',
   AI_MODEL: 'gemini-3.1-flash-lite',
-  AI_REQUEST_INTERVAL_MS: 5000,
+  AI_REQUEST_INTERVAL_MS: 30000,
   AI_MAX_RETRIES: 3,
   AI_RETRY_DELAY_MS: 10000,
   AI_MAX_OUTPUT_TOKENS: 1024,
