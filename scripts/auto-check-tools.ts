@@ -309,9 +309,10 @@ async function main() {
       const pageText = (rawPageText && rawPageText.length >= 100) ? rawPageText : null;
       if (pageText) {
         console.log(`  🌐 サイト取得: ${pageText.length.toLocaleString()}文字`);
-      } else if (rawPageText && rawPageText.length < 100) {
-        console.log(`  ⚠ サイト取得: ${rawPageText.length}文字（100文字未満のため失敗扱い）`);
       } else {
+        if (rawPageText && rawPageText.length < 100) {
+          console.log(`  ⚠ サイト取得: ${rawPageText.length}文字（100文字未満のため失敗扱い）`);
+        }
         // サイト取得失敗 → 同会社名の既存ツールがあれば保留・なければ非公開
         let hasSameCompany = false;
         if (tool.company_name) {
@@ -425,7 +426,7 @@ async function main() {
         break;
       }
 
-      // 503は連続2回で中断（RPD節約）
+      // 503は連続5回で中断（RPD節約）
       if (msg.includes('503')) {
         consecutive503++;
         console.error(`  ⚠ Gemini 503エラー（${consecutive503}回連続）`);
