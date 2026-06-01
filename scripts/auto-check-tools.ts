@@ -126,8 +126,7 @@ async function fetchPageText(url: string): Promise<string | null> {
       .slice(0, 2000);
 
     // メタ情報 + 本文を結合
-    const combined = [...metaParts, bodyText].join('
-').trim();
+    const combined = [...metaParts, bodyText].join('\n').trim();
     return combined.length > 0 ? combined.slice(0, 3000) : null;
   } catch {
     return null;
