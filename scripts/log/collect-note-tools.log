@@ -1,8 +1,8 @@
 🚀 AI Chronicle - Note記事収集（ツール名検索）開始
-  → 対象ツール: 262件
-  → カーソル位置: 0番目から開始
+  → 対象ツール: 307件
+  → カーソル位置: 51番目から開始
 
-[1/50] Mozart Studio（note:0件）
+[1/50] Hopper（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -12,15 +12,7 @@
   → [like] 40件取得
   → 35秒待機...
 
-[2/50] Typewise（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 5件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 5件取得
-  → 35秒待機...
-
-[3/50] Yutori（note:0件）
+[2/50] Architecto（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -30,7 +22,27 @@
   → [like] 40件取得
   → 35秒待機...
 
-[4/50] Ailytics（note:0件）
+[3/50] Claro（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[4/50] Jitera（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[5/50] Ajelix（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 2件取得
@@ -38,43 +50,21 @@
   → [like] 2件取得
   → 35秒待機...
 
-[5/50] Plurai（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 6件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 6件取得
-  → 35秒待機...
-
-[6/50] Dune（note:0件）
+[6/50] Amp （note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
   → [hot] 40件取得
+  🚫 [除外] AIツール多すぎて月1万円どこに使うか分からない。副業クリエイターが2026年の正解を出す‼️
+  🚫 [除外] AI基盤産業の次の主戦場は、モデル性能競争ではなく、「知能を安全に業務価値へ変換する産業」になる。そ
+  🚫 [除外] AIツール多すぎて月1万円どこに使うか分からない。副業クリエイターが2026年の正解を出す‼️
+  🚫 [除外] AI基盤産業の次の主戦場は、モデル性能競争ではなく、「知能を安全に業務価値へ変換する産業」になる。そ
   → APIフェッチ: sort=like page=1
   → APIフェッチ: sort=like page=2
   → [like] 40件取得
   → 35秒待機...
 
-[7/50] Hera Launch（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[8/50] SureThing（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 4件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 4件取得
-  → 35秒待機...
-
-[9/50] ZeroHuman（note:0件）
+[7/50] Noteweave（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 0件取得
@@ -82,7 +72,7 @@
   → [like] 0件取得
   → 35秒待機...
 
-[10/50] Spira AI（note:0件）
+[8/50] Rowboat（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -92,25 +82,15 @@
   → [like] 40件取得
   → 35秒待機...
 
-[11/50] Loova（note:0件）
+[9/50] ShioriCode（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
-  → [hot] 14件取得
+  → [hot] 0件取得
   → APIフェッチ: sort=like page=1
-  → [like] 13件取得
+  → [like] 0件取得
   → 35秒待機...
 
-[12/50] Mindra（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[13/50] Jet Admin（note:0件）
+[10/50] Enjo（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -120,7 +100,65 @@
   → [like] 40件取得
   → 35秒待機...
 
-[14/50] Aaavatar（note:0件）
+[11/50] Yeta AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[12/50] nRev（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[13/50] Amotions AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 2件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 2件取得
+  → 35秒待機...
+
+[14/50] dodocs（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[15/50] Cleo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[16/50] Espa（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  🚫 [除外] 【海外版note・Substackで世界に発信する前に、知らないと数百万損する「言語と市場」の不思議
+  🚫 [除外] 【海外版note・Substackで世界に発信する前に、知らないと数百万損する「言語と市場」の不思議
+  → 35秒待機...
+
+[17/50] StoreClaw（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 1件取得
@@ -128,7 +166,7 @@
   → [like] 1件取得
   → 35秒待機...
 
-[15/50] Lensmor（note:0件）
+[18/50] KushoAI（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 0件取得
@@ -136,101 +174,7 @@
   → [like] 0件取得
   → 35秒待機...
 
-[16/50] Tendem（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[17/50] Gro（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[18/50] Jotform AI（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[19/50] Frontdesk（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 8件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 8件取得
-  → 35秒待機...
-
-[20/50] Inrō（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 10件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 10件取得
-  → 35秒待機...
-
-[21/50] Dageno AI（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 2件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 2件取得
-  → 35秒待機...
-
-[22/50] MESA（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[23/50] Warp（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[24/50] Reloop（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[25/50] Causo（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[26/50] Lokuma（note:0件）
+[19/50] Owlish（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 14件取得
@@ -238,7 +182,7 @@
   → [like] 14件取得
   → 35秒待機...
 
-[27/50] Happenstance（note:0件）
+[20/50] iOrchestra（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -248,97 +192,7 @@
   → [like] 40件取得
   → 35秒待機...
 
-[28/50] Contrario（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[29/50] Crono（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[30/50] Asteroid（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[31/50] mia（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[32/50] Fei（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[33/50] Cosine（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[34/50] Bansi（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[35/50] Fabric（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[36/50] Odyssey-2 Max（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[37/50] PromptPaste（note:0件）
+[21/50] CaseGap AI（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 0件取得
@@ -346,7 +200,7 @@
   → [like] 0件取得
   → 35秒待機...
 
-[38/50] Nomie（note:0件）
+[22/50] Bruin（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -356,7 +210,35 @@
   → [like] 40件取得
   → 35秒待機...
 
-[39/50] PangeAI（note:0件）
+[23/50] Basedash（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 19件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 19件取得
+  → 35秒待機...
+
+[24/50] Replit（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 日本で今すぐ始められるAI副業アイデア20選【2026年版・初心者OK】
+  🚫 [除外] 日本で今すぐ始められるAI副業アイデア20選【2026年版・初心者OK】
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[25/50] WeWeb（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 12件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 12件取得
+  → 35秒待機...
+
+[26/50] Seleqt（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 3件取得
@@ -364,83 +246,7 @@
   → [like] 3件取得
   → 35秒待機...
 
-[40/50] Harker（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[41/50] OptimizeGEO（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 1件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 1件取得
-  → 35秒待機...
-
-[42/50] Epismo（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → [hot] 2件取得
-  → APIフェッチ: sort=like page=1
-  → [like] 2件取得
-  → 35秒待機...
-
-[43/50] Redesign（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[44/50] Gauge（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[45/50] Makko（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[46/50] Adaptive（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[47/50] Whisper（note:0件）
-  → hot + like モード（現在0件）
-  → APIフェッチ: sort=hot page=1
-  → APIフェッチ: sort=hot page=2
-  → [hot] 40件取得
-  → APIフェッチ: sort=like page=1
-  → APIフェッチ: sort=like page=2
-  → [like] 40件取得
-  → 35秒待機...
-
-[48/50] CtrlOps（note:0件）
+[27/50] Dialfyne（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 0件取得
@@ -448,7 +254,23 @@
   → [like] 0件取得
   → 35秒待機...
 
-[49/50] Omnia（note:0件）
+[28/50] COMPAMIR（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[29/50] ZipTier（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[30/50] Mixpanel（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -458,7 +280,178 @@
   → [like] 40件取得
   → 35秒待機...
 
-[50/50] Voiser AI（note:0件）
+[31/50] Super Benji（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[32/50] IceSume（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[33/50] PortfoliQa（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[34/50] AI FrontDesk（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 8件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 8件取得
+  → 35秒待機...
+
+[35/50] Curo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[36/50] Nugget AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[37/50] Unscreen.io（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[38/50] Aisty（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[39/50] Superlemon（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 3件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 3件取得
+  → 35秒待機...
+
+[40/50] motionvid.ai（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 2件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 2件取得
+  → 35秒待機...
+
+[41/50] Bayescore（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[42/50] Aristo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 古代ギリシャに学ぶ、「自分の強み」を育てる副業戦略
+  🚫 [除外] 古代ギリシャに学ぶ、「自分の強み」を育てる副業戦略
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[43/50] DecisionBox（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[44/50] RepBud（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[45/50] Ertas（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[46/50] UnboundAI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[47/50] CourseGuard AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[48/50] GB1（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  ✅ [hot] ローカルAIデジタルヒューマンをDGX Spark(GB10) 1台に押し込んだ
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[49/50] Pack your bags（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[50/50] Command A+（note:0件）
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
@@ -468,5 +461,5 @@
   → [like] 40件取得
 
 ========== 結果 ==========
-  ✅ 保存: 0件
+  ✅ 保存: 1件
   🔄 処理ツール: 50件

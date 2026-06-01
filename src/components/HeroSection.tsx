@@ -140,6 +140,8 @@ export default function HeroSection({ locale, recentFeatures = [] }: HeroSection
           }
           .hero-feature-card { display: none !important; }
         }
+        .hero-feature-dots { display: flex; }
+        @media (max-width: 767px) { .hero-feature-dots { display: none !important; } }
         .hero-feature-card {
           transition: box-shadow 0.18s, transform 0.18s;
         }
@@ -272,9 +274,9 @@ export default function HeroSection({ locale, recentFeatures = [] }: HeroSection
         </a>
       )}
 
-      {/* ドットナビ（2件以上の場合のみ） */}
+      {/* ドットナビ（2件以上の場合のみ・スマホ非表示） */}
       {featureOrder.length > 1 && (
-        <div style={{
+        <div className="hero-feature-dots" style={{
           position: 'absolute',
           bottom: '10px',
           left: '28px',
