@@ -1,0 +1,62 @@
+🚀 AI Chronicle - Note記事収集（ツール名検索）開始
+  → 対象ツール: 286件
+  → カーソル位置: 99番目から開始
+
+[1/50] Brandostro（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[2/50] NEWT Chat（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[3/50] Cognera（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[4/50] Yapd（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[5/50] ChatyfAI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[6/50] omniveo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 3件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 3件取得
+  → 35秒待機...
+
+[7/50] Thundr（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1

@@ -153,7 +153,7 @@ async function callGeminiCheck(prompt: string): Promise<string> {
 function buildPrompt(name_en: string, url: string, pageText: string | null): string {
   const contentSection = pageText
     ? `【サイト内容（抜粋）】\n${pageText}`
-    : `【注意】サイトの取得に失敗しました。ツール名とURLドメインのみで判定してください。`;
+    : `【注意】サイトの取得に失敗しました。`;
 
   return `あなたはAIツールの分類専門家です。以下のツールを判定してください。
 
@@ -304,14 +304,34 @@ async function main() {
     }
 
     try {
-      // 公式サイト取得
-      const pageText = await fetchPageText(tool.official_url);
+      // 公式サイト取得（100文字未満は取得失敗扱い）
+      const rawPageText = await fetchPageText(tool.official_url);
+      const pageText = (rawPageText && rawPageText.length >= 100) ? rawPageText : null;
       if (pageText) {
         console.log(`  🌐 サイト取得: ${pageText.length.toLocaleString()}文字`);
+      } else if (rawPageText && rawPageText.length < 100) {
+        console.log(`  ⚠ サイト取得: ${rawPageText.length}文字（100文字未満のため失敗扱い）`);
       } else {
-        // サイト取得失敗 + 会社名なし → 非公開（Gemini不要）
-        if (!tool.company_name) {
-          console.log('  ⚠ サイト取得失敗 + 会社名なし → 非公開');
+        // サイト取得失敗 → 同会社名の既存ツールがあれば保留・なければ非公開
+        let hasSameCompany = false;
+        if (tool.company_name) {
+          const sameCompany = await db.query<{ cnt: number }>(
+            `SELECT COUNT(*) as cnt FROM tools WHERE company_name=? AND id!=? AND status='active' AND is_published=1`,
+            [tool.company_name, tool.id]
+          );
+          hasSameCompany = (sameCompany[0]?.cnt ?? 0) > 0;
+        }
+        if (hasSameCompany) {
+          console.log(`  ⚠ サイト取得失敗 + 同会社名あり → 保留`);
+          if (!isDryRun) {
+            await db.execute(
+              `UPDATE tools SET is_published=0, status='pending', updated_at=datetime('now') WHERE id=?`,
+              [tool.id]
+            );
+          }
+          reviewCount++;
+        } else {
+          console.log('  ⚠ サイト取得失敗 → 非公開');
           if (!isDryRun) {
             await db.execute(
               `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
@@ -319,9 +339,8 @@ async function main() {
             );
           }
           notAiCount++;
-          continue;
         }
-        console.log('  ⚠ サイト取得失敗 → 名前+URLのみで判定');
+        continue;
       }
 
       // ━━ STEP2+3：Gemini判定（会社名取得 + AIツール判定を1回で実行） ━━
