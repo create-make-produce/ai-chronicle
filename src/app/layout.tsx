@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { getPublishedFeaturesCount } from '@/lib/db';
 import CookieBanner from '@/components/CookieBanner';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chronicle-76h.pages.dev';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chron.com';
 
 export const metadata: Metadata = {
   icons: { icon: [{ url: '/favicon.ico' }, { url: '/icon.png' }], shortcut: '/favicon.ico', apple: '/icon.png' },
@@ -26,6 +26,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ja" data-theme="dark" suppressHydrationWarning>
       <head>
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F28WYMCPT1" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-F28WYMCPT1');`,
+          }}
+        />
         {/* Google Fonts CDN経由（自己ホスティング廃止・Workers負荷軽減） */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
