@@ -410,8 +410,8 @@ async function main() {
       if (msg.includes('503')) {
         consecutive503++;
         console.error(`  ⚠ Gemini 503エラー（${consecutive503}回連続）`);
-        if (consecutive503 >= 2) {
-          console.error('  ❌ 503エラー2回連続 → 中断（次回起動時に続きから再開）');
+        if (consecutive503 >= 5) {
+          console.error('  ❌ 503エラー5回連続 → 中断（次回起動時に続きから再開）');
           break;
         }
       } else {

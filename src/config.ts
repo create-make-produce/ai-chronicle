@@ -56,7 +56,7 @@ export const CONFIG = {
   // AIツール自動判定（auto-check-tools.ts 専用）
   // ここだけ変更すればモデル切り替え可能
   // =============================================
-  CHECK_AI_MODEL: 'gemini-3.5-flash',
+  CHECK_AI_MODEL: 'gemini-3.1-flash-lite',
 
   // =============================================
   // スクレイピング設定
