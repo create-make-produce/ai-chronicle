@@ -1,4 +1,4 @@
-// src/app/sitemap.ts
+// src/app/sitemap.ts - updated
 import type { MetadataRoute } from 'next';
 import { getAllToolSlugs, getAllNewsSlugs, getAllCategories, getAllFeaturesLight } from '@/lib/db';
 
