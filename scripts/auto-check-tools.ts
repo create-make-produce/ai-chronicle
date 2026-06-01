@@ -99,13 +99,36 @@ async function fetchPageText(url: string): Promise<string | null> {
     });
     if (!res.ok) return null;
     const html = await res.text();
-    const text = html
+
+    // メタタグを抽出（title・description・og:title・og:description・keywords）
+    const metaParts: string[] = [];
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    if (titleMatch) metaParts.push(`title: ${titleMatch[1].trim()}`);
+    const metaTags = html.matchAll(/<meta[^>]+>/gi);
+    for (const tag of metaTags) {
+      const nameMatch = tag[0].match(/(?:name|property)=["']([^"']+)["']/i);
+      const contentMatch = tag[0].match(/content=["']([^"']+)["']/i);
+      if (nameMatch && contentMatch) {
+        const name = nameMatch[1].toLowerCase();
+        if (['description','keywords','og:title','og:description','twitter:title','twitter:description'].includes(name)) {
+          metaParts.push(`${name}: ${contentMatch[1].trim()}`);
+        }
+      }
+    }
+
+    // 本文テキストを抽出
+    const bodyText = html
       .replace(/<script[\s\S]*?<\/script>/gi, ' ')
       .replace(/<style[\s\S]*?<\/style>/gi, ' ')
       .replace(/<[^>]+>/g, ' ')
       .replace(/\s+/g, ' ')
-      .trim();
-    return text.slice(0, 3000);
+      .trim()
+      .slice(0, 2000);
+
+    // メタ情報 + 本文を結合
+    const combined = [...metaParts, bodyText].join('
+').trim();
+    return combined.length > 0 ? combined.slice(0, 3000) : null;
   } catch {
     return null;
   }
