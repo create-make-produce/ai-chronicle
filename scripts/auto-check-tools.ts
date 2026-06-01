@@ -137,11 +137,9 @@ async function fetchPageText(url: string): Promise<string | null> {
 // Gemini API呼び出し（CHECK_AI_MODEL専用・既存ai.tsとは独立）
 // =====================
 
-async function callGeminiCheck(prompt: string): Promise<string> {
+async function callGeminiCheck(prompt: string, model: string): Promise<string> {
   const apiKey = process.env.AI_API_KEY;
   if (!apiKey) throw new Error('AI_API_KEY が設定されていません');
-
-  const model = CONFIG.CHECK_AI_MODEL;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const res = await fetch(url, {
@@ -285,7 +283,6 @@ async function main() {
   if (isDryRun) console.log('🔍 DRY RUN モード（DBは更新しません）\n');
 
   console.log('🚀 AI Chronicle - AIツール自動判定開始');
-  console.log(`使用モデル: ${CONFIG.CHECK_AI_MODEL}\n`);
 
   const db = D1Client.fromEnv();
 
@@ -296,7 +293,13 @@ async function main() {
      ORDER BY created_at ASC`
   );
 
-  console.log(`未処理ツール: ${tools.length} 件\n`);
+  // 未処理件数に応じてモデルを動的選択
+  const useModel = tools.length <= CONFIG.CHECK_AI_MODEL_THRESHOLD
+    ? CONFIG.CHECK_AI_MODEL_HEAVY
+    : CONFIG.CHECK_AI_MODEL_LIGHT;
+
+  console.log(`未処理ツール: ${tools.length} 件`);
+  console.log(`使用モデル: ${useModel} （閾値${CONFIG.CHECK_AI_MODEL_THRESHOLD}件・${tools.length <= CONFIG.CHECK_AI_MODEL_THRESHOLD ? '高精度モード' : '高速モード'}）\n`);
 
   if (tools.length === 0) {
     console.log('処理対象がありません。');
@@ -368,7 +371,7 @@ async function main() {
 
       // ━━ STEP2+3：Gemini判定（会社名取得 + AIツール判定を1回で実行） ━━
       const prompt = buildPrompt(tool.name_en, tool.official_url, pageText);
-      const rawResponse = await callGeminiCheck(prompt);
+      const rawResponse = await callGeminiCheck(prompt, useModel);
       consecutive503 = 0; // Gemini呼び出し成功でリセット
       console.log(`  🤖 Gemini応答: ${rawResponse.trim().slice(0, 200)}`);
       const parsed = parseResponse(rawResponse);

@@ -54,14 +54,16 @@ export const CONFIG = {
 
   // =============================================
   // AIツール自動判定（auto-check-tools.ts 専用）
-  // ここだけ変更すればモデル切り替え可能
+  // 未処理件数がCHECK_AI_MODEL_THRESHOLDを超える場合はLIGHT、以下の場合はHEAVYを使用
   // =============================================
-  CHECK_AI_MODEL: 'gemini-3.1-flash-lite',
+  CHECK_AI_MODEL_LIGHT: 'gemini-3.1-flash-lite',  // 未処理多い時（高速・低コスト）
+  CHECK_AI_MODEL_HEAVY: 'gemini-3.5-flash',        // 未処理少ない時（高精度）
+  CHECK_AI_MODEL_THRESHOLD: 20,                    // この件数以下ならHEAVYを使用
 
   // =============================================
   // スクレイピング設定
   // =============================================
-  SCRAPER_USER_AGENT: 'AI-Chronicle-Bot/1.0 (+https://ai-chronicle.com/about)',
+  SCRAPER_USER_AGENT: 'AI-Chronicle-Bot/1.0 (+https://ai-chron.com/about)',
   SCRAPER_REQUEST_DELAY_MS: 3000,
   SCRAPER_TIMEOUT_MS: 10000,
   SCRAPER_MAX_RETRIES: 2,

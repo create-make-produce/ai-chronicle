@@ -1,5 +1,5 @@
 🚀 AI Chronicle - Note記事収集（ツール名検索）開始
-  → 対象ツール: 245件
+  → 対象ツール: 261件
   → カーソル位置: 124番目から開始
 
 [1/50] Revolte（note:0件）
@@ -21,3 +21,489 @@
   → APIフェッチ: sort=like page=2
   → [like] 40件取得
   → 35秒待機...
+
+[3/50] NeuralAgent（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[4/50] Crew44（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 3件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 3件取得
+  → 35秒待機...
+
+[5/50] VoiceDouble（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[6/50] RevEdge（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 1件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 1件取得
+  → 35秒待機...
+
+[7/50] Qentaris（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[8/50] Subsig（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 4件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 4件取得
+  → 35秒待機...
+
+[9/50] StudySong（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[10/50] GizmoZo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[11/50] JobsJudo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[12/50] Loopvalid（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[13/50] MoDev（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[14/50] Hyper（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  ✅ [hot] 【超リアルAI】時を刻む宇宙の巨門！「砂漠の中に佇む巨大砂時計・無限ループ動画」のプロンプト＆作り方
+  ✅ [hot] 【超リアルAI】愛と静寂に包まれる聖域！「天空の図書館と光のクジラ・無限ループ動画」のプロンプト＆作
+  🚫 [除外] 【画像生成AI】ハイクオリティな立体ペーパークラフト風の都市をリアルに再現する方法｟プロンプト無料公
+  ✅ [hot] 【超リアルAI】雲海の最果てに眠る聖地！「神々の住む断崖修道院・無限ループ動画」のプロンプト＆作り方
+  🚫 [除外] 【画像生成AI】ハイクオリティな立体ペーパークラフト風の都市をリアルに再現する方法｟プロンプト無料公
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[15/50] SpeakPro AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 1件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[16/50] Ava Studio（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[17/50] AiSDR（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 【2026年版】海外AI副業・起業の新語25選｜Vibe Coding/Faceless YouTu
+  🚫 [除外] 【2026年版】海外AI副業・起業の新語25選｜Vibe Coding/Faceless YouTu
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  🚫 [除外] 【2026年版】海外AI副業・起業の新語25選｜Vibe Coding/Faceless YouTu
+  🚫 [除外] 【2026年版】海外AI副業・起業の新語25選｜Vibe Coding/Faceless YouTu
+  → 35秒待機...
+
+[18/50] Brixzly（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[19/50] Wingbits AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 8件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 8件取得
+  → 35秒待機...
+
+[20/50] Imgedits（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[21/50] Twintual（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[22/50] FacelessGenie（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[23/50] IntKoach（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[24/50] Club Fyndr（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[25/50] Dockay（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[26/50] Loghema（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[27/50] Step 3.7 Flash（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[28/50] Wandesk（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 1件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 1件取得
+  → 35秒待機...
+
+[29/50] Komplian（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 1件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 1件取得
+  → 35秒待機...
+
+[30/50] Rabtine（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[31/50] Daivenci AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[32/50] ResumeChat（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[33/50] Preperai（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[34/50] Wonder Plant（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[35/50] Vantage（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[36/50] Cavemind（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 1件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 1件取得
+  → 35秒待機...
+
+[37/50] Saya（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 【成功事例付き】30人に聞いたクラウドワークス副業お悩みランキング×僕ができること
+  🚫 [除外] 副業サポーターの面談記録 part3｜共感を軸に書ける方は、発信の道がいくつも開いていきます
+  🚫 [除外] 【成功事例付き】30人に聞いたクラウドワークス副業お悩みランキング×僕ができること
+  🚫 [除外] 副業サポーターの面談記録 part3｜共感を軸に書ける方は、発信の道がいくつも開いていきます
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[38/50] Mijotia（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[39/50] Ryzent AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 2件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 2件取得
+  → 35秒待機...
+
+[40/50] SOLZIGI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[41/50] Google AI Studio（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 【速報】AI副業の潮目が変わった！2026年5月最終週の激動と、今すぐ取るべき戦略
+  🚫 [除外] 寝ている間も売れ続ける——AIで電子書籍を1冊作ってGumroadで副業を仕組み化する全工程
+  🚫 [除外] 【速報】AI副業の潮目が変わった！2026年5月最終週の激動と、今すぐ取るべき戦略
+  🚫 [除外] 寝ている間も売れ続ける——AIで電子書籍を1冊作ってGumroadで副業を仕組み化する全工程
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[42/50] ElevenLabs（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  ✅ [hot] ElevenLabsがAI音楽に革命！曲の途中でジャンル変更の新モデル登場
+  🚫 [除外] AI×動画作成副業ロードマップ：未経験から月10万円を稼ぐ実践ガイド
+  🚫 [除外] 【先行者利益】AI音声吹き替えで月5万円超え？米国で急拡大中の副業を日本人が今すぐ始める方法
+  🚫 [除外] AI×動画作成副業ロードマップ：未経験から月10万円を稼ぐ実践ガイド
+  🚫 [除外] 【先行者利益】AI音声吹き替えで月5万円超え？米国で急拡大中の副業を日本人が今すぐ始める方法
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[43/50] v0（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 副業エンジニアのためのAIコーディング使い分けマップ【ツール俯瞰編】Codex・Claude Cod
+  🚫 [除外] 副業エンジニアのためのAIコーディング使い分けマップ【ツール俯瞰編】Codex・Claude Cod
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[44/50] Udio（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 【手堅く稼ぐ】スマホ＆PCで始めるAI副業の超実践的ロードマップ
+  🚫 [除外] 【手堅く稼ぐ】スマホ＆PCで始めるAI副業の超実践的ロードマップ
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[45/50] Canva AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] まだ大きな実績がない人ほど、AI×SNS副業では“学びの過程”を出せばいい
+  🚫 [除外] 100本投稿で収益化できるか。AIでYouTubeショートに本格挑戦してみた
+  🚫 [除外] 【手堅く稼ぐ】スマホ＆PCで始めるAI副業の超実践的ロードマップ
+  ✅ [hot] 半年以上Canvaを開いていません。ChatGPTの進化を見て「働き方そのものが変わる」と確信した話
+  🚫 [除外] まだ大きな実績がない人ほど、AI×SNS副業では“学びの過程”を出せばいい
+  🚫 [除外] 100本投稿で収益化できるか。AIでYouTubeショートに本格挑戦してみた
+  🚫 [除外] 【手堅く稼ぐ】スマホ＆PCで始めるAI副業の超実践的ロードマップ
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  ✅ [like] 50代、初めてのnote画像作成。AIとCanvaにボコボコにされた夜。
+  → 35秒待機...
+
+[46/50] Genspark（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  ✅ [hot] AIって最近どう変わったの？」2026年、Genspark・Notion AI編──ChatGPT以
+  ✅ [hot] 【2026年最新版】AI文章校正で仕事の質が劇的に向上！Gensparkで校正時間を80%削減した実
+  ✅ [hot] Gensparkとは？ChatGPT・Claude・Geminiとの違いをわかりやすく解説
+  ✅ [hot] 最新AI比較2026—Claude、ChatGPT、Gemini、Copilot、GenSpark、
+  ✅ [hot] Codex小型アップデート多数！ソフトバンク450億ユーロ投資！？Genspark電通導入！スキマ時
+  ✅ [hot] 🌠 AIコンサルタントに60万円払ったという調査レポートが、どう見ても、ClaudeかGenSpa
+  ✅ [hot] 💡 期待したAIツールにがっかりしていませんか？私がGensparkから別の選択肢に変えた理由【生
+  🚫 [除外] AIツール多すぎて月1万円どこに使うか分からない。副業クリエイターが2026年の正解を出す‼️
+  🚫 [除外] AIツール多すぎて月1万円どこに使うか分からない。副業クリエイターが2026年の正解を出す‼️
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[47/50] Glean（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  ✅ [hot] 社内ナレッジを“AIの燃料”に変える：検索×エージェント運用（Glean導入事例から90日で再現）
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  ✅ [like] なぜ Glean は Work AI の有力な基盤になり得るのか？「ただの社内検索」からの進化
+  → 35秒待機...
+
+[48/50] Lovable（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  ✅ [hot] 「こんなの個人で作れるの!?」AI開発コミュニティ『r/lovable_AI_studio』で見つけ
+  ✅ [hot] 【ご報告】r/lovable_AI_studioのメンバーが200人を超えました
+  🚫 [除外] 高校生が起業のためにお金を稼ぐ方法　#11
+  🚫 [除外] 高校生が起業のためにお金を稼ぐ方法　#11
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  🚫 [除外] 創業3年・146人で600億円。スウェーデン発「Lovable」が壊した、起業の常識——『プログラミ
+  🚫 [除外] 創業3年・146人で600億円。スウェーデン発「Lovable」が壊した、起業の常識——『プログラミ
+  → 35秒待機...
+
+[49/50] Stable Diffusion（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 【手堅く稼ぐ】スマホ＆PCで始めるAI副業の超実践的ロードマップ
+  ✅ [hot] LoRA作りが楽しくて仕方がない。｜Stable Diffusion｜ SDXL｜StyleLoRA
+  🚫 [除外] 画像生成AI5本で副業3件失敗。使い分け全公開
+  🚫 [除外] AIイラスト副業初心者がPCを買った話
+  🚫 [除外] 【手堅く稼ぐ】スマホ＆PCで始めるAI副業の超実践的ロードマップ
+  🚫 [除外] 画像生成AI5本で副業3件失敗。使い分け全公開
+  🚫 [除外] AIイラスト副業初心者がPCを買った話
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[50/50] Github Copilot（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  ✅ [hot] 【AIコーディングツール比較】Cursor・GitHub Copilot・Claude Code、—
+  ✅ [hot] AIニュース3分：GitHub Copilotが従量課金へ／経産省GENIAC-PRIZE始動
+  ✅ [hot] 制作現場へのAI導入の第一歩。Backlog × GitHub Copilotでソースコードを民主化
+  ✅ [hot] GitHub Copilotが「シート料金時代」を終わらせた——6月1日からAI Credits従量
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  ✅ [like] GitHub CopilotはClaude・ChatGPTと組み合わせて使うのが正解。その理由と具体
+
+========== 結果 ==========
+  ✅ 保存: 23件
+  🔄 処理ツール: 50件
