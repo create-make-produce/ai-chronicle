@@ -2,7 +2,7 @@
 
 import type { MetadataRoute } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chronicle-76h.pages.dev';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chron.com';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/_next/', '/admin'],
+        disallow: ['/api/', '/_next/', '/admin/'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
