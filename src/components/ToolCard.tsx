@@ -139,7 +139,7 @@ export default function ToolCard({ tool, locale, index = 0, categoryName, catego
 
         {/* 概要（動的コンテンツ → システムフォント） */}
         {(locale === 'ja' ? tool.description_ja : tool.description_en) && (
-          <p style={{
+          <p data-nosnippet style={{
             fontFamily:      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
             fontSize:        '0.72rem',
             color:           'var(--color-text-sub)',
