@@ -361,7 +361,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     }
 
     const confidence = calculateConfidence(extracted);
-    const translated = await translateToJapanese(post.name, extracted.tagline ?? post.tagline, extracted.description ?? post.description);
+    const translated = await translateToJapanese(post.name, extracted.tagline ?? post.tagline, extracted.description ?? post.description, pageText);
     const categoryId = await resolveCategoryId(db, extracted.category_hint);
     const nameEn = extracted.tool_name ?? post.name;
 

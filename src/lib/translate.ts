@@ -26,21 +26,27 @@ function cleanPHName(phName: string): string {
 /**
  * AIツールの英語情報を日本語に翻訳し、search_keywords も生成して返す。
  *
- * @param nameEn   ツール名（Product Hunt正式名 or 公式名）
- * @param tagline  英語タグライン（なければnull）
+ * @param nameEn      ツール名（Product Hunt正式名 or 公式名）
+ * @param tagline     英語タグライン（なければnull）
  * @param description 英語説明文（なければnull）
+ * @param pageText    公式サイトから取得したテキスト（なければnull・失敗時はPH/DB情報で補完）
  */
 export async function translateToJapanese(
   nameEn: string,
   tagline: string | null,
-  description: string | null
+  description: string | null,
+  pageText?: string | null
 ): Promise<TranslatedToolData> {
   const cleanName = cleanPHName(nameEn);
 
   // 翻訳対象がなければキーワードだけ返す
-  if (!tagline && !description) {
+  if (!tagline && !description && !pageText) {
     return { tagline_ja: null, description_ja: null, use_case_ja: null, target_user_ja: null, search_keywords: cleanName };
   }
+
+  const siteSection = pageText
+    ? `\n【公式サイト内容（抜粋）】\n${pageText}`
+    : '';
 
   const prompt = `以下の英語テキストを日本語に翻訳してください。JSONのみ出力。
 
@@ -48,7 +54,7 @@ export async function translateToJapanese(
 
 【翻訳対象】
 - tagline: ${tagline ?? '（なし）'}
-- description: ${description ?? '（なし）'}
+- description: ${description ?? '（なし）'}${siteSection}
 
 tagline_jaルール：
 ・「[カテゴリ] [キャッチコピー]」形式・35文字以内・会社名・製品名禁止
