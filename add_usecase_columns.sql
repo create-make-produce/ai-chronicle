@@ -1,0 +1,2 @@
+ALTER TABLE tools ADD COLUMN use_case_ja TEXT NULL;
+ALTER TABLE tools ADD COLUMN target_user_ja TEXT NULL;

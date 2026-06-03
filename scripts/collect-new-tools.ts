@@ -405,6 +405,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       `INSERT INTO tools (
         id, slug, name_ja, name_en, ph_name, ph_slug, search_keywords,
         tagline_ja, tagline_en, description_ja, description_en,
+        use_case_ja, target_user_ja,
         official_url, logo_url, company_name, category_id,
         status, is_published, has_api, has_free_plan,
         product_hunt_id, product_hunt_url,
@@ -415,6 +416,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       ) VALUES (
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
+        ?, ?,
         ?, ?, ?, ?,
         ?, ?, ?, ?,
         ?, ?,
@@ -431,6 +433,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         translated.search_keywords,
         translated.tagline_ja, extracted.tagline ?? post.tagline,
         translated.description_ja, extracted.description ?? post.description,
+        translated.use_case_ja, translated.target_user_ja,
         officialUrl, logoUrl, extracted.company_name, categoryId,
         toolStatus, finalPublished,
         extracted.has_api === true ? 1 : 0,

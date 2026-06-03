@@ -154,6 +154,45 @@ export default function ToolDetailContent({
                   </div>
                 </div>
               )}
+
+              {/* 活用用途 ＆ どんな人が利用するか（横並び） */}
+              {(tool.use_case_ja || tool.target_user_ja) && (() => {
+                let useCases: string[] = [];
+                let targetUsers: string[] = [];
+                try { if (tool.use_case_ja) useCases = JSON.parse(tool.use_case_ja); } catch {}
+                try { if (tool.target_user_ja) targetUsers = JSON.parse(tool.target_user_ja); } catch {}
+                if (useCases.length === 0 && targetUsers.length === 0) return null;
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: useCases.length > 0 && targetUsers.length > 0 ? '1fr 1fr' : '1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    {useCases.length > 0 && (
+                      <div style={{ background: 'var(--color-bg-sub)', borderRadius: '6px', padding: '1.25rem' }}>
+                        <h3 className="font-display" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>活用用途</h3>
+                        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {useCases.map((item, i) => (
+                            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.88rem', color: 'var(--color-text-sub)', lineHeight: 1.5 }}>
+                              <span style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: '2px' }}>▸</span>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {targetUsers.length > 0 && (
+                      <div style={{ background: 'var(--color-bg-sub)', borderRadius: '6px', padding: '1.25rem' }}>
+                        <h3 className="font-display" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>こんな人におすすめ</h3>
+                        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {targetUsers.map((item, i) => (
+                            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.88rem', color: 'var(--color-text-sub)', lineHeight: 1.5 }}>
+                              <span style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: '2px' }}>▸</span>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
               {hasLinks && (
                 <div>
                   {/* 「リンク」は固定テキスト → .section-label クラス */}

@@ -10,6 +10,8 @@ export interface Tool {
   search_keywords: string | null;
   tagline_ja: string | null; tagline_en: string | null;
   description_ja: string | null; description_en: string | null;
+  use_case_ja: string | null;
+  target_user_ja: string | null;
   official_url: string | null; logo_url: string | null;
   company_name: string | null; company_country: string | null;
   founded_year: number | null; twitter_handle: string | null; github_url: string | null;
