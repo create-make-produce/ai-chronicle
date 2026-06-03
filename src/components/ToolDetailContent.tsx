@@ -163,7 +163,7 @@ export default function ToolDetailContent({
                 try { if (tool.target_user_ja) targetUsers = JSON.parse(tool.target_user_ja); } catch {}
                 if (useCases.length === 0 && targetUsers.length === 0) return null;
                 return (
-                  <div style={{ display: 'grid', gridTemplateColumns: useCases.length > 0 && targetUsers.length > 0 ? '1fr 1fr' : '1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                  <div className="use-case-grid" style={{ display: 'grid', gridTemplateColumns: useCases.length > 0 && targetUsers.length > 0 ? '1fr 1fr' : '1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                     {useCases.length > 0 && (
                       <div style={{ background: 'var(--color-bg-sub)', borderRadius: '6px', padding: '1.25rem' }}>
                         <h3 className="font-display" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>活用用途</h3>

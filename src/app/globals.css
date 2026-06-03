@@ -475,3 +475,13 @@ body {
 .card, .clean-table, [style*="var(--color-bg-sub)"] {
   background-color: var(--color-bg-card);
 }
+
+/* =========================================
+   ツール詳細：活用用途・こんな人におすすめ
+   スマホで縦並び
+   ========================================= */
+@media (max-width: 767px) {
+  .use-case-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
