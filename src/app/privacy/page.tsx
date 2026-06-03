@@ -48,6 +48,18 @@ const SECTIONS = [
   },
 ];
 
+function renderWithLinks(text: string) {
+  const urlRegex = /(https?:\/\/[^\s）)]+|www\.[^\s）)]+)/g;
+  const parts = text.split(urlRegex);
+  return parts.map((part, i) => {
+    if (urlRegex.test(part)) {
+      const href = part.startsWith('http') ? part : `https://${part}`;
+      return <a key={i} href={href} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline', wordBreak: 'break-all' }}>{part}</a>;
+    }
+    return part;
+  });
+}
+
 export default function PrivacyPage() {
   return (
     <main className="flex-1">
@@ -63,7 +75,7 @@ export default function PrivacyPage() {
               <h2 className="font-display text-xl mb-3">{title}</h2>
               {body.split('\n\n').map((para, i) => (
                 <p key={i} className="leading-relaxed text-[var(--color-text-sub)] mb-3">
-                  {para}
+                  {renderWithLinks(para)}
                 </p>
               ))}
             </section>
