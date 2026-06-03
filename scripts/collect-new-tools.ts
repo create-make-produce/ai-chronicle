@@ -383,7 +383,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
     const isChromeStore = officialUrl ? officialUrl.includes('chromewebstore.google.com') : false;
-    const judgeResult = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore });
+    const judgeResult = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore, fetchFailed: !!post.website && !pageText });
     const { isPublished, unpublishCondition, reasons } = judgeResult;
     if (isChromeStore) console.log(`  ⚠ Chrome拡張機能のため保留: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;

@@ -10,6 +10,7 @@ export interface PublishJudgeInput {
   confidenceOk: boolean;
   logoUrl:      string | null;
   isChromeStore?: boolean;
+  fetchFailed?: boolean;  // 公式URLがあってfetch失敗 → 保留
 }
 
 export interface PublishJudgeResult {
@@ -27,6 +28,7 @@ export interface PublishJudgeResult {
  *   - github.com URLでない
  *   - AIコンフィデンススコアが閾値以上
  *   - ロゴURLがある
+ *   - 公式URLがあってfetch失敗でない
  *
  * 非公開になる理由：
  *   - 公式URLなし
@@ -34,21 +36,23 @@ export interface PublishJudgeResult {
  *   - コンフィデンス不足
  *   - ロゴなし
  *   - Chrome拡張ストアURL（保留扱い）
+ *   - 公式URLがあってfetch失敗（保留扱い）
  *
  * ※ 会社名は公開条件に含まない（auto-check-tools.tsが後から補完する）
  */
 export function judgePublish(input: PublishJudgeInput): PublishJudgeResult {
-  const { officialUrl, confidenceOk, logoUrl, isChromeStore = false } = input;
+  const { officialUrl, confidenceOk, logoUrl, isChromeStore = false, fetchFailed = false } = input;
 
   const reasons: string[] = [];
 
-  const hasOfficialUrl = !!officialUrl;
-  const isGithubOnly   = !!officialUrl && officialUrl.includes('github.com');
-  const isStoreOnly    = !!officialUrl && (
+  const hasOfficialUrl    = !!officialUrl;
+  const isGithubOnly      = !!officialUrl && officialUrl.includes('github.com');
+  const isStoreOnly       = !!officialUrl && (
     officialUrl.includes('apps.apple.com') ||
     officialUrl.includes('play.google.com')
   );
-  const hasLogo        = !!logoUrl;
+  const hasLogo           = !!logoUrl;
+  const isFetchFailed     = hasOfficialUrl && fetchFailed;
 
   if (!hasOfficialUrl)  reasons.push('公式URLなし');
   if (isGithubOnly)     reasons.push('GitHub URL');
@@ -56,10 +60,11 @@ export function judgePublish(input: PublishJudgeInput): PublishJudgeResult {
   if (isChromeStore)    reasons.push('Chrome拡張ストアURL');
   if (!confidenceOk)    reasons.push('コンフィデンス不足');
   if (!hasLogo)         reasons.push('ロゴなし');
+  if (isFetchFailed)    reasons.push('公式サイトfetch失敗');
 
-  const unpublishCondition = !hasOfficialUrl || isGithubOnly || isStoreOnly || isChromeStore || !confidenceOk || !hasLogo;
+  const unpublishCondition = !hasOfficialUrl || isGithubOnly || isStoreOnly || isChromeStore || !confidenceOk || !hasLogo || isFetchFailed;
   const isPublished        = unpublishCondition ? 0 : 1;
-  const status             = isChromeStore ? 'pending' : isPublished ? 'active' : 'inactive';
+  const status             = (isChromeStore || isFetchFailed) ? 'pending' : isPublished ? 'active' : 'inactive';
 
   return { isPublished, status, unpublishCondition, reasons };
 }

@@ -126,9 +126,17 @@ async function main() {
       if (pageText) {
         console.log(`  ✅ fetch成功`);
       } else {
-        console.log(`  ⚠ fetch失敗 → tagline_en + description_en + Gemini知識で補完`);
+        console.log(`  ⚠ fetch失敗 → 保留（pending）に変更`);
         logFailedFetch(tool.id, tool.name_en, tool.official_url, 'fetch失敗');
         fetchFailed++;
+        if (!isDryRun) {
+          await db.execute(
+            `UPDATE tools SET status = 'pending', is_published = 0, updated_at = datetime('now') WHERE id = ?`,
+            [tool.id]
+          );
+        }
+        await sleep(1000);
+        continue;
       }
     } else {
       console.log(`  ⚠ 公式URLなし → tagline_en + description_en + Gemini知識で補完`);
