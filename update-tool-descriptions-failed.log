@@ -1,2 +1,19 @@
 === update-tool-descriptions 実行開始 2026-06-03T08:20:00.420Z ===
 2026-06-03T08:20:01.071Z | id=tool_7c77ac603d2b4298b32d5877ec0ce0b2 | name=ChatGPT | url=https://openai.com/ | reason=fetch失敗
+2026-06-03T08:27:44.969Z | id=tool_4f40c7118c8149f3a19cc2336ed61749 | name=Claude | url=https://claude.ai/ | reason=fetch失敗
+2026-06-03T08:29:58.128Z | id=tool_de576aa88be14e37a5e2441059d3940c | name=DeepSeek | url=https://chat.deepseek.com/coder | reason=fetch失敗
+2026-06-03T08:30:30.731Z | id=tool_e9bc40cb254744b1bd5a52a3d986ac15 | name=ChatGPT Images | url=https://chatgpt.com/images/ | reason=fetch失敗
+2026-06-03T08:32:21.240Z | id=tool_b5a09f64529d4c8e88b70c8e667dee79 | name=Kimi | url=https://kimi.ai/ | reason=fetch失敗
+2026-06-03T08:34:00.336Z | id=tool_f7cc3aa3526c41219f2c1ba0bfc5aa13 | name=Codex | url=https://chatgpt.com/codex/ | reason=fetch失敗
+2026-06-03T08:39:04.820Z | id=tool_3aca13e50fdd43118ce43ac80b886fac | name=Claude Code | url=https://claude.ai/code | reason=fetch失敗
+2026-06-03T09:09:23.225Z | id=tool_f7c0aea0d2d34a1d8d96e35708a2d2d9 | name=Midjourney | url=https://www.midjourney.com/ | reason=fetch失敗
+2026-06-03T09:12:43.581Z | id=tool_f8f715efabda48c792f67b9755ffc43b | name=Ideogram | url=https://ideogram.ai/ | reason=fetch失敗
+2026-06-03T09:13:48.860Z | id=tool_25cf6c3009df4010bea155dff8d5ea71 | name=Perplexity | url=https://www.perplexity.ai/ | reason=fetch失敗
+2026-06-03T09:15:27.323Z | id=tool_5a5fe806937241a2ba74dd549877e906 | name=Meta AI | url=https://www.meta.ai/ | reason=fetch失敗
+2026-06-03T09:18:16.975Z | id=tool_b7f0c84d08ec4a12bf2a8d8e0c394efd | name=Gamma | url=https://gamma.app/ | reason=fetch失敗
+2026-06-03T10:12:23.469Z | id=tool_400efdae9efa47fa9de930f29f6f3988 | name=ClawMate AI | url=https://global.chaichaijizhang.xyz/market | reason=fetch失敗
+2026-06-03T10:29:50.054Z | id=tool_eb28efe0bc324d8e97ec165296c8e0b2 | name=Canva AI | url=https://canva.com/ | reason=fetch失敗
+2026-06-03T10:30:22.387Z | id=tool_9ec5a166c0a04821a5bbe83d87048802 | name=Genspark | url=https://www.genspark.ai/ | reason=fetch失敗
+2026-06-03T10:32:05.784Z | id=18f5b884-6458-43c1-90e9-66549dfa7523 | name=Stable Diffusion | url=https://stablediffusionweb.com/ | reason=fetch失敗
+2026-06-03T10:33:13.596Z | id=f44256f9-8e6b-4265-ae4d-3777733422cd | name=Leonardo AI | url=https://leonardo.ai/ | reason=fetch失敗
+2026-06-03T10:35:29.632Z | id=155cca80-d25b-4c13-97a5-90b39cff0391 | name=Le Chat | url=https://chat.mistral.ai/ | reason=fetch失敗
