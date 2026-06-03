@@ -135,7 +135,7 @@ export default function HomeContent(p: HomeContentProps) {
             color: 'var(--color-text-muted)',
             margin: '-16px 0 24px',
             lineHeight: 1.7,
-          }}>{locale==='ja' ? 'AIツールを8つのカテゴリに分類しているので、気になる分野からご確認ください' : 'Browse AI tools by category to find what you need.'}</p>
+          }}>{locale==='ja' ? 'AIツールを8つのカテゴリに分類しているので、気になる分野からご確認ください。' : 'Browse AI tools by category to find what you need.'}</p>
           <CategoryGrid categories={categories} locale={locale} />
         </Sec>
       )}
