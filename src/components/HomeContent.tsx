@@ -129,6 +129,13 @@ export default function HomeContent(p: HomeContentProps) {
             label={locale==='ja'?'AIカテゴリ':'AI Categories'}
             locale={locale}
           />
+          <p style={{
+            fontFamily: 'Noto Sans JP, sans-serif',
+            fontSize: '0.85rem',
+            color: 'var(--color-text-muted)',
+            margin: '-16px 0 24px',
+            lineHeight: 1.7,
+          }}>{locale==='ja' ? 'AIツールを8つのカテゴリに分類しているので、気になる分野からご確認ください' : 'Browse AI tools by category to find what you need.'}</p>
           <CategoryGrid categories={categories} locale={locale} />
         </Sec>
       )}
@@ -139,6 +146,13 @@ export default function HomeContent(p: HomeContentProps) {
       {newTools.length > 0 && (
         <Sec bg="var(--color-page-gradient)">
           <SectionHead label={locale==='ja'?'月刊AIアップデート':'Monthly AI Updates'} />
+          <p style={{
+            fontFamily: 'Noto Sans JP, sans-serif',
+            fontSize: '0.85rem',
+            color: 'var(--color-text-muted)',
+            margin: '-16px 0 24px',
+            lineHeight: 1.7,
+          }}>{locale==='ja' ? '直近で新しく登録・更新されたAIツールをまとめています。' : 'Recently added and updated AI tools.'}</p>
           <ToolSlider tools={newTools.slice(0,12)} locale={locale} categories={categories} tt={tt} />
           <div className="mt-3 text-right">
             <Link href={localizedPath(locale,'/monthly')}
@@ -156,6 +170,13 @@ export default function HomeContent(p: HomeContentProps) {
       {categoryNotes.length > 0 && (
         <Sec bg="var(--color-bg)">
           <SectionHead label="注目のNote記事" />
+          <p style={{
+            fontFamily: 'Noto Sans JP, sans-serif',
+            fontSize: '0.85rem',
+            color: 'var(--color-text-muted)',
+            margin: '-16px 0 24px',
+            lineHeight: 1.7,
+          }}>直近1ヶ月以内にNoteで公開され、多く読まれている記事をご紹介します。</p>
           <style>{`
             .note-slider::-webkit-scrollbar { height: 4px; }
             .note-slider::-webkit-scrollbar-track { background: var(--color-border); border-radius: 2px; }
