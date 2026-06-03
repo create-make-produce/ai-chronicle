@@ -378,16 +378,19 @@ async function main() {
       console.log(`  → 判定: ${parsed.result}${parsed.category ? ` / カテゴリ: ${parsed.category}` : ''}`);
 
       if (!isDryRun) {
+        // 文字列"null"もPHの誤データとして空扱いにする
+        const companyIsEmpty = !tool.company_name || tool.company_name.toLowerCase() === 'null';
+
         if (parsed.result === 'ai') {
           const newCategoryId = CATEGORY_MAP[parsed.category ?? 'other'];
           // 会社名が空で取得できた場合は保存
-          if (!tool.company_name && parsed.company_name) {
+          if (companyIsEmpty && parsed.company_name) {
             console.log(`  🏢 会社名取得: ${parsed.company_name}`);
             await db.execute(
               `UPDATE tools SET admin_checked=1, category_id=?, company_name=?, updated_at=datetime('now') WHERE id=?`,
               [newCategoryId, parsed.company_name, tool.id]
             );
-          } else if (!tool.company_name && !parsed.company_name) {
+          } else if (companyIsEmpty && !parsed.company_name) {
             console.log('  ❌ 会社名取得失敗 → 非公開');
             await db.execute(
               `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
@@ -413,7 +416,7 @@ async function main() {
           notAiCount++;
         } else {
           // review判定：会社名が空なら非公開・あれば保留
-          if (!tool.company_name && !parsed.company_name) {
+          if (companyIsEmpty && !parsed.company_name) {
             console.log('  ❌ review + 会社名なし → 非公開');
             await db.execute(
               `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
@@ -421,7 +424,7 @@ async function main() {
             );
             notAiCount++;
           } else {
-            if (!tool.company_name && parsed.company_name) {
+            if (companyIsEmpty && parsed.company_name) {
               console.log(`  🏢 会社名取得: ${parsed.company_name}`);
               await db.execute(
                 `UPDATE tools SET status='pending', is_published=0, company_name=?, updated_at=datetime('now') WHERE id=?`,
