@@ -152,7 +152,7 @@ export default function HomeContent(p: HomeContentProps) {
             color: 'var(--color-text-muted)',
             margin: '-16px 0 24px',
             lineHeight: 1.7,
-          }}>{locale==='ja' ? '直近で新しく登録・更新されたAIツールをまとめています。' : 'Recently added and updated AI tools.'}</p>
+          }}>{locale==='ja' ? '直近で登録・更新されたAIツールをまとめています。' : 'Recently added and updated AI tools.'}</p>
           <ToolSlider tools={newTools.slice(0,12)} locale={locale} categories={categories} tt={tt} />
           <div className="mt-3 text-right">
             <Link href={localizedPath(locale,'/monthly')}
