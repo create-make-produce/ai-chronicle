@@ -120,7 +120,7 @@ export default function HomeContent(p: HomeContentProps) {
         </Sec>
       )}
 
-      <SectionDivider direction="right" />
+      {topFeatures.length >= 4 && <SectionDivider direction="right" />}
 
       {/* カテゴリ */}
       {categories.length > 0 && (
