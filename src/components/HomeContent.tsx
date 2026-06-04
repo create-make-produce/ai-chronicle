@@ -120,7 +120,7 @@ export default function HomeContent(p: HomeContentProps) {
         </Sec>
       )}
 
-      <SectionDivider direction="left" />
+      <SectionDivider direction="right" />
 
       {/* カテゴリ */}
       {categories.length > 0 && (
