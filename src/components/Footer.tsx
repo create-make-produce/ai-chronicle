@@ -91,8 +91,8 @@ export default function Footer({ lang = 'ja', showFeatures = false }: { lang?: '
               { href: '/tools',   en: 'TOOLS',     ja: 'AIツール一覧' },
               ...(showFeatures ? [{ href: '/features', en: 'FEATURES', ja: '特集' }] : []),
             ].map(item => (
-              <Link key={item.href} href={item.href} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: theme.accent, flexShrink: 0, display: 'inline-block' }} />
+              <Link key={item.href} href={item.href} style={{ textDecoration: 'none', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: theme.accent, flexShrink: 0, display: 'inline-block', marginTop: '9px' }} />
                 <span>
                   <span style={{ fontFamily: 'Fira Sans, sans-serif', fontWeight: 700, fontSize: '0.9rem', color: '#FFFFFF', letterSpacing: '0.05em', display: 'block' }}>{item.en}</span>
                   <span style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.7rem', color: '#8A9BB0' }}>{item.ja}</span>
