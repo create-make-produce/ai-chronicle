@@ -63,7 +63,13 @@ export default function Footer({ lang = 'ja', showFeatures = false }: { lang?: '
 
           {/* 左：ロゴ＋説明 */}
           <div style={{ minWidth: '200px' }}>
-            <Link href={isEn ? '/en' : '/'} style={{ textDecoration: 'none', display: 'inline-block', marginBottom: '0.75rem' }}>
+            <Link href={isEn ? '/en' : '/'} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
+              <svg width="32" height="32" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="256" cy="256" r="240" fill="#FFFFFF" fillOpacity="0.08" stroke="#FFFFFF" strokeOpacity="0.2" strokeWidth="8"/>
+                <circle cx="256" cy="256" r="162" fill="none" stroke="#FFFFFF" strokeWidth="30" strokeDasharray="340 170"/>
+                <circle cx="256" cy="256" r="84" fill="#FFFFFF"/>
+                <circle cx="256" cy="256" r="42" fill="#060F1E"/>
+              </svg>
               <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.06em', color: '#FFFFFF' }}>
                 AI<span style={{ color: theme.accent, transition: 'color 0.3s' }}>/</span>CHRONICLE
               </span>
