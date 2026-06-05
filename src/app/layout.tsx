@@ -36,6 +36,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Google Fonts CDN経由（自己ホスティング廃止・Workers負荷軽減） */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* 最優先：ロゴ・ナビに使用するフォントをpreload */}
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Fira+Sans:wght@700;800;900&display=swap" as="style" />
+        {/* 全フォントをstylesheetとして読み込み */}
         <link
           href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Sans:wght@400;600;700;800;900&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap"
           rel="stylesheet"
