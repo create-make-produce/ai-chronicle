@@ -87,8 +87,8 @@ export default function Header({ showFeatures = false }: { showFeatures?: boolea
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <svg width="32" height="32" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="256" cy="256" r="240" fill="#FFFFFF" stroke="#E4E8EF" strokeWidth="8"/>
-            <circle cx="256" cy="256" r="162" fill="none" stroke="#008CED" strokeWidth="30" strokeDasharray="340 170"/>
-            <circle cx="256" cy="256" r="84" fill="#008CED"/>
+            <circle cx="256" cy="256" r="162" fill="none" stroke={accent} strokeWidth="30" strokeDasharray="340 170"/>
+            <circle cx="256" cy="256" r="84" fill={accent}/>
             <circle cx="256" cy="256" r="42" fill="#FFFFFF"/>
           </svg>
           <span style={{
