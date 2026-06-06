@@ -35,3 +35,53 @@
   → APIフェッチ: sort=like page=2
   → [like] 40件取得
   → 35秒待機...
+
+[3/50] Scrptly（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[4/50] NexChat（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 2件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 2件取得
+  → 35秒待機...
+
+[5/50] GraceDraft（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[6/50] Gallio PRO（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 10件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 10件取得
+  → 35秒待機...
+
+[7/50] Aivastark（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[8/50] Flung（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
