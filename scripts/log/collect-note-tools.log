@@ -98,3 +98,67 @@
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[11/50] Mirelight（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[12/50] AncestraLingua（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[13/50] Mira（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[14/50] Aura Love Coach（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[15/50] Noesia（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 2件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 2件取得
+  → 35秒待機...
+
+[16/50] LMIM OS（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[17/50] JewelAI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
