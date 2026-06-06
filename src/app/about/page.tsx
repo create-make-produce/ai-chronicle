@@ -77,6 +77,10 @@ export default function AboutPage() {
                 <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>更新頻度：</span>
                 新しいAIツールの情報は日次で収集・更新しています。情報の鮮度を保つことを重視しています。
               </p>
+              <p>
+                <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>免責事項：</span>
+                掲載している情報は収集時点のものであり、各ツールの仕様変更・料金改定により現在の情報と異なる場合があります。最新・正確な情報は各ツールの公式サイトをご確認ください。本サイトの情報によって生じた損害について、当方は一切の責任を負いかねます。
+              </p>
             </div>
           </section>
 

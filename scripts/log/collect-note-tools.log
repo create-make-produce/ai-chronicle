@@ -85,3 +85,16 @@
   → APIフェッチ: sort=like page=2
   → [like] 40件取得
   → 35秒待機...
+
+[9/50] NatureQuery（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[10/50] Moving Abroad Smarter（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
