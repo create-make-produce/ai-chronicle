@@ -306,6 +306,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     let pageText: string | null = null;
     let logoUrl: string | null = null;
+    let isSslError = false;
 
     if (post.website) {
       try {
@@ -313,8 +314,10 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         pageText = htmlToText(html);
         // ロゴはGoogleファビコンサービス優先（og:imageはバナー画像のことが多い）
         logoUrl = extractFaviconUrl(html, post.website);
-      } catch {
+      } catch (fetchErr) {
         logoUrl = null; // fetchは失敗でも後でGoogleファビコンをセット
+        const errMsg = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+        isSslError = /certificate|ssl|tls|cert/i.test(errMsg);
       }
     }
 
@@ -383,8 +386,8 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     const hasOfficialUrl = !!officialUrl;
     const confidenceOk = confidence >= CONFIG.MIN_AI_CONFIDENCE_TO_PUBLISH;
     const isChromeStore = officialUrl ? officialUrl.includes('chromewebstore.google.com') : false;
-    const judgeResult = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore, fetchFailed: !!post.website && !pageText });
-    const { isPublished, unpublishCondition, reasons } = judgeResult;
+    const judgeResult = judgePublish({ officialUrl, confidenceOk: confidenceOk, logoUrl, isChromeStore, fetchFailed: !!post.website && !pageText, sslError: isSslError });
+    const { isPublished, unpublishCondition, reasons, pendingMemo } = judgeResult;
     if (isChromeStore) console.log(`  ⚠ Chrome拡張機能のため保留: ${slug}`);
     const needsReview = !isPublished ? 1 : 0;
 
@@ -410,6 +413,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         status, is_published, has_api, has_free_plan,
         product_hunt_id, product_hunt_url,
         ai_confidence_score, needs_manual_review,
+        admin_memo,
         data_source, source_url, language_support,
         ios_url, android_url,
         last_scraped_at, created_at, updated_at
@@ -421,6 +425,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         ?, ?, ?, ?,
         ?, ?,
         ?, ?,
+        ?,
         'product_hunt_api', ?, ?,
         ?, ?,
         datetime('now'), datetime('now'), datetime('now')
@@ -441,6 +446,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         post.product_id ?? post.id,
         post.product_url ?? post.url,
         confidence, needsReview,
+        pendingMemo ?? null,
         post.url,
         extracted.supported_languages ? JSON.stringify(extracted.supported_languages) : null,
         iosUrlFinal, androidUrlFinal,
@@ -462,7 +468,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       if (sameCompany.length > 0) {
         // 同会社のツールが既存にある場合は保留に変更
         await db.execute(
-          `UPDATE tools SET status = 'pending', is_published = 0 WHERE id = ?`,
+          `UPDATE tools SET status = 'pending', is_published = 0, admin_memo = '同会社の既存ツールあり' WHERE id = ?`,
           [toolId]
         );
         console.log(`  ⚠ 同会社ツール検出のため保留に変更: ${extracted.company_name}`);

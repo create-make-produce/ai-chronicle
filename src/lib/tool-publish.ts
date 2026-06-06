@@ -11,6 +11,7 @@ export interface PublishJudgeInput {
   logoUrl:      string | null;
   isChromeStore?: boolean;
   fetchFailed?: boolean;  // 公式URLがあってfetch失敗 → 保留
+  sslError?: boolean;     // SSL証明書エラー → 非公開
 }
 
 export interface PublishJudgeResult {
@@ -18,6 +19,7 @@ export interface PublishJudgeResult {
   status:            'active' | 'inactive' | 'pending';
   unpublishCondition: boolean;
   reasons:           string[];
+  pendingMemo:       string | null;  // 保留時の管理画面表示用メモ
 }
 
 /**
@@ -35,13 +37,13 @@ export interface PublishJudgeResult {
  *   - GitHub URLのみ
  *   - コンフィデンス不足
  *   - ロゴなし
- *   - Chrome拡張ストアURL（保留扱い）
+ *   - Chrome拡張ストアURL（非公開扱い・同会社ツールがあれば呼び出し側で保留に変更）
  *   - 公式URLがあってfetch失敗（保留扱い）
  *
  * ※ 会社名は公開条件に含まない（auto-check-tools.tsが後から補完する）
  */
 export function judgePublish(input: PublishJudgeInput): PublishJudgeResult {
-  const { officialUrl, confidenceOk, logoUrl, isChromeStore = false, fetchFailed = false } = input;
+  const { officialUrl, confidenceOk, logoUrl, isChromeStore = false, fetchFailed = false, sslError = false } = input;
 
   const reasons: string[] = [];
 
@@ -52,7 +54,8 @@ export function judgePublish(input: PublishJudgeInput): PublishJudgeResult {
     officialUrl.includes('play.google.com')
   );
   const hasLogo           = !!logoUrl;
-  const isFetchFailed     = hasOfficialUrl && fetchFailed;
+  const isFetchFailed     = hasOfficialUrl && fetchFailed && !sslError;
+  const isSslFailed       = hasOfficialUrl && fetchFailed && sslError;
 
   if (!hasOfficialUrl)  reasons.push('公式URLなし');
   if (isGithubOnly)     reasons.push('GitHub URL');
@@ -61,10 +64,15 @@ export function judgePublish(input: PublishJudgeInput): PublishJudgeResult {
   if (!confidenceOk)    reasons.push('コンフィデンス不足');
   if (!hasLogo)         reasons.push('ロゴなし');
   if (isFetchFailed)    reasons.push('公式サイトfetch失敗');
+  if (isSslFailed)      reasons.push('SSL証明書エラー');
 
-  const unpublishCondition = !hasOfficialUrl || isGithubOnly || isStoreOnly || isChromeStore || !confidenceOk || !hasLogo || isFetchFailed;
+  const unpublishCondition = !hasOfficialUrl || isGithubOnly || isStoreOnly || isChromeStore || !confidenceOk || !hasLogo || isFetchFailed || isSslFailed;
   const isPublished        = unpublishCondition ? 0 : 1;
-  const status             = (isChromeStore || isFetchFailed) ? 'pending' : isPublished ? 'active' : 'inactive';
+  // SSL証明書エラーはinactive（証明書が無効なサイトは信頼できない）
+  // その他のfetch失敗はpending（ボット対策されている有名ツールの可能性）
+  // Chrome拡張はinactive（同会社ツールがあれば呼び出し側でpendingに変更）
+  const status             = isFetchFailed ? 'pending' : isPublished ? 'active' : 'inactive';
+  const pendingMemo        = isFetchFailed ? '公式サイトにアクセスできず' : null;
 
-  return { isPublished, status, unpublishCondition, reasons };
+  return { isPublished, status, unpublishCondition, reasons, pendingMemo };
 }

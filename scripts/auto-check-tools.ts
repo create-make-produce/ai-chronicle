@@ -351,7 +351,7 @@ async function main() {
           console.log(`  ⚠ サイト取得失敗 + 同会社名あり → 保留`);
           if (!isDryRun) {
             await db.execute(
-              `UPDATE tools SET is_published=0, status='pending', updated_at=datetime('now') WHERE id=?`,
+              `UPDATE tools SET is_published=0, status='pending', admin_memo='公式サイトにアクセスできず', updated_at=datetime('now') WHERE id=?`,
               [tool.id]
             );
           }
@@ -427,12 +427,12 @@ async function main() {
             if (companyIsEmpty && parsed.company_name) {
               console.log(`  🏢 会社名取得: ${parsed.company_name}`);
               await db.execute(
-                `UPDATE tools SET status='pending', is_published=0, company_name=?, updated_at=datetime('now') WHERE id=?`,
+                `UPDATE tools SET status='pending', is_published=0, company_name=?, admin_memo='サイト内容がツールと無関係', updated_at=datetime('now') WHERE id=?`,
                 [parsed.company_name, tool.id]
               );
             } else {
               await db.execute(
-                `UPDATE tools SET status='pending', is_published=0, updated_at=datetime('now') WHERE id=?`,
+                `UPDATE tools SET status='pending', is_published=0, admin_memo='サイト内容がツールと無関係', updated_at=datetime('now') WHERE id=?`,
                 [tool.id]
               );
             }
