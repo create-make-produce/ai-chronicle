@@ -162,3 +162,216 @@
   → hot + like モード（現在0件）
   → APIフェッチ: sort=hot page=1
   → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[18/50] Krater（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[19/50] Nudge Review（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[20/50] RemoteX（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[21/50] SignalForge（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[22/50] Angle（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  🚫 [除外] 【画像生成AI】裏垢女子風の自撮り画像を再現するプロンプト集｟プロンプト無料公開｠Midjourne
+  🚫 [除外] 【画像生成AI】1940年代レトロポスター風のイラストをリアルに再現する方法｟プロンプト無料公開｠M
+  🚫 [除外] 副業を100個調べて全部やめた僕が、AI動画だけは続いている理由
+  🚫 [除外] 【画像生成AI】「ヨガパンツを履いた猫のポートレート」をAIで生成する方法《プロンプト公開》ミッドジ
+  🚫 [除外] AIブログ自動化をnoteで活用する方法｜記事作成・投稿・収益化を効率化する完全ガイド
+  🚫 [除外] 英語もスキルも顔出しも要らなかった——ChatGPT×KlingでAI動画が10分で完成して、そのま
+  🚫 [除外] 【画像生成AI】裏垢女子風の自撮り画像を再現するプロンプト集｟プロンプト無料公開｠Midjourne
+  🚫 [除外] 【画像生成AI】1940年代レトロポスター風のイラストをリアルに再現する方法｟プロンプト無料公開｠M
+  🚫 [除外] 副業を100個調べて全部やめた僕が、AI動画だけは続いている理由
+  🚫 [除外] 【画像生成AI】「ヨガパンツを履いた猫のポートレート」をAIで生成する方法《プロンプト公開》ミッドジ
+  🚫 [除外] AIブログ自動化をnoteで活用する方法｜記事作成・投稿・収益化を効率化する完全ガイド
+  🚫 [除外] 英語もスキルも顔出しも要らなかった——ChatGPT×KlingでAI動画が10分で完成して、そのま
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[23/50] BankStatementLab（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[24/50] Codecop（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 9件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 9件取得
+  → 35秒待機...
+
+[25/50] Revolte（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[26/50] Pancake（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[27/50] NeuralAgent（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[28/50] Crew44（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 3件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 3件取得
+  → 35秒待機...
+
+[29/50] VoiceDouble（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[30/50] Clipia（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[31/50] RevEdge（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 1件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 1件取得
+  → 35秒待機...
+
+[32/50] Qentaris（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[33/50] NoteNestAI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[34/50] Subsig（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 4件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 4件取得
+  → 35秒待機...
+
+[35/50] StudySong（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[36/50] GizmoZo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[37/50] JobsJudo（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[38/50] Loopvalid（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 0件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...
+
+[39/50] MoDev（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → APIフェッチ: sort=hot page=2
+  → [hot] 40件取得
+  → APIフェッチ: sort=like page=1
+  → APIフェッチ: sort=like page=2
+  → [like] 40件取得
+  → 35秒待機...
+
+[40/50] SpeakPro AI（note:0件）
+  → hot + like モード（現在0件）
+  → APIフェッチ: sort=hot page=1
+  → [hot] 1件取得
+  → APIフェッチ: sort=like page=1
+  → [like] 0件取得
+  → 35秒待機...

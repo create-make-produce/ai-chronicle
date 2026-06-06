@@ -13,8 +13,8 @@
 
   /* テキスト（青寄り濃紺・可読性重視） */
   --color-text:        #0A2040;
-  --color-text-sub:    #1A3A5C;
-  --color-text-muted:  #3A5A78;
+  --color-text-sub:    #0F2A45;
+  --color-text-muted:  #1E3A58;
   --color-border:      #E4E8EF;
   --color-border-mid:  #C8CDD8;
 
@@ -65,13 +65,13 @@
   --color-note-card-border: #E4E8EF;
   --color-text-timestamp:   #1A3A5C;
   --color-text-nav:         #0A2040;
-  --color-text-breadcrumb:  #3A5A78;
+  --color-text-breadcrumb:  #1E3A58;
   --color-select-bg:        #FFFFFF;
   --color-search-bg:        #F4F6F9;
-  --color-tab-inactive:     #3A5A78;
+  --color-tab-inactive:     #1E3A58;
   --color-row-hover:        #F4F6F9;
   --color-page-btn-border:  #E4E8EF;
-  --color-page-btn-text:    #1A3A5C;
+  --color-page-btn-text:    #0F2A45;
 
   /* フッター専用（常にダーク） */
   --color-footer-bg:        #060F1E;
