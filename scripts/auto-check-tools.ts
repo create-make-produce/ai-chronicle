@@ -352,7 +352,7 @@ async function main() {
           console.log(`  ⚠ サイト取得失敗 + 同会社名あり → 保留`);
           if (!isDryRun) {
             await db.execute(
-              `UPDATE tools SET is_published=0, status='pending', admin_memo='公式サイトにアクセスできず', updated_at=datetime('now') WHERE id=?`,
+              `UPDATE tools SET is_published=0, status='pending', admin_memo='同会社の既存ツールあり', updated_at=datetime('now') WHERE id=?`,
               [tool.id]
             );
           }

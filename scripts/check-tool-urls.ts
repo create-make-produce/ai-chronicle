@@ -93,7 +93,7 @@ async function main() {
     if (result === 'not_found') {
       console.log(`  ❌ 404検出 → 保留に変更`);
       await db.execute(
-        `UPDATE tools SET is_published = 0, status = 'pending', updated_at = datetime('now') WHERE id = ?`,
+        `UPDATE tools SET is_published = 0, status = 'pending', admin_memo = '公式サイトが見つかりません（404）', updated_at = datetime('now') WHERE id = ?`,
         [tool.id]
       );
       inactivated.push(`${tool.name_en} (${tool.official_url})`);
