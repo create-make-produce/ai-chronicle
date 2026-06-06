@@ -420,15 +420,15 @@ function CategorySectionHead({ label, locale }: { label: string; locale: Locale 
             onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border-mid)'}
           />
           <button type="submit" style={{
-            padding:'10px 18px', background:'transparent',
+            padding:'10px 18px', background:'var(--color-accent)',
             border:'1px solid var(--color-accent)', borderRadius:'0 3px 3px 0',
-            color:'var(--color-accent)', fontFamily:'var(--font-fira), system-ui',
+            color:'#FFFFFF', fontFamily:'var(--font-fira), system-ui',
             fontSize:'0.78rem', fontWeight:700, letterSpacing:'0.1em',
             textTransform:'uppercase', cursor:'pointer', whiteSpace:'nowrap',
             transition:'all 180ms ease',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-accent)'; e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-accent)'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-accent-hover)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-accent)'; }}
           >
             {locale === 'ja' ? '検索' : 'Search'}
           </button>
