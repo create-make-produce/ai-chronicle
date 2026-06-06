@@ -34,9 +34,9 @@ export default async function AllToolsPage({
     params.push(cat);
   }
   if (q) {
-    conditions.push(`(t.name_ja LIKE ? OR t.name_en LIKE ? OR t.tagline_ja LIKE ? OR t.search_keywords LIKE ?)`);
+    conditions.push(`(t.name_ja LIKE ? OR t.name_en LIKE ? OR t.tagline_ja LIKE ? OR t.search_keywords LIKE ? OR t.description_ja LIKE ?)`);
     const like = `%${q}%`;
-    params.push(like, like, like, like);
+    params.push(like, like, like, like, like);
   }
 
   const where = conditions.join(' AND ');
