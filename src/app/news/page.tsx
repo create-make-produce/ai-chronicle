@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'AIツール最新ニュース | AI Chronicle',
-  description: '新機能・アップデート・価格改定に関する最新情報。',
+  description: 'AIツールの新機能・アップデート・最新ニュースをお届け',
 };
 
 const PER_PAGE = 50;
@@ -59,7 +59,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
           en="AI News"
           ja="最新ニュース"
           theme={theme}
-          subtitle="新機能・アップデート・価格改定に関する最新情報"
+          subtitle="AIツールの新機能・アップデート・最新ニュースをお届け"
         />
       </PageHero>
 
