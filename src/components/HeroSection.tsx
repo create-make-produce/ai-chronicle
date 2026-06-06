@@ -367,8 +367,7 @@ export default function HeroSection({ locale, recentFeatures = [] }: HeroSection
             : 'The AI world moves every day'}
         </p>
         {(locale === 'ja' ? [
-          '海外発の最新ツールを日本語でいち早く',
-          '新機能 / 新サービス / 料金改定',
+          '世界の最新AIツールを、日本語でいち早く',
           '知るべきニュースを、見逃さない',
         ] : [
           'The latest tools from overseas, in Japanese',

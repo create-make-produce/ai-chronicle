@@ -22,10 +22,10 @@ export default function AboutPage() {
           <section>
             <h2 className="font-display text-xl mb-3">このサイトについて</h2>
             <p className="leading-relaxed text-[var(--color-text-sub)] mb-3">
-              AI Chronicleは、海外で発表された最新AIツール情報を日本語でいち早くお届けすることを目的としたデータベースサイトです。
+              AI Chronicleは、世界の最新AIツール情報を日本語でいち早くお届けすることを目的としたデータベースサイトです。
             </p>
             <p className="leading-relaxed text-[var(--color-text-sub)] mb-3">
-              英語圏では毎日数十本のAIツールが登場しますが、日本語でまとまった情報を得られる場所はまだ限られています。当サイトは「海外のAI最前線を、日本語で・素早く・わかりやすく」届けることをミッションとしています。
+              英語圏では毎日数十本のAIツールが登場しますが、日本語でまとまった情報を得られる場所はまだ限られています。当サイトは「世界のAI最前線を、日本語で・素早く・わかりやすく」届けることをミッションとしています。
             </p>
           </section>
 
@@ -49,7 +49,7 @@ export default function AboutPage() {
               </ul>
             </div>
             <p className="leading-relaxed text-[var(--color-text-sub)] mb-3">
-              近年のAI技術の急速な進化に伴い、ツールの品質・信頼性に大きな差が生じています。当サイトでは技術的な観点から各ツールを評価し、実際に活用できると判断したものを中心に掲載しています。
+              近年のAI技術の急速な進化に伴い、ツールの品質・信頼性に大きな差が生じています。当サイトでは信頼性・実用性の観点から掲載基準を設け、条件を満たしたものを掲載しています。
             </p>
           </section>
 
