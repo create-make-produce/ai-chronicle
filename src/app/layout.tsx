@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   icons: { icon: [{ url: '/favicon.ico' }, { url: '/icon.png' }], shortcut: '/favicon.ico', apple: '/icon.png' },
   metadataBase: new URL(SITE_URL),
   title: { default: 'AI Chronicle - AIツール最新情報データベース', template: '%s | AI Chronicle' },
-  description: 'AIツールの最新情報データベース。最新ニュース・価格・アップデートを一つの場所で確認。',
+  description: '日本語専用AIツールデータベース：世界の最新AIツール情報・ニュース・アップデートをいち早くお届け',
   openGraph: { type: 'website', siteName: 'AI Chronicle', locale: 'ja_JP', alternateLocale: ['en_US'] },
   twitter: { card: 'summary_large_image' },
   robots: { index: true, follow: true },

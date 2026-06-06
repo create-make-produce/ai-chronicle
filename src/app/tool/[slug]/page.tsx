@@ -46,8 +46,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const name = tool.name_ja;
   const tagline = tool.tagline_ja || '';
   return {
-    title: `${name}の料金・評判・使い方`,
-    description: tagline || `${name}の機能・料金プラン・使い方を詳細解説。`,
+    title: `${name} - AIツール詳細 | AI Chronicle`,
+    description: tagline || `${name}の機能・特徴を日本語で解説。`,
     alternates: {
       canonical: `/tool/${tool.slug}`,
     },
