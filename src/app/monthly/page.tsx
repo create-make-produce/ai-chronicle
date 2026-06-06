@@ -19,22 +19,21 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
 
   const now = new Date();
-  const ym  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  const [countRows, totalCountRows] = await Promise.all([
-    queryD1(`SELECT COUNT(*) as count FROM tools WHERE is_published = 1 AND status = 'active' AND admin_checked = 1 AND strftime('%Y-%m', updated_at) = ?`, [ym]),
-    queryD1(`SELECT COUNT(*) as count FROM tools WHERE is_published = 1 AND status = 'active' AND admin_checked = 1`),
-  ]);
+  const countRows = await queryD1(
+    `SELECT COUNT(*) as count FROM tools WHERE is_published = 1 AND status = 'active' AND admin_checked = 1 AND date(updated_at) >= ?`,
+    [oneMonthAgo]
+  );
 
   const thisMonthCount = (countRows[0] as any)?.count ?? 0;
-  const totalCount = (totalCountRows[0] as any)?.count ?? 0;
-  const totalPages  = Math.max(1, Math.ceil(totalCount / PER_PAGE));
+  const totalPages  = Math.max(1, Math.ceil(thisMonthCount / PER_PAGE));
   const currentPage = Math.min(Math.max(1, parseInt(sp.p ?? '1', 10)), totalPages);
   const offset = (currentPage - 1) * PER_PAGE;
 
   const tools = await queryD1(
-    `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 ORDER BY t.updated_at DESC LIMIT ? OFFSET ?`,
-    [PER_PAGE, offset]
+    `SELECT t.*, c.name_ja as category_name_ja, c.name_en as category_name_en, c.slug as category_slug FROM tools t LEFT JOIN categories c ON t.category_id = c.id WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1 AND date(t.updated_at) >= ? ORDER BY t.updated_at DESC LIMIT ? OFFSET ?`,
+    [oneMonthAgo, PER_PAGE, offset]
   );
 
   return (
@@ -48,7 +47,7 @@ export default async function MonthlyPage({ searchParams }: { searchParams: Prom
           en="Monthly Update"
           ja="AIアップデート"
           theme={theme}
-          subtitle={`今月更新のAIツール（${thisMonthCount}件更新）`}
+          subtitle={`直近1ヶ月の更新AIツール（${thisMonthCount}件）`}
         />
       </PageHero>
 
