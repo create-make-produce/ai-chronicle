@@ -30,6 +30,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '必須項目が未入力です' }, { status: 400 });
   }
 
+  if (subject.length > 100) {
+    return NextResponse.json({ error: '件名は100文字以内でお願いします' }, { status: 400 });
+  }
+
   if (body.length > 2000) {
     return NextResponse.json({ error: '本文は2000文字以内でお願いします' }, { status: 400 });
   }

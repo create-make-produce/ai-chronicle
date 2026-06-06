@@ -83,6 +83,7 @@ export default function ContactPage() {
               </label>
               <input type="text" value={subject} onChange={e => setSubject(e.target.value)} required
                 placeholder="例：ChatGPTの掲載情報の修正依頼"
+                maxLength={100}
                 style={INPUT}
                 onFocus={e => e.currentTarget.style.borderColor = 'var(--color-accent)'}
                 onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border-mid)'} />
