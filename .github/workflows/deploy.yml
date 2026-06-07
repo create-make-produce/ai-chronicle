@@ -33,7 +33,7 @@ jobs:
       - name: Check NEXT_PUBLIC_SITE_URL
         env:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-        run: 'echo "SITE_URL starts with: ${NEXT_PUBLIC_SITE_URL:0:25}"'
+        run: 'echo "SITE_URL length: ${#NEXT_PUBLIC_SITE_URL}"'
 
       - name: Build with OpenNext
         env:
