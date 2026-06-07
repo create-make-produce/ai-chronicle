@@ -12,11 +12,7 @@ if (existsSync(envLocalPath)) { loadEnv({ path: envLocalPath }); } else { loadEn
 import { D1Client } from '../src/lib/d1-rest';
 
 async function main() {
-  const db = new D1Client(
-    process.env.CLOUDFLARE_ACCOUNT_ID!,
-    process.env.CLOUDFLARE_D1_DATABASE_ID!,
-    process.env.CLOUDFLARE_API_TOKEN!,
-  );
+  const db = D1Client.fromEnv();
 
   // 非公開ツールに紐づくニュースを取得
   const targets = await db.query<{ id: string; title_ja: string }>(
