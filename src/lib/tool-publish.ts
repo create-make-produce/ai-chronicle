@@ -71,8 +71,8 @@ export function judgePublish(input: PublishJudgeInput): PublishJudgeResult {
   // SSL証明書エラーはinactive（証明書が無効なサイトは信頼できない）
   // その他のfetch失敗はpending（ボット対策されている有名ツールの可能性）
   // Chrome拡張はinactive（同会社ツールがあれば呼び出し側でpendingに変更）
-  const status             = isFetchFailed ? 'pending' : isPublished ? 'active' : 'inactive';
-  const pendingMemo        = isFetchFailed ? '公式サイトにアクセスできず' : null;
+  const status             = isPublished ? 'active' : 'inactive';
+  const pendingMemo        = null;
 
   return { isPublished, status, unpublishCondition, reasons, pendingMemo };
 }
