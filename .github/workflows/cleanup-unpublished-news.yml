@@ -1,0 +1,27 @@
+name: cleanup-unpublished-news
+
+on:
+  schedule:
+    # 毎週月曜 JST 10:00（UTC 01:00）
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run cleanup
+        env:
+          CLOUDFLARE_ACCOUNT_ID:    ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN:     ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx tsx scripts/cleanup-unpublished-news.ts
