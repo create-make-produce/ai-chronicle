@@ -48,6 +48,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             __html: `try{var t=localStorage.getItem('ai-chronicle-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}`,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){function show(){document.body.classList.add('fonts-loaded');}if(document.fonts&&document.fonts.ready){document.fonts.ready.then(show);}else{window.addEventListener('load',show);}setTimeout(show,1000);}());`,
+          }}
+        />
       </head>
       <body className="min-h-screen flex flex-col antialiased" style={{ background: 'var(--color-bg)', overflowX: 'hidden' }}>
         <ThemeProvider>

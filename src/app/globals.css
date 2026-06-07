@@ -96,6 +96,10 @@ body {
   font-family: Noto Sans JP, system-ui, sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
+  visibility: hidden;
+}
+body.fonts-loaded {
+  visibility: visible;
 }
 
 @media (max-width: 767px) {
