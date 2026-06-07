@@ -485,3 +485,19 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* =========================================
+   ニュース詳細：リンク＋ツールカード
+   スマホで縦並び
+   ========================================= */
+@media (max-width: 767px) {
+  .news-link-card {
+    grid-template-columns: 1fr !important;
+  }
+  .news-tool-col {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid var(--color-border);
+    padding-top: 1.25rem;
+  }
+}

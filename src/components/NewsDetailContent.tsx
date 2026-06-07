@@ -32,8 +32,23 @@ function formatDateShort(isoStr: string): string {
   return isoStr?.slice(0, 10) ?? '';
 }
 
+function getDomain(url: string): string {
+  try { return new URL(url).hostname.replace('www.', ''); }
+  catch { return url; }
+}
+
+function GlobeIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  );
+}
+
 interface NewsDetailContentProps {
-  news: News;
+  news: News & { source_url?: string | null };
   relatedTool: Tool | null;
   relatedNews: News[];
   locale: Locale;
@@ -48,6 +63,10 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
   const badge      = NEWS_TYPE_LABELS[typeKey] ?? NEWS_TYPE_LABELS.other;
   const badgeLabel = locale === 'ja' ? badge.ja : badge.en;
   const dateTime   = formatDateTime(news.published_at, locale);
+
+  // 表示するURL：source_url優先 → relatedToolのofficial_url
+  const linkUrl    = news.source_url || (relatedTool?.official_url ?? null);
+  const linkDomain = linkUrl ? getDomain(linkUrl) : null;
 
   return (
     <main className="flex-1" style={{ background: 'var(--color-page-gradient)' }}>
@@ -64,7 +83,6 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
       >
         {/* バッジ＋日時 */}
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-          {/* バッジ（固定テキスト → Fira Sans サブセット） */}
           <span style={{
             fontFamily:    'Fira Sans, system-ui',
             fontSize:      '0.72rem',
@@ -78,13 +96,12 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
           }}>
             {badgeLabel}
           </span>
-          {/* 日時（固定文字セット → Fira Sans サブセット） */}
           <time style={{ fontFamily: 'Fira Sans, system-ui', fontSize: '0.82rem', color: 'var(--color-text-timestamp)', letterSpacing: '0.02em' }}>
             {dateTime}
           </time>
         </div>
 
-        {/* タイトル（動的コンテンツ → システムフォント） */}
+        {/* タイトル */}
         <h1 style={{
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
           fontSize:   'clamp(1.5rem, 3vw, 2.25rem)',
@@ -99,14 +116,52 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
 
       {/* ━━━ 記事本文エリア ━━━ */}
       <article className="max-w-3xl mx-auto section-px py-10">
-        {/* 本文（動的コンテンツ → システムフォント・body継承） */}
+
+        {/* ニュース内容カード（本文 + Webサイトリンク） */}
         {body && (
-          <div style={{ fontSize: '0.95rem', lineHeight: 1.95, color: 'var(--color-text)', whiteSpace: 'pre-wrap', marginBottom: '2.5rem' }}>
-            {body}
-          </div>
+          <section style={{
+            background: 'var(--color-bg)',
+            border: '1px solid var(--color-border)',
+            borderLeft: `3px solid ${badge.color}`,
+            borderRadius: '4px',
+            padding: '1.5rem',
+            marginBottom: '1rem',
+          }}>
+            <h2 className="font-display text-2xl tracking-tight mb-4" style={{ color: 'var(--color-text)' }}>ニュース内容</h2>
+            <div style={{ fontSize: '0.95rem', lineHeight: 1.95, color: 'var(--color-text)', whiteSpace: 'pre-wrap', marginBottom: linkUrl && linkDomain ? '1.5rem' : 0 }}>
+              {body}
+            </div>
+            {/* Webサイトリンク（カード内・本文の下） */}
+            {linkUrl && linkDomain && (
+              <a
+                href={linkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: '#000',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  textDecoration: 'none',
+                  lineHeight: 1.3,
+                  minWidth: '130px',
+                }}
+              >
+                <GlobeIcon />
+                <span style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontFamily: 'Noto Sans JP, sans-serif', fontSize: '0.6rem', opacity: 0.7, letterSpacing: '0.03em' }}>Webサイト</span>
+                  <span style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 700, fontSize: '0.82rem' }}>{linkDomain}</span>
+                </span>
+              </a>
+            )}
+          </section>
         )}
 
-        {/* 関連ツール */}
+        {/* 関連ツールカード（元のスタイル） */}
         {relatedTool && (
           <div style={{ marginBottom: '2.5rem', padding: '1.25rem', background: 'var(--color-panel-bg)', border: '1px solid var(--color-panel-border)', borderLeft: `3px solid ${badge.color}`, borderRadius: '4px' }}>
             <Link href={localizedPath(locale, `/tool/${relatedTool.slug}`)} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -116,14 +171,12 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={relatedTool.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    /* イニシャルは動的 → システムフォント */
                     <span style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 800, fontSize: '0.9rem', color: 'var(--color-text)', textTransform: 'uppercase' }}>
                       {(locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en).slice(0, 2).toUpperCase()}
                     </span>
                   )}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  {/* ツール名（動的 → システムフォント） */}
                   <p style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', margin: 0 }}>
                     {locale === 'ja' ? relatedTool.name_ja : relatedTool.name_en}
                   </p>
@@ -135,7 +188,6 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                {/* 固定テキスト → Fira Sans サブセット */}
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'Noto Sans JP, sans-serif', letterSpacing: '0.05em' }}>
                   ツール情報確認
                 </span>
@@ -164,14 +216,12 @@ export default function NewsDetailContent({ news, relatedTool, relatedNews, loca
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-row-hover)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    {/* 日付（固定文字セット → Fira Sans サブセット） */}
                     <time style={{ flexShrink: 0, fontFamily: 'Fira Sans, system-ui', fontSize: '0.75rem', color: 'var(--color-text-timestamp)' }}>
                       {formatDateShort(item.published_at)}
                     </time>
                     <span style={{ flexShrink: 0, fontSize: '0.65rem', fontWeight: 700, color: itemBadge.color, background: itemBadge.bg, padding: '2px 7px', borderRadius: '3px', border: `1px solid ${itemBadge.border}` }}>
                       {locale === 'ja' ? itemBadge.ja : itemBadge.en}
                     </span>
-                    {/* タイトル（動的 → システムフォント） */}
                     <span style={{ flex: 1, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif', fontSize: '0.85rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {locale === 'ja' ? item.title_ja : item.title_en || item.title_ja}
                     </span>
