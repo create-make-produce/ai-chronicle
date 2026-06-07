@@ -2,7 +2,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllToolSlugs, getAllNewsSlugs, getAllCategories, getAllFeaturesLight } from '@/lib/db';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ai-chron.com';
+const SITE_URL = 'https://ai-chron.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
