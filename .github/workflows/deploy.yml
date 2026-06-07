@@ -30,6 +30,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check NEXT_PUBLIC_SITE_URL
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        run: echo "SITE_URL starts with: ${NEXT_PUBLIC_SITE_URL:0:25}"
+
       - name: Build with OpenNext
         env:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
