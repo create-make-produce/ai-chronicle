@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'AI Chronicle - AIツール最新情報データベース', template: '%s | AI Chronicle' },
   description: '日本語専用AIツールデータベース：世界の最新AIツール情報・ニュース・アップデートをいち早くお届け',
-  openGraph: { type: 'website', siteName: 'AI Chronicle', locale: 'ja_JP', alternateLocale: ['en_US'] },
-  twitter: { card: 'summary_large_image' },
+  openGraph: { type: 'website', siteName: 'AI Chronicle', locale: 'ja_JP', alternateLocale: ['en_US'], images: [{ url: '/og-image.png', width: 1200, height: 630 }] },
+  twitter: { card: 'summary_large_image', images: ['/og-image.png'] },
   robots: { index: true, follow: true },
   alternates: { canonical: '/', languages: { ja: '/', en: '/en', 'x-default': '/' } },
 };
@@ -54,7 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col antialiased" style={{ background: 'var(--color-bg)', overflowX: 'hidden' }}>
+      <body className="min-h-screen flex flex-col antialiased" style={{ background: 'var(--color-bg)', overflowX: 'hidden' }} suppressHydrationWarning>
         <ThemeProvider>
           <Header showFeatures={hasFeatures} />
           {children}
