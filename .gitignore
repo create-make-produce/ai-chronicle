@@ -93,3 +93,6 @@ ph-debug5.mjs
 
 # OpenNext ビルド成果物（APIトークンが含まれるため除外）
 .open-next/
+
+# スクリプト実行ログ（ローカルのみ）
+scripts/log/
