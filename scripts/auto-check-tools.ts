@@ -292,7 +292,10 @@ async function fetchImageBuffer(url: string): Promise<Buffer | null> {
       signal: AbortSignal.timeout(10000),
       headers: { 'User-Agent': CONFIG.SCRAPER_USER_AGENT },
     });
-    if (!res.ok) return null;
+    // Googleファビコンサービスは404でも画像を返す場合があるため、
+    // content-typeがimage/pngならステータスに関わらず取得する
+    const contentType = res.headers.get('content-type') ?? '';
+    if (!res.ok && !contentType.includes('image/')) return null;
     const arrayBuffer = await res.arrayBuffer();
     return Buffer.from(arrayBuffer);
   } catch {
