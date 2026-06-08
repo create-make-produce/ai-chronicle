@@ -294,7 +294,7 @@ function Sec({ children, bg, paddingBottom }: { children: React.ReactNode; bg?: 
 function NewsCardTop({ item, href, lang }: {
   item: {
     id: string; slug: string; title_ja: string; title_en?: string;
-    news_type: string; published_at: string;
+    news_type: string; published_at: string; body_ja?: string;
     tool_name_ja?: string; tool_name_en?: string; tool_logo_url?: string;
     category_slug?: string; category_name_ja?: string;
   };
@@ -347,26 +347,37 @@ function NewsCardTop({ item, href, lang }: {
           {date}
         </span>
       </div>
-      {/* ツール情報（タイトルより上） */}
-      {toolName && (
-        <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
-          {logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt={toolName}
-              style={{ width:'24px', height:'24px', borderRadius:'4px', objectFit:'contain' }} />
-          )}
-          <span style={{ fontSize:'0.92rem', color:'var(--color-text-sub)', fontWeight:700 }}>{toolName}</span>
-        </div>
+      {/* アイコン＋ツール名＋タイトル横並び */}
+      <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px', flexWrap:'wrap' }}>
+        {logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoUrl} alt={toolName ?? ''}
+            style={{ width:'24px', height:'24px', borderRadius:'4px', objectFit:'contain', flexShrink:0 }} />
+        )}
+        {toolName && (
+          <span style={{ fontSize:'0.92rem', color:'var(--color-text-sub)', fontWeight:700, flexShrink:0 }}>{toolName}</span>
+        )}
+        <p style={{
+          fontFamily: lang==='en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif',
+          fontSize:   '1.05rem',
+          fontWeight: 700,
+          color:      'var(--color-text)',
+          margin:     0,
+          lineHeight: 1.5,
+        }}>{title}</p>
+      </div>
+      {/* 概要 */}
+      {item.body_ja && (
+        <p style={{
+          fontFamily: 'Noto Sans JP, system-ui',
+          fontSize:   '0.88rem',
+          color:      'var(--color-text-muted)',
+          margin:     0,
+          lineHeight: 1.7,
+        }}>
+          {item.body_ja.slice(0, 120)}…
+        </p>
       )}
-      {/* タイトル */}
-      <p style={{
-        fontFamily: lang==='en' ? 'Inter, sans-serif' : 'Noto Sans JP, sans-serif',
-        fontSize:   '1.05rem',
-        fontWeight: 700,
-        color:      'var(--color-text)',
-        margin:     0,
-        lineHeight: 1.5,
-      }}>{title}</p>
     </Link>
   );
 }
