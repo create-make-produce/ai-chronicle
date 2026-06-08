@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 import { getAllFeaturesLight } from '@/lib/db';
 import Link from 'next/link';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
