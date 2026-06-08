@@ -312,7 +312,11 @@ async function checkDefaultLogo(db: D1Client): Promise<void> {
   for (const tool of logoTools) {
     if (!tool.logo_url) continue;
     const buf = await fetchImageBuffer(tool.logo_url);
-    if (!buf) continue;
+    if (!buf) {
+      console.log(`  ⚠ ロゴfetch失敗: ${tool.name_en}`);
+      continue;
+    }
+    console.log(`  📐 ${tool.name_en}: ${buf.length}B`);
     if (DEFAULT_LOGO_SIZES.has(buf.length)) {
       console.log(`  🗂 デフォルトロゴ一致(${buf.length}B) → 特別非公開: ${tool.name_en}`);
       if (!isDryRun) {
