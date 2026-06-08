@@ -1,4 +1,5 @@
 // src/app/tool/[slug]/page.tsx
+export const revalidate = 5400;
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import ToolDetailContent from '@/components/ToolDetailContent';
