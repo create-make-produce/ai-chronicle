@@ -279,8 +279,12 @@ function parseResponse(text: string): GeminiResponse {
 }
 
 // =====================
-// グレー地球儀デフォルトロゴ検出
+// グレー地球儀・黒白△デフォルトロゴ検出
 // =====================
+
+// Googleデフォルトファビコンの既知バイト数
+// 地球儀：726バイト、黒白△：1022バイト
+const DEFAULT_LOGO_SIZES = new Set([726, 1022]);
 
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -297,19 +301,8 @@ async function fetchImageBuffer(url: string): Promise<Buffer | null> {
 }
 
 async function checkDefaultLogo(db: D1Client): Promise<void> {
-  console.log('\n🔍 STEP0：グレー地球儀ロゴ検出開始');
+  console.log('\n🔍 STEP0：デフォルトロゴ検出開始（地球儀726B・黒白△1022B）');
 
-  // Googleのデフォルトファビコン（存在しないドメインで取得）
-  const DEFAULT_FAVICON_URL = 'https://www.google.com/s2/favicons?domain=nonexistent-xyz-12345-abc-def.com&sz=128';
-  const defaultBuf = await fetchImageBuffer(DEFAULT_FAVICON_URL);
-  if (!defaultBuf) {
-    console.log('  ⚠ デフォルトロゴの取得に失敗 → STEP0スキップ');
-    return;
-  }
-  const defaultMd5 = require('crypto').createHash('md5').update(defaultBuf).digest('hex');
-  console.log(`  ✅ デフォルトロゴ取得成功 (md5: ${defaultMd5})`);
-
-  // is_published=1のツール全件のlogo_urlを取得
   const logoTools = await db.query<{ id: string; name_en: string; logo_url: string | null }>(
     `SELECT id, name_en, logo_url FROM tools WHERE is_published = 1 AND status = 'active' AND logo_url IS NOT NULL`
   );
@@ -320,23 +313,25 @@ async function checkDefaultLogo(db: D1Client): Promise<void> {
     if (!tool.logo_url) continue;
     const buf = await fetchImageBuffer(tool.logo_url);
     if (!buf) continue;
-    const md5 = require('crypto').createHash('md5').update(buf).digest('hex');
-    if (md5 === defaultMd5) {
-      console.log(`  🗂 デフォルトロゴ一致 → 特別非公開: ${tool.name_en}`);
+    if (DEFAULT_LOGO_SIZES.has(buf.length)) {
+      console.log(`  🗂 デフォルトロゴ一致(${buf.length}B) → 特別非公開: ${tool.name_en}`);
       if (!isDryRun) {
         await db.execute(
-          `UPDATE tools SET is_published=0, status='archived', admin_memo='デフォルトロゴ（グレー地球儀）検出', updated_at=datetime('now') WHERE id=?`,
+          `UPDATE tools SET is_published=0, status='archived', admin_memo='デフォルトロゴ検出(${buf.length}B)', updated_at=datetime('now') WHERE id=?`,
           [tool.id]
         );
       }
       archivedCount++;
     }
-    await sleep(500);
+    await sleep(200);
   }
 
   console.log(`  完了: ${archivedCount}件を特別非公開に設定\n`);
 }
 
+// =====================
+// メイン処理
+// =====================
 // =====================
 // メイン処理
 // =====================
