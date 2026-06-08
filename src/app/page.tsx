@@ -1,6 +1,6 @@
 // src/app/page.tsx
 import { CONFIG } from '@/config';
-export const revalidate = CONFIG.REVALIDATE_TOP_PAGE_SECONDS;
+export const revalidate = 28800;
 
 import HomeContent from '@/components/HomeContent';
 import {
