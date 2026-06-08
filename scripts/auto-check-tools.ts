@@ -279,6 +279,65 @@ function parseResponse(text: string): GeminiResponse {
 }
 
 // =====================
+// グレー地球儀デフォルトロゴ検出
+// =====================
+
+async function fetchImageBuffer(url: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(10000),
+      headers: { 'User-Agent': CONFIG.SCRAPER_USER_AGENT },
+    });
+    if (!res.ok) return null;
+    const arrayBuffer = await res.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch {
+    return null;
+  }
+}
+
+async function checkDefaultLogo(db: D1Client): Promise<void> {
+  console.log('\n🔍 STEP0：グレー地球儀ロゴ検出開始');
+
+  // Googleのデフォルトファビコン（存在しないドメインで取得）
+  const DEFAULT_FAVICON_URL = 'https://www.google.com/s2/favicons?domain=nonexistent-xyz-12345-abc-def.com&sz=128';
+  const defaultBuf = await fetchImageBuffer(DEFAULT_FAVICON_URL);
+  if (!defaultBuf) {
+    console.log('  ⚠ デフォルトロゴの取得に失敗 → STEP0スキップ');
+    return;
+  }
+  const defaultMd5 = require('crypto').createHash('md5').update(defaultBuf).digest('hex');
+  console.log(`  ✅ デフォルトロゴ取得成功 (md5: ${defaultMd5})`);
+
+  // is_published=1のツール全件のlogo_urlを取得
+  const logoTools = await db.query<{ id: string; name_en: string; logo_url: string | null }>(
+    `SELECT id, name_en, logo_url FROM tools WHERE is_published = 1 AND status = 'active' AND logo_url IS NOT NULL`
+  );
+  console.log(`  対象ツール: ${logoTools.length}件`);
+
+  let archivedCount = 0;
+  for (const tool of logoTools) {
+    if (!tool.logo_url) continue;
+    const buf = await fetchImageBuffer(tool.logo_url);
+    if (!buf) continue;
+    const md5 = require('crypto').createHash('md5').update(buf).digest('hex');
+    if (md5 === defaultMd5) {
+      console.log(`  🗂 デフォルトロゴ一致 → 特別非公開: ${tool.name_en}`);
+      if (!isDryRun) {
+        await db.execute(
+          `UPDATE tools SET is_published=0, status='archived', admin_memo='デフォルトロゴ（グレー地球儀）検出', updated_at=datetime('now') WHERE id=?`,
+          [tool.id]
+        );
+      }
+      archivedCount++;
+    }
+    await sleep(500);
+  }
+
+  console.log(`  完了: ${archivedCount}件を特別非公開に設定\n`);
+}
+
+// =====================
 // メイン処理
 // =====================
 
@@ -288,6 +347,11 @@ async function main() {
   console.log('🚀 AI Chronicle - AIツール自動判定開始');
 
   const db = D1Client.fromEnv();
+
+  // =====================
+  // STEP0：グレー地球儀ロゴ検出 → 特別非公開（archived）
+  // =====================
+  await checkDefaultLogo(db);
 
   const tools = await db.query<ToolRow>(
     `SELECT id, name_en, official_url, category_id, company_name
