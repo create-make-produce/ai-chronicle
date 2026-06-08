@@ -1,4 +1,4 @@
-export const revalidate = 1800;
+export const revalidate = 5400;
 
 import { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';

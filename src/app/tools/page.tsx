@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 5400;
 
 import ToolsListContent from '@/components/ToolsListContent';
 import { queryD1 } from '@/lib/db';

@@ -1,4 +1,4 @@
-export const revalidate = 3600;
+export const revalidate = 5400;
 
 import { Metadata } from 'next';
 import PageSelect from '@/components/PageSelect';

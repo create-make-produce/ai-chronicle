@@ -1,6 +1,6 @@
 // src/app/page.tsx
 import { CONFIG } from '@/config';
-export const revalidate = 28800;
+export const revalidate = 5400;
 
 import HomeContent from '@/components/HomeContent';
 import {
