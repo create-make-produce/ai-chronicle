@@ -8,8 +8,11 @@ import { getNewsCount, getNewsPaged } from '@/lib/db';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'AIツール最新ニュース | AI Chronicle',
+  title: 'AIツール最新ニュース',
   description: 'AIツールの新機能・アップデート・最新ニュースをお届け',
+  alternates: {
+    canonical: '/news',
+  },
 };
 
 const PER_PAGE = 50;

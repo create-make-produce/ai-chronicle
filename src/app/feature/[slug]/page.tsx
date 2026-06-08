@@ -4,10 +4,28 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
+import type { Metadata } from 'next';
 
 const theme = PAGE_THEMES.features;
 
-export default async function FeatureDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+interface Params {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const feature = await getFeatureBySlug(slug);
+  if (!feature) return {};
+  return {
+    title: feature.title,
+    description: `${feature.title} - AI Chronicleの特集記事。AIツールの活用事例・レビューをお届けします。`,
+    alternates: {
+      canonical: `/feature/${slug}`,
+    },
+  };
+}
+
+export default async function FeatureDetailPage({ params }: Params) {
   const { slug } = await params;
   const feature = await getFeatureBySlug(slug);
   if (!feature) notFound();

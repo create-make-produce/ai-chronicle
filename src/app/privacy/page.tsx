@@ -1,8 +1,12 @@
 // src/app/privacy/page.tsx
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'プライバシーポリシー | AI Chronicle',
+export const metadata: Metadata = {
+  title: 'プライバシーポリシー',
   description: 'AI Chronicleのプライバシーポリシー。',
+  alternates: {
+    canonical: '/privacy',
+  },
 };
 
 const SECTIONS = [

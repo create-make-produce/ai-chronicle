@@ -4,8 +4,11 @@ import ToolsListContent from '@/components/ToolsListContent';
 import { queryD1 } from '@/lib/db';
 
 export const metadata = {
-  title: 'すべてのAIツール一覧 | AI Chronicle',
+  title: 'すべてのAIツール一覧',
   description: '登録済みのAIツールをすべて一覧表示。カテゴリ・機能で絞り込み可能。',
+  alternates: {
+    canonical: '/tools',
+  },
 };
 
 const PER_PAGE = 12;

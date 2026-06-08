@@ -8,8 +8,11 @@ import { PAGE_THEMES } from '@/lib/page-themes';
 import { queryD1 } from '@/lib/db';
 
 export const metadata: Metadata = {
-  title: '月刊AIアップデート | AI Chronicle',
+  title: '月刊AIアップデート',
   description: '最新アップデートされたAIツールをまとめてチェック。',
+  alternates: {
+    canonical: '/monthly',
+  },
 };
 
 const PER_PAGE = 12;

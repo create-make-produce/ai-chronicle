@@ -3,10 +3,14 @@ import { getAllFeaturesLight } from '@/lib/db';
 import Link from 'next/link';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: '特集 | AI Chronicle',
+export const metadata: Metadata = {
+  title: '特集',
   description: 'AI Chronicleの特集記事一覧。実際に使ったAIツールのレビューや活用事例をお届けします。',
+  alternates: {
+    canonical: '/features',
+  },
 };
 
 const theme = PAGE_THEMES.features;
