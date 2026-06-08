@@ -304,7 +304,7 @@ async function checkDefaultLogo(db: D1Client): Promise<void> {
   console.log('\n🔍 STEP0：デフォルトロゴ検出開始（地球儀726B・黒白△1022B）');
 
   const logoTools = await db.query<{ id: string; name_en: string; logo_url: string | null }>(
-    `SELECT id, name_en, logo_url FROM tools WHERE is_published = 1 AND status = 'active' AND logo_url IS NOT NULL`
+    `SELECT id, name_en, logo_url FROM tools WHERE is_published = 1 AND status = 'active' AND admin_checked = 0 AND logo_url IS NOT NULL`
   );
   console.log(`  対象ツール: ${logoTools.length}件`);
 
