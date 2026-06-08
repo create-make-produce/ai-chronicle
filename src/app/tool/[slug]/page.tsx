@@ -15,12 +15,6 @@ async function getToolNews(toolId: string) {
   );
 }
 
-async function getToolLaunches(toolId: string) {
-  return queryD1(
-    `SELECT * FROM tool_launches WHERE tool_id = ? ORDER BY launch_number DESC LIMIT 100`,
-    [toolId]
-  );
-}
 
 async function getNoteArticles(toolId: string) {
   return queryD1(
@@ -59,10 +53,9 @@ export default async function ToolDetailPage({ params }: Params) {
   const tool = await getToolDetailBySlug(slug);
   if (!tool) notFound();
 
-  const [related, toolNews, toolLaunches, noteArticles, relatedFromRelations, toolFeatures] = await Promise.all([
+  const [related, toolNews, noteArticles, relatedFromRelations, toolFeatures] = await Promise.all([
     getRelatedTools(tool.category_id, tool.id, 6),
     getToolNews(tool.id),
-    getToolLaunches(tool.id),
     getNoteArticles(tool.id),
     getRelatedToolsFromRelations(tool.id),
     getFeaturesByToolId(tool.id),
@@ -74,7 +67,6 @@ export default async function ToolDetailPage({ params }: Params) {
       relatedTools={related}
       locale="ja"
       toolNews={toolNews}
-      toolLaunches={toolLaunches}
       noteArticles={noteArticles}
       relatedToolsFromRelations={relatedFromRelations}
       toolFeatures={toolFeatures as any}

@@ -1,7 +1,7 @@
 'use client';
 // src/components/ToolMediaTabs.tsx
 import { useState, useRef, useEffect } from 'react';
-import type { Locale, ToolLaunch, NoteArticle } from '@/types';
+import type { Locale, NoteArticle } from '@/types';
 
 const NOTES_PER_PAGE = 12;
 
@@ -24,7 +24,6 @@ interface Feature {
 
 interface ToolMediaTabsProps {
   noteArticles: NoteArticle[];
-  launches: ToolLaunch[];
   locale: Locale;
   toolName: string;
   toolLogoUrl?: string | null;

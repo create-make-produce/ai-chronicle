@@ -14,7 +14,7 @@ interface ToolDetailContentProps {
   relatedTools: Tool[];
   locale: Locale;
   toolNews?: News[];
-  toolLaunches?: ToolLaunch[];
+
   noteArticles?: NoteArticle[];
   relatedToolsFromRelations?: Array<{ id: string; slug: string; name_ja: string; name_en: string; tagline_ja: string | null; logo_url: string | null }>;
   toolFeatures?: Array<{ id: string; slug: string; title: string; thumbnail_url: string | null; published_at: string; updated_at: string }>;
@@ -66,7 +66,7 @@ function LinkBadge({ href, icon, topLabel, bottomLabel }: { href: string; icon: 
 }
 
 export default function ToolDetailContent({
-  tool, relatedTools, locale, toolNews = [], toolLaunches = [], noteArticles = [], relatedToolsFromRelations = [], toolFeatures = [],
+  tool, relatedTools, locale, toolNews = [], noteArticles = [], relatedToolsFromRelations = [], toolFeatures = [],
 }: ToolDetailContentProps) {
   const tt          = t[locale];
   const name        = locale === 'ja' ? tool.name_ja : tool.name_en;
@@ -218,7 +218,6 @@ export default function ToolDetailContent({
           <ToolMediaTabs
             noteArticles={noteArticles}
             locale={locale}
-            launches={toolLaunches}
             toolName={name}
             toolLogoUrl={tool.logo_url ?? null}
             relatedTools={relatedToolsFromRelations}
