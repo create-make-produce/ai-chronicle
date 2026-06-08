@@ -236,3 +236,13 @@ INSERT OR IGNORE INTO categories (id, slug, name_ja, name_en, description_ja, de
   ('cat_data',         'data-analysis',    'データ分析',       'Data Analysis',    'データ可視化・統計解析・予測モデル構築のAIツール',                'AI tools for data visualization, statistics, and prediction',    '📊',  6),
   ('cat_productivity', 'productivity',     '業務効率化',       'Productivity',     'タスク管理・自動化・コラボレーションを支援するAIツール',          'AI tools for task management, automation, and collaboration',    '⚡',  7),
   ('cat_other',        'other',            'その他',           'Other',            '上記カテゴリに分類されないAIツール',                              'AI tools that do not fit into the above categories',             '🔧',  8);
+
+-- =============================================
+-- 追加インデックス（V42・2026年6月8日）
+-- tool_note_articlesのRows read削減（26.27M→大幅削減）
+-- =============================================
+CREATE INDEX IF NOT EXISTS idx_note_tool_id ON tool_note_articles(tool_id);
+CREATE INDEX IF NOT EXISTS idx_note_published_at ON tool_note_articles(published_at);
+CREATE INDEX IF NOT EXISTS idx_tools_published ON tools(is_published, status, admin_checked);
+CREATE INDEX IF NOT EXISTS idx_news_published_at ON news(is_published, published_at);
+CREATE INDEX IF NOT EXISTS idx_tools_updated_at ON tools(updated_at);
