@@ -5,7 +5,7 @@ export const CONFIG = {
   // =============================================
   // キャッシュ戦略（ISR revalidate 秒数）
   // =============================================
-  REVALIDATE_TOP_PAGE_SECONDS: 1800,
+  REVALIDATE_TOP_PAGE_SECONDS: 28800,
   REVALIDATE_TOOL_PAGE_SECONDS: 86400,
   REVALIDATE_CATEGORY_PAGE_SECONDS: 3600,
 

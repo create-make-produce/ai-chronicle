@@ -246,3 +246,5 @@ CREATE INDEX IF NOT EXISTS idx_note_published_at ON tool_note_articles(published
 CREATE INDEX IF NOT EXISTS idx_tools_published ON tools(is_published, status, admin_checked);
 CREATE INDEX IF NOT EXISTS idx_news_published_at ON news(is_published, published_at);
 CREATE INDEX IF NOT EXISTS idx_tools_updated_at ON tools(updated_at);
+CREATE INDEX IF NOT EXISTS idx_note_likes ON tool_note_articles(likes_count);
+CREATE INDEX IF NOT EXISTS idx_tool_relations_a ON tool_relations(tool_id_a);

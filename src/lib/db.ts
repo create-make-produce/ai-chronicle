@@ -376,45 +376,59 @@ export interface CategoryNoteArticles {
 
 export async function getTopNoteArticlesByCategory(limitPerCategory = 10): Promise<CategoryNoteArticles[]> {
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-  const rows = await queryD1<NoteArticleForTop>(
-    `SELECT
-       na.id, na.title, na.thumbnail_url, na.note_url, na.likes_count, na.published_at,
-       c.id as category_id, c.name_ja as category_name_ja, c.name_en as category_name_en,
-       c.slug as category_slug, c.sort_order as category_sort_order
-     FROM tool_note_articles na
-     JOIN tools t ON na.tool_id = t.id
-     JOIN categories c ON t.category_id = c.id
-     WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1
-       AND na.thumbnail_url IS NOT NULL
-       AND na.thumbnail_url != ''
-       AND na.published_at >= ?
-     ORDER BY c.sort_order ASC, na.likes_count DESC
-     LIMIT 500`,
-    [since],
+  const fetchPerCategory = 30
+
+  // カテゴリ一覧を取得
+  const categories = await queryD1<{ id: string; name_ja: string; name_en: string; slug: string; sort_order: number }>(
+    `SELECT id, name_ja, name_en, slug, sort_order FROM categories ORDER BY sort_order ASC`,
   )
 
-  const map = new Map<string, CategoryNoteArticles>()
+  // カテゴリごとに並列で30件取得
+  const results = await Promise.all(
+    categories.map(cat =>
+      queryD1<NoteArticleForTop>(
+        `SELECT
+           na.id, na.title, na.thumbnail_url, na.note_url, na.likes_count, na.published_at,
+           ? as category_id, ? as category_name_ja, ? as category_name_en,
+           ? as category_slug, ? as category_sort_order
+         FROM tool_note_articles na
+         JOIN tools t ON na.tool_id = t.id
+         WHERE t.is_published = 1 AND t.status = 'active' AND t.admin_checked = 1
+           AND t.category_id = ?
+           AND na.thumbnail_url IS NOT NULL
+           AND na.thumbnail_url != ''
+           AND na.published_at >= ?
+         ORDER BY na.likes_count DESC
+         LIMIT ?`,
+        [cat.id, cat.name_ja, cat.name_en, cat.slug, cat.sort_order, cat.id, since, fetchPerCategory],
+      )
+    )
+  )
+
+  // カテゴリごとに重複URL除去・limitPerCategory件に絞る
   const seenUrls = new Set<string>()
-  for (const row of rows) {
-    if (seenUrls.has(row.note_url)) continue
-    seenUrls.add(row.note_url)
-    if (!map.has(row.category_id)) {
-      map.set(row.category_id, {
-        category_id: row.category_id,
-        category_name_ja: row.category_name_ja,
-        category_name_en: (row as any).category_name_en ?? '',
-        category_slug: row.category_slug,
-        sort_order: row.category_sort_order,
-        articles: [],
-      })
+  const categoryNotes: CategoryNoteArticles[] = []
+
+  for (let i = 0; i < categories.length; i++) {
+    const cat = categories[i]
+    const articles: NoteArticleForTop[] = []
+    for (const row of results[i]) {
+      if (seenUrls.has(row.note_url)) continue
+      seenUrls.add(row.note_url)
+      articles.push(row)
+      if (articles.length >= limitPerCategory) break
     }
-    const cat = map.get(row.category_id)!
-    if (cat.articles.length < limitPerCategory) {
-      cat.articles.push(row)
-    }
+    categoryNotes.push({
+      category_id: cat.id,
+      category_name_ja: cat.name_ja,
+      category_name_en: cat.name_en,
+      category_slug: cat.slug,
+      sort_order: cat.sort_order,
+      articles,
+    })
   }
 
-  return Array.from(map.values()).sort((a, b) => a.sort_order - b.sort_order)
+  return categoryNotes
 }
 
 // =============================================

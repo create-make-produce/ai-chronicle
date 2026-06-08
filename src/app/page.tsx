@@ -1,5 +1,6 @@
 // src/app/page.tsx
-export const dynamic = 'force-dynamic';
+import { CONFIG } from '@/config';
+export const revalidate = CONFIG.REVALIDATE_TOP_PAGE_SECONDS;
 
 import HomeContent from '@/components/HomeContent';
 import {
@@ -11,7 +12,6 @@ import {
   getAllFeatures,
   getRecentFeatures,
 } from '@/lib/db';
-import { CONFIG } from '@/config';
 
 export default async function HomePage() {
   const [toolCount, latestNews, newTools, categories, categoryNotes, allFeatures, recentFeatures] = await Promise.all([
