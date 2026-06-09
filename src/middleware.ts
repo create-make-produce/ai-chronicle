@@ -24,15 +24,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // =============================================
-  // /en/* → 日本語パスに301リダイレクト
-  // =============================================
-  if (pathname.startsWith('/en')) {
-    const url = req.nextUrl.clone();
-    url.pathname = pathname.replace(/^\/en/, '') || '/';
-    return NextResponse.redirect(url, 301);
-  }
-
   return NextResponse.next();
 }
 
