@@ -178,10 +178,9 @@ export default function HomeContent(p: HomeContentProps) {
             lineHeight: 1.7,
           }}>直近1ヶ月以内にNoteで公開され、多く読まれている記事をご紹介します。</p>
           <style>{`
-            .note-slider::-webkit-scrollbar { height: 4px; }
-            .note-slider::-webkit-scrollbar-track { background: var(--color-border); border-radius: 2px; }
-            .note-slider::-webkit-scrollbar-thumb { background: var(--color-border-mid); border-radius: 2px; }
-            .note-slider::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+            .note-slider::-webkit-scrollbar { height: 8px; }
+            .note-slider::-webkit-scrollbar-track { background: var(--color-border); border-radius: 4px; }
+            .note-slider::-webkit-scrollbar-thumb { border-radius: 4px; }
             @media (max-width: 767px) { .note-card { width: 72vw !important; } }
             .note-card:hover .note-thumb { transform: scale(1.04); }
             .note-card:hover .note-title { color: var(--color-accent) !important; }
@@ -215,12 +214,13 @@ export default function HomeContent(p: HomeContentProps) {
                   </div>
 
                   {/* スライダー */}
-                  <div className="note-slider" style={{
+                  <div className={`note-slider note-slider-${cat.category_slug}`} style={{
                     display: 'flex', gap: '14px',
                     overflowX: 'auto', overflowY: 'hidden',
                     paddingBottom: '8px',
                     WebkitOverflowScrolling: 'touch' as any,
                   }}>
+                    <style>{`.note-slider-${cat.category_slug}::-webkit-scrollbar-thumb { background: ${pastel.border}; } .note-slider-${cat.category_slug}::-webkit-scrollbar-thumb:hover { background: ${pastel.color}; }`}</style>
                     {cat.articles.map(article => (
                       <a key={article.id} className="note-card"
                         href={article.note_url} target="_blank" rel="noopener noreferrer"
@@ -501,9 +501,9 @@ function ToolSlider({ tools, locale, categories, tt }: {
   return (
     <div>
       <style>{`
-        #tool-slider::-webkit-scrollbar { height: 4px; }
-        #tool-slider::-webkit-scrollbar-track { background: var(--color-border); border-radius: 2px; }
-        #tool-slider::-webkit-scrollbar-thumb { background: var(--color-border-mid); border-radius: 2px; }
+        #tool-slider::-webkit-scrollbar { height: 8px; }
+        #tool-slider::-webkit-scrollbar-track { background: var(--color-border); border-radius: 4px; }
+        #tool-slider::-webkit-scrollbar-thumb { background: rgba(0,140,237,0.3); border-radius: 4px; }
         #tool-slider::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
         @media (max-width: 767px) {
           .tool-slider-card { width: calc(72vw) !important; }
