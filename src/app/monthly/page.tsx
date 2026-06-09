@@ -1,19 +1,27 @@
 export const revalidate = 5400;
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import PageSelect from '@/components/PageSelect';
 import ToolCard from '@/components/ToolCard';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
 import { queryD1 } from '@/lib/db';
 
-export const metadata: Metadata = {
-  title: '月刊AIアップデート',
-  description: '最新アップデートされたAIツールをまとめてチェック。',
-  alternates: {
-    canonical: '/monthly',
-  },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ p?: string }>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const page = Math.max(1, parseInt(sp.p ?? '1', 10) || 1);
+  return {
+    title: '月刊AIアップデート',
+    description: '最新アップデートされたAIツールをまとめてチェック。',
+    alternates: {
+      canonical: page > 1 ? `/monthly?p=${page}` : '/monthly',
+    },
+  };
+}
 
 const PER_PAGE = 12;
 const theme    = PAGE_THEMES.monthly;

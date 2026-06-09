@@ -1,19 +1,27 @@
 export const revalidate = 5400;
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import NewsRow from '@/components/NewsRow';
 import PageHero, { PageHeroTitle } from '@/components/PageHero';
 import { PAGE_THEMES } from '@/lib/page-themes';
 import { getNewsCount, getNewsPaged } from '@/lib/db';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'AIツール最新ニュース',
-  description: 'AIツールの新機能・アップデート・最新ニュースをお届け',
-  alternates: {
-    canonical: '/news',
-  },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1);
+  return {
+    title: 'AIツール最新ニュース',
+    description: 'AIツールの新機能・アップデート・最新ニュースをお届け',
+    alternates: {
+      canonical: page > 1 ? `/news?page=${page}` : '/news',
+    },
+  };
+}
 
 const PER_PAGE = 50;
 

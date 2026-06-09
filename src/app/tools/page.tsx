@@ -1,15 +1,24 @@
 export const revalidate = 5400;
 
+import type { Metadata } from 'next';
 import ToolsListContent from '@/components/ToolsListContent';
 import { queryD1 } from '@/lib/db';
 
-export const metadata = {
-  title: 'すべてのAIツール一覧',
-  description: '登録済みのAIツールをすべて一覧表示。カテゴリ・機能で絞り込み可能。',
-  alternates: {
-    canonical: '/tools',
-  },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ cat?: string; q?: string; p?: string }>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const cat = sp.cat ?? '';
+  return {
+    title: 'すべてのAIツール一覧',
+    description: '登録済みのAIツールをすべて一覧表示。カテゴリ・機能で絞り込み可能。',
+    alternates: {
+      canonical: cat ? `/tools?cat=${cat}` : '/tools',
+    },
+  };
+}
 
 const PER_PAGE = 12;
 
