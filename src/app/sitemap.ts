@@ -1,6 +1,6 @@
 // src/app/sitemap.ts - updated
 import type { MetadataRoute } from 'next';
-import { getAllToolSlugs, getAllNewsSlugs, getAllCategories, getAllFeaturesLight } from '@/lib/db';
+import { getAllToolSlugs, getAllNewsSlugs, getAllFeaturesLight } from '@/lib/db';
 
 const SITE_URL = 'https://ai-chron.com';
 
@@ -28,14 +28,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 動的ページ（DB取得失敗時はスキップ）
   let toolEntries: MetadataRoute.Sitemap = [];
-  let categoryEntries: MetadataRoute.Sitemap = [];
   let newsEntries: MetadataRoute.Sitemap = [];
   let featureEntries: MetadataRoute.Sitemap = [];
 
   try {
-    const [toolSlugs, categories, newsSlugs, features] = await Promise.all([
+    const [toolSlugs, newsSlugs, features] = await Promise.all([
       getAllToolSlugs(),
-      getAllCategories(),
       getAllNewsSlugs(),
       getAllFeaturesLight().catch(() => []),
     ]);
@@ -45,13 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
-    }));
-
-    categoryEntries = categories.map((cat) => ({
-      url: `${SITE_URL}/category/${cat.slug}`,
-      lastModified: now,
-      changeFrequency: 'daily' as const,
-      priority: 0.7,
     }));
 
     newsEntries = newsSlugs.map((slug) => ({
@@ -71,5 +62,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[sitemap] failed to fetch dynamic entries:', e);
   }
 
-  return [...staticEntries, ...toolEntries, ...categoryEntries, ...newsEntries, ...featureEntries];
+  return [...staticEntries, ...toolEntries, ...newsEntries, ...featureEntries];
 }
