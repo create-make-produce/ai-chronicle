@@ -11,12 +11,20 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const sp = await searchParams;
   const cat = sp.cat ?? '';
+  const q = sp.q ?? '';
+  const p = parseInt(sp.p ?? '1', 10) || 1;
+
+  let canonical = '/tools';
+  const params: string[] = [];
+  if (cat) params.push(`cat=${cat}`);
+  if (q) params.push(`q=${encodeURIComponent(q)}`);
+  if (p > 1) params.push(`p=${p}`);
+  if (params.length > 0) canonical = `/tools?${params.join('&')}`;
+
   return {
     title: 'すべてのAIツール一覧',
     description: '登録済みのAIツールをすべて一覧表示。カテゴリ・機能で絞り込み可能。',
-    alternates: {
-      canonical: cat ? `/tools?cat=${cat}` : '/tools',
-    },
+    alternates: { canonical },
   };
 }
 
