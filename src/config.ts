@@ -58,7 +58,7 @@ export const CONFIG = {
   // =============================================
   CHECK_AI_MODEL_LIGHT: 'gemini-3.1-flash-lite',  // 未処理多い時（高速・低コスト）
   CHECK_AI_MODEL_HEAVY: 'gemini-3.5-flash',        // 未処理少ない時（高精度）
-  CHECK_AI_MODEL_THRESHOLD: 20,                    // この件数以下ならHEAVYを使用
+  CHECK_AI_MODEL_THRESHOLD: 6,                     // この件数以下ならHEAVYを使用
 
   // =============================================
   // スクレイピング設定
