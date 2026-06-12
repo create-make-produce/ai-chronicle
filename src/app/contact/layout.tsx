@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'お問い合わせ | AI Chronicle',
+  title: 'お問い合わせ',
   description: 'AI Chronicleへのお問い合わせはこちらから。',
   alternates: {
     canonical: '/contact',
