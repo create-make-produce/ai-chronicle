@@ -1,6 +1,8 @@
 // src/app/about/page.tsx
 import type { Metadata } from 'next';
 
+export const revalidate = 5400;
+
 export const metadata: Metadata = {
   title: '運営について',
   description: 'AI Chronicleの運営方針・監修体制・サイトコンセプトについてご紹介します。',

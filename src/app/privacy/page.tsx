@@ -1,6 +1,8 @@
 // src/app/privacy/page.tsx
 import type { Metadata } from 'next';
 
+export const revalidate = 5400;
+
 export const metadata: Metadata = {
   title: 'プライバシーポリシー',
   description: 'AI Chronicleのプライバシーポリシー。',
