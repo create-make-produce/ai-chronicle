@@ -91,7 +91,7 @@ export default function ToolDetailContent({
           breadcrumbs={[
             { label: tt.navHome, href: localizedPath(locale, '/') },
             { label: 'すべてのAI', href: localizedPath(locale, '/tools') },
-            ...(tool.category ? [{ label: tool.category.name_ja, href: localizedPath(locale, `/category/${tool.category.slug}`) }] : []),
+            ...(tool.category ? [{ label: tool.category.name_ja, href: localizedPath(locale, `/tools?cat=${tool.category.slug}`) }] : []),
             { label: name },
           ]}
           label="AI TOOL"

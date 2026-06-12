@@ -1,6 +1,11 @@
 // src/app/page.tsx
+import type { Metadata } from 'next';
 import { CONFIG } from '@/config';
 export const revalidate = 5400;
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 import HomeContent from '@/components/HomeContent';
 import {

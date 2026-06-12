@@ -2,6 +2,8 @@
 import type { MetadataRoute } from 'next';
 import { getAllToolSlugs, getAllNewsSlugs, getAllFeaturesLight } from '@/lib/db';
 
+export const revalidate = 5400;
+
 const SITE_URL = 'https://ai-chron.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

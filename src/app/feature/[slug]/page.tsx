@@ -1,4 +1,4 @@
-export const revalidate = 86400;
+export const revalidate = 5400;
 import { getFeatureBySlug } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';

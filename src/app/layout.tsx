@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   openGraph: { type: 'website', siteName: 'AI Chronicle', locale: 'ja_JP', images: [{ url: '/og-image.png', width: 1200, height: 630 }] },
   twitter: { card: 'summary_large_image', images: ['/og-image.png'] },
   robots: { index: true, follow: true },
-  alternates: { canonical: '/' },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
