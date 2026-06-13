@@ -32,6 +32,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-F28WYMCPT1');`,
           }}
         />
+        {/* Google AdSense */}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1103390207780412" crossOrigin="anonymous" />
         {/* Google Fonts CDN経由（自己ホスティング廃止・Workers負荷軽減） */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
