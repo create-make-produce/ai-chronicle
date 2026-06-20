@@ -384,12 +384,12 @@ async function main() {
     const tool = tools[i];
     console.log(`[${i + 1}/${tools.length}] ${tool.name_en}`);
 
-    // URLなし → review
+    // URLなし → 非公開
     if (!tool.official_url) {
-      console.log('  ⏭ URLなし → review');
+      console.log('  ⏭ URLなし → 非公開');
       if (!isDryRun) {
         await db.execute(
-          `UPDATE tools SET status='pending', is_published=0, updated_at=datetime('now') WHERE id=?`,
+          `UPDATE tools SET status='inactive', is_published=0, updated_at=datetime('now') WHERE id=?`,
           [tool.id]
         );
       }
@@ -407,34 +407,15 @@ async function main() {
         if (rawPageText && rawPageText.length < 100) {
           console.log(`  ⚠ サイト取得: ${rawPageText.length}文字（100文字未満のため失敗扱い）`);
         }
-        // サイト取得失敗 → 同会社名の既存ツールがあれば保留・なければ非公開
-        let hasSameCompany = false;
-        if (tool.company_name) {
-          const sameCompany = await db.query<{ cnt: number }>(
-            `SELECT COUNT(*) as cnt FROM tools WHERE company_name=? AND id!=? AND status='active' AND is_published=1`,
-            [tool.company_name, tool.id]
+        // サイト取得失敗 → 非公開
+        console.log('  ⚠ サイト取得失敗 → 非公開');
+        if (!isDryRun) {
+          await db.execute(
+            `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
+            [tool.id]
           );
-          hasSameCompany = (sameCompany[0]?.cnt ?? 0) > 0;
         }
-        if (hasSameCompany) {
-          console.log(`  ⚠ サイト取得失敗 + 同会社名あり → 保留`);
-          if (!isDryRun) {
-            await db.execute(
-              `UPDATE tools SET is_published=0, status='pending', admin_memo='同会社の既存ツールあり', updated_at=datetime('now') WHERE id=?`,
-              [tool.id]
-            );
-          }
-          reviewCount++;
-        } else {
-          console.log('  ⚠ サイト取得失敗 → 非公開');
-          if (!isDryRun) {
-            await db.execute(
-              `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
-              [tool.id]
-            );
-          }
-          notAiCount++;
-        }
+        notAiCount++;
         continue;
       }
 
@@ -484,29 +465,21 @@ async function main() {
           );
           notAiCount++;
         } else {
-          // review判定：会社名が空なら非公開・あれば保留
-          if (companyIsEmpty && !parsed.company_name) {
-            console.log('  ❌ review + 会社名なし → 非公開');
+          // review判定：保留を廃止し一律非公開
+          if (companyIsEmpty && parsed.company_name) {
+            console.log(`  🏢 会社名取得: ${parsed.company_name} → 非公開`);
             await db.execute(
-              `UPDATE tools SET is_published=0, status='inactive', updated_at=datetime('now') WHERE id=?`,
+              `UPDATE tools SET status='inactive', is_published=0, company_name=?, updated_at=datetime('now') WHERE id=?`,
+              [parsed.company_name, tool.id]
+            );
+          } else {
+            console.log('  ❌ review → 非公開');
+            await db.execute(
+              `UPDATE tools SET status='inactive', is_published=0, updated_at=datetime('now') WHERE id=?`,
               [tool.id]
             );
-            notAiCount++;
-          } else {
-            if (companyIsEmpty && parsed.company_name) {
-              console.log(`  🏢 会社名取得: ${parsed.company_name}`);
-              await db.execute(
-                `UPDATE tools SET status='pending', is_published=0, company_name=?, admin_memo='サイト内容がツールと無関係', updated_at=datetime('now') WHERE id=?`,
-                [parsed.company_name, tool.id]
-              );
-            } else {
-              await db.execute(
-                `UPDATE tools SET status='pending', is_published=0, admin_memo='サイト内容がツールと無関係', updated_at=datetime('now') WHERE id=?`,
-                [tool.id]
-              );
-            }
-            reviewCount++;
           }
+          notAiCount++;
         }
       } else {
         if (parsed.result === 'ai') aiCount++;

@@ -395,7 +395,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
     
     const toolStatus = judgeResult.status;
     if (reasons.length > 0) console.log(`  ⚠ 非公開理由: ${reasons.join(', ')}`);
-    const finalPublished = toolStatus === 'pending' ? 0 : isPublished;
+    const finalPublished = isPublished;
 
     if (!hasOfficialUrl) {
       console.log(`  ⚠️ 公式URLなし → 非公開で登録: ${post.name}`);
@@ -457,7 +457,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
 
     // 新規ツールの最初のローンチとしてPH投稿を保存
 
-    console.log(`  ✅ 登録完了: ${slug}（${finalPublished ? '公開' : toolStatus === 'pending' ? '保留' : '非公開'}）`);
+    console.log(`  ✅ 登録完了: ${slug}（${finalPublished ? '公開' : '非公開'}）`);
 
     // 同じ会社名の既存ツールと関連AIツール登録
     if (extracted.company_name) {
@@ -466,12 +466,8 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
         [extracted.company_name, toolId]
       );
       if (sameCompany.length > 0) {
-        // 同会社のツールが既存にある場合は保留に変更
-        await db.execute(
-          `UPDATE tools SET status = 'pending', is_published = 0, admin_memo = '同会社の既存ツールあり' WHERE id = ?`,
-          [toolId]
-        );
-        console.log(`  ⚠ 同会社ツール検出のため保留に変更: ${extracted.company_name}`);
+        // 同会社ツールがあっても公開のまま（保留にしない）
+        console.log(`  ℹ 同会社ツール検出（公開のまま）: ${extracted.company_name}`);
       }
       for (const related of sameCompany) {
         await db.execute(
@@ -486,7 +482,7 @@ async function processSingleTool(db: D1Client, post: ProductHuntPost): Promise<{
       }
     }
 
-    if (finalPublished || toolStatus === 'pending') {
+    if (finalPublished) {
       // 24時間以内に同ツールのニュースが既にある場合はスキップ
       const recentNews = await db.first<{ id: string }>(
         `SELECT id FROM news WHERE tool_id = ? AND published_at > datetime('now', '-24 hours') LIMIT 1`,
