@@ -34,6 +34,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
         {/* Google AdSense */}
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1103390207780412" crossOrigin="anonymous" />
+        {/* 忍者AdMax */}
+        <script async src="https://adm.shinobi.jp/st/auto.js" data-admax-id="3d3d1a894228195d2b22d810b064155e" />
         {/* Google Fonts CDN経由（自己ホスティング廃止・Workers負荷軽減） */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
